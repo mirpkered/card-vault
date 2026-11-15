@@ -34,7 +34,9 @@ Data is stored as a versioned JSON envelope (`schemaVersion`, `updatedAt`, `cata
 
 ## GitHub Pages
 
-The `.github/workflows/deploy.yml` workflow builds and publishes the `main` branch to GitHub Pages when enabled for the repository. Its Vite base path is set for a repository named `card-vault`. Change `base` in `vite.config.ts` and the workflow setting if the Pages repository name differs. Deployment has not been run or verified for this project.
+The `.github/workflows/deploy.yml` workflow builds and publishes the `main` branch to GitHub Pages. The live app is [Card Vault](https://mirpkered.github.io/card-vault/). The Pages build was verified after deployment. Its Vite base path is set for a repository named `card-vault`; change `base` in `vite.config.ts` and the workflow setting if the repository name differs.
+
+On iPhone, open the app in Safari and use **Share → Add to Home Screen**. Use **Import** in the app to load a JSON backup from Files. Catalog and inventory data stay in that browser’s IndexedDB and are not uploaded to the public repository. Private GitHub synchronization is not connected.
 
 ## Synchronization and security
 
