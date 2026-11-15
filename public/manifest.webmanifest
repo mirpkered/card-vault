@@ -1,0 +1,11 @@
+{
+  "name": "Card Vault — Collection Tracker",
+  "short_name": "Card Vault",
+  "description": "A quiet home for every card in your collection.",
+  "start_url": ".",
+  "scope": ".",
+  "display": "standalone",
+  "background_color": "#111313",
+  "theme_color": "#111313",
+  "icons": [{ "src": "./vault.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any maskable" }]
+}
