@@ -84,6 +84,20 @@ python scripts/import_naruto_package.py "/path/to/card-vault-naruto-import-packa
 
 The generated inventory backup stays local and contains personal data. `private-data/` is ignored by Git and excluded from the production build. The app keeps imported ownership quantities separate from the public catalog definitions and image links.
 
+## Final Fantasy TCG catalog
+
+The Memories of Life (Opus 30) catalog import contains the 118 standard card definitions published by Square Enix, with verified names, rarity codes, and direct links to exact card images on the official CDN. Image files are not copied into this repository. The product announcement also describes 12 Heavensward starter-exclusive cards and premium, foil, and alternate-art printings; this first checklist does not create separate quantity slots for those items. No ownership quantities are included.
+
+On the app, review the **Memories of Life catalog is ready** banner and select **Add checklist** to add the release. The operation adds the Square Enix publisher, Final Fantasy franchise, Final Fantasy TCG series, set, card definitions, and official image links. It preserves existing ownership and user-provided images and does not overwrite conflicting catalog records.
+
+To refresh the catalog file from the official card browser, run:
+
+```sh
+npm run catalog:fftcg:memories-of-life
+```
+
+The importer filters the official browser to Memories of Life's 118 standard records, validates the per-rarity counts, namespaced identities, and official image hosts, then writes `public/fftcg-memories-of-life.json`. It stops without writing if the source structure or expected counts change. Source references: [Square Enix card browser](https://fftcg.square-enix-games.com/na/card-browser) and [Memories of Life product announcement](https://fftcg.square-enix-games.com/na/news/new-product-information-memories-of-life-booster-set).
+
 ## Validate
 
 ```sh

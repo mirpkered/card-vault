@@ -1,0 +1,736 @@
+{
+  "schemaVersion": 1,
+  "source": "Square Enix official Card Browser",
+  "cataloguedAt": "2026-11-16T21:16:37.463Z",
+  "browserUrl": "https://fftcg.square-enix-games.com/na/card-browser",
+  "productUrl": "https://fftcg.square-enix-games.com/na/news/new-product-information-memories-of-life-booster-set",
+  "release": {
+    "id": "set:final-fantasy-tcg:memories-of-life",
+    "seriesId": "series:final-fantasy-tcg",
+    "name": "Memories of Life",
+    "releaseNumber": "Opus 30",
+    "expectedCardCount": 118,
+    "rarityScheme": [
+      "C",
+      "R",
+      "H",
+      "L"
+    ],
+    "rarityCounts": {
+      "C": 48,
+      "R": 30,
+      "H": 26,
+      "L": 14
+    }
+  },
+  "cards": [
+    {
+      "number": "30-001H",
+      "name": "Auron",
+      "rarity": "H",
+      "imageUrl": "https://fftcg.cdn.sewest.net/images/cards/full/30-001H_FL_eg.jpg"
+    },
+    {
+      "number": "30-002C",
+      "name": "Ifrit",
+      "rarity": "C",
+      "imageUrl": "https://fftcg.cdn.sewest.net/images/cards/full/30-002C_eg.jpg"
+    },
+    {
+      "number": "30-003H",
+      "name": "Edgar",
+      "rarity": "H",
+      "imageUrl": "https://fftcg.cdn.sewest.net/images/cards/full/30-003H_eg.jpg"
+    },
+    {
+      "number": "30-004R",
+      "name": "Scorpion Sentinel",
+      "rarity": "R",
+      "imageUrl": "https://fftcg.cdn.sewest.net/images/cards/full/30-004R_eg.jpg"
+    },
+    {
+      "number": "30-005C",
+      "name": "Samurai",
+      "rarity": "C",
+      "imageUrl": "https://fftcg.cdn.sewest.net/images/cards/full/30-005C_eg.jpg"
+    },
+    {
+      "number": "30-006C",
+      "name": "Amarant",
+      "rarity": "C",
+      "imageUrl": "https://fftcg.cdn.sewest.net/images/cards/full/30-006C_eg.jpg"
+    },
+    {
+      "number": "30-007L",
+      "name": "Jecht",
+      "rarity": "L",
+      "imageUrl": "https://fftcg.cdn.sewest.net/images/cards/full/30-007L_FL_eg.jpg"
+    },
+    {
+      "number": "30-008C",
+      "name": "Zidane",
+      "rarity": "C",
+      "imageUrl": "https://fftcg.cdn.sewest.net/images/cards/full/30-008C_eg.jpg"
+    },
+    {
+      "number": "30-009C",
+      "name": "Bangaa",
+      "rarity": "C",
+      "imageUrl": "https://fftcg.cdn.sewest.net/images/cards/full/30-009C_eg.jpg"
+    },
+    {
+      "number": "30-010C",
+      "name": "Vivi",
+      "rarity": "C",
+      "imageUrl": "https://fftcg.cdn.sewest.net/images/cards/full/30-010C_eg.jpg"
+    },
+    {
+      "number": "30-011R",
+      "name": "Blank",
+      "rarity": "R",
+      "imageUrl": "https://fftcg.cdn.sewest.net/images/cards/full/30-011R_eg.jpg"
+    },
+    {
+      "number": "30-012R",
+      "name": "Marcus",
+      "rarity": "R",
+      "imageUrl": "https://fftcg.cdn.sewest.net/images/cards/full/30-012R_eg.jpg"
+    },
+    {
+      "number": "30-013C",
+      "name": "Mazurka",
+      "rarity": "C",
+      "imageUrl": "https://fftcg.cdn.sewest.net/images/cards/full/30-013C_eg.jpg"
+    },
+    {
+      "number": "30-014L",
+      "name": "Sabin",
+      "rarity": "L",
+      "imageUrl": "https://fftcg.cdn.sewest.net/images/cards/full/30-014L_eg.jpg"
+    },
+    {
+      "number": "30-015R",
+      "name": "Luneth",
+      "rarity": "R",
+      "imageUrl": "https://fftcg.cdn.sewest.net/images/cards/full/30-015R_eg.jpg"
+    },
+    {
+      "number": "30-016H",
+      "name": "Lulu",
+      "rarity": "H",
+      "imageUrl": "https://fftcg.cdn.sewest.net/images/cards/full/30-016H_FL_eg.jpg"
+    },
+    {
+      "number": "30-017C",
+      "name": "Leon",
+      "rarity": "C",
+      "imageUrl": "https://fftcg.cdn.sewest.net/images/cards/full/30-017C_eg.jpg"
+    },
+    {
+      "number": "30-018C",
+      "name": "Blue Mage",
+      "rarity": "C",
+      "imageUrl": "https://fftcg.cdn.sewest.net/images/cards/full/30-018C_eg.jpg"
+    },
+    {
+      "number": "30-019R",
+      "name": "Alaya Rundall",
+      "rarity": "R",
+      "imageUrl": "https://fftcg.cdn.sewest.net/images/cards/full/30-019R_eg.jpg"
+    },
+    {
+      "number": "30-020R",
+      "name": "Omega",
+      "rarity": "R",
+      "imageUrl": "https://fftcg.cdn.sewest.net/images/cards/full/30-020R_eg.jpg"
+    },
+    {
+      "number": "30-021H",
+      "name": "Gestahlian Empire Cid",
+      "rarity": "H",
+      "imageUrl": "https://fftcg.cdn.sewest.net/images/cards/full/30-021H_eg.jpg"
+    },
+    {
+      "number": "30-022C",
+      "name": "Glenn",
+      "rarity": "C",
+      "imageUrl": "https://fftcg.cdn.sewest.net/images/cards/full/30-022C_eg.jpg"
+    },
+    {
+      "number": "30-023H",
+      "name": "Seymour",
+      "rarity": "H",
+      "imageUrl": "https://fftcg.cdn.sewest.net/images/cards/full/30-023H_FL_eg.jpg"
+    },
+    {
+      "number": "30-024C",
+      "name": "Styx",
+      "rarity": "C",
+      "imageUrl": "https://fftcg.cdn.sewest.net/images/cards/full/30-024C_eg.jpg"
+    },
+    {
+      "number": "30-025C",
+      "name": "Strago",
+      "rarity": "C",
+      "imageUrl": "https://fftcg.cdn.sewest.net/images/cards/full/30-025C_eg.jpg"
+    },
+    {
+      "number": "30-026R",
+      "name": "Zenos",
+      "rarity": "R",
+      "imageUrl": "https://fftcg.cdn.sewest.net/images/cards/full/30-026R_eg.jpg"
+    },
+    {
+      "number": "30-027C",
+      "name": "Celes",
+      "rarity": "C",
+      "imageUrl": "https://fftcg.cdn.sewest.net/images/cards/full/30-027C_eg.jpg"
+    },
+    {
+      "number": "30-028H",
+      "name": "Fina",
+      "rarity": "H",
+      "imageUrl": "https://fftcg.cdn.sewest.net/images/cards/full/30-028H_FL_eg.jpg"
+    },
+    {
+      "number": "30-029R",
+      "name": "Hraesvelgr",
+      "rarity": "R",
+      "imageUrl": "https://fftcg.cdn.sewest.net/images/cards/full/30-029R_eg.jpg"
+    },
+    {
+      "number": "30-030C",
+      "name": "Mini Fighter",
+      "rarity": "C",
+      "imageUrl": "https://fftcg.cdn.sewest.net/images/cards/full/30-030C_FL_eg.jpg"
+    },
+    {
+      "number": "30-031C",
+      "name": "Mog (XIII-2)",
+      "rarity": "C",
+      "imageUrl": "https://fftcg.cdn.sewest.net/images/cards/full/30-031C_eg.jpg"
+    },
+    {
+      "number": "30-032L",
+      "name": "Roca",
+      "rarity": "L",
+      "imageUrl": "https://fftcg.cdn.sewest.net/images/cards/full/30-032L_FL_eg.jpg"
+    },
+    {
+      "number": "30-033C",
+      "name": "Roghza Ovis",
+      "rarity": "C",
+      "imageUrl": "https://fftcg.cdn.sewest.net/images/cards/full/30-033C_eg.jpg"
+    },
+    {
+      "number": "30-034L",
+      "name": "Locke",
+      "rarity": "L",
+      "imageUrl": "https://fftcg.cdn.sewest.net/images/cards/full/30-034L_eg.jpg"
+    },
+    {
+      "number": "30-035C",
+      "name": "Viera",
+      "rarity": "C",
+      "imageUrl": "https://fftcg.cdn.sewest.net/images/cards/full/30-035C_eg.jpg"
+    },
+    {
+      "number": "30-036L",
+      "name": "Bismarck, Lord of the Mists",
+      "rarity": "L",
+      "imageUrl": "https://fftcg.cdn.sewest.net/images/cards/full/30-036L_eg.jpg"
+    },
+    {
+      "number": "30-037H",
+      "name": "Aerith",
+      "rarity": "H",
+      "imageUrl": "https://fftcg.cdn.sewest.net/images/cards/full/30-037H_eg.jpg"
+    },
+    {
+      "number": "30-038R",
+      "name": "Gordon",
+      "rarity": "R",
+      "imageUrl": "https://fftcg.cdn.sewest.net/images/cards/full/30-038R_FL_eg.jpg"
+    },
+    {
+      "number": "30-039C",
+      "name": "Cissnei",
+      "rarity": "C",
+      "imageUrl": "https://fftcg.cdn.sewest.net/images/cards/full/30-039C_eg.jpg"
+    },
+    {
+      "number": "30-040C",
+      "name": "Chocobo",
+      "rarity": "C",
+      "imageUrl": "https://fftcg.cdn.sewest.net/images/cards/full/30-040C_eg.jpg"
+    },
+    {
+      "number": "30-041R",
+      "name": "Fat Chocobo",
+      "rarity": "R",
+      "imageUrl": "https://fftcg.cdn.sewest.net/images/cards/full/30-041R_eg.jpg"
+    },
+    {
+      "number": "30-042C",
+      "name": "Dryad",
+      "rarity": "C",
+      "imageUrl": "https://fftcg.cdn.sewest.net/images/cards/full/30-042C_eg.jpg"
+    },
+    {
+      "number": "30-043H",
+      "name": "Hilda",
+      "rarity": "H",
+      "imageUrl": "https://fftcg.cdn.sewest.net/images/cards/full/30-043H_FL_eg.jpg"
+    },
+    {
+      "number": "30-044L",
+      "name": "Fickblix",
+      "rarity": "L",
+      "imageUrl": "https://fftcg.cdn.sewest.net/images/cards/full/30-044L_FL_eg.jpg"
+    },
+    {
+      "number": "30-045R",
+      "name": "Verena",
+      "rarity": "R",
+      "imageUrl": "https://fftcg.cdn.sewest.net/images/cards/full/30-045R_FL_eg.jpg"
+    },
+    {
+      "number": "30-046C",
+      "name": "Firion",
+      "rarity": "C",
+      "imageUrl": "https://fftcg.cdn.sewest.net/images/cards/full/30-046C_eg.jpg"
+    },
+    {
+      "number": "30-047H",
+      "name": "Poppy",
+      "rarity": "H",
+      "imageUrl": "https://fftcg.cdn.sewest.net/images/cards/full/30-047H_eg.jpg"
+    },
+    {
+      "number": "30-048R",
+      "name": "Malebranche",
+      "rarity": "R",
+      "imageUrl": "https://fftcg.cdn.sewest.net/images/cards/full/30-048R_eg.jpg"
+    },
+    {
+      "number": "30-049C",
+      "name": "Yuffie",
+      "rarity": "C",
+      "imageUrl": "https://fftcg.cdn.sewest.net/images/cards/full/30-049C_eg.jpg"
+    },
+    {
+      "number": "30-050C",
+      "name": "Lu'Cia",
+      "rarity": "C",
+      "imageUrl": "https://fftcg.cdn.sewest.net/images/cards/full/30-050C_eg.jpg"
+    },
+    {
+      "number": "30-051C",
+      "name": "Red XIII",
+      "rarity": "C",
+      "imageUrl": "https://fftcg.cdn.sewest.net/images/cards/full/30-051C_eg.jpg"
+    },
+    {
+      "number": "30-052R",
+      "name": "Ardbert",
+      "rarity": "R",
+      "imageUrl": "https://fftcg.cdn.sewest.net/images/cards/full/30-052R_eg.jpg"
+    },
+    {
+      "number": "30-053H",
+      "name": "Warrior of Light",
+      "rarity": "H",
+      "imageUrl": "https://fftcg.cdn.sewest.net/images/cards/full/30-053H_eg.jpg"
+    },
+    {
+      "number": "30-054C",
+      "name": "Yenke",
+      "rarity": "C",
+      "imageUrl": "https://fftcg.cdn.sewest.net/images/cards/full/30-054C_FL_eg.jpg"
+    },
+    {
+      "number": "30-055R",
+      "name": "Oberon Heindler",
+      "rarity": "R",
+      "imageUrl": "https://fftcg.cdn.sewest.net/images/cards/full/30-055R_eg.jpg"
+    },
+    {
+      "number": "30-056C",
+      "name": "Garif",
+      "rarity": "C",
+      "imageUrl": "https://fftcg.cdn.sewest.net/images/cards/full/30-056C_eg.jpg"
+    },
+    {
+      "number": "30-057H",
+      "name": "Kimahri",
+      "rarity": "H",
+      "imageUrl": "https://fftcg.cdn.sewest.net/images/cards/full/30-057H_FL_eg.jpg"
+    },
+    {
+      "number": "30-058C",
+      "name": "Gladiator",
+      "rarity": "C",
+      "imageUrl": "https://fftcg.cdn.sewest.net/images/cards/full/30-058C_FL_eg.jpg"
+    },
+    {
+      "number": "30-059L",
+      "name": "Sin",
+      "rarity": "L",
+      "imageUrl": "https://fftcg.cdn.sewest.net/images/cards/full/30-059L_FL_eg.jpg"
+    },
+    {
+      "number": "30-060H",
+      "name": "Daisy",
+      "rarity": "H",
+      "imageUrl": "https://fftcg.cdn.sewest.net/images/cards/full/30-060H_FL_eg.jpg"
+    },
+    {
+      "number": "30-061C",
+      "name": "Tifa",
+      "rarity": "C",
+      "imageUrl": "https://fftcg.cdn.sewest.net/images/cards/full/30-061C_eg.jpg"
+    },
+    {
+      "number": "30-062C",
+      "name": "Biggs",
+      "rarity": "C",
+      "imageUrl": "https://fftcg.cdn.sewest.net/images/cards/full/30-062C_eg.jpg"
+    },
+    {
+      "number": "30-063C",
+      "name": "Biran",
+      "rarity": "C",
+      "imageUrl": "https://fftcg.cdn.sewest.net/images/cards/full/30-063C_FL_eg.jpg"
+    },
+    {
+      "number": "30-064C",
+      "name": "Fenrir",
+      "rarity": "C",
+      "imageUrl": "https://fftcg.cdn.sewest.net/images/cards/full/30-064C_eg.jpg"
+    },
+    {
+      "number": "30-065C",
+      "name": "Marcel",
+      "rarity": "C",
+      "imageUrl": "https://fftcg.cdn.sewest.net/images/cards/full/30-065C_eg.jpg"
+    },
+    {
+      "number": "30-066R",
+      "name": "Proto-behemoth",
+      "rarity": "R",
+      "imageUrl": "https://fftcg.cdn.sewest.net/images/cards/full/30-066R_eg.jpg"
+    },
+    {
+      "number": "30-067R",
+      "name": "Rinora",
+      "rarity": "R",
+      "imageUrl": "https://fftcg.cdn.sewest.net/images/cards/full/30-067R_eg.jpg"
+    },
+    {
+      "number": "30-068L",
+      "name": "Rikku",
+      "rarity": "L",
+      "imageUrl": "https://fftcg.cdn.sewest.net/images/cards/full/30-068L_FL_eg.jpg"
+    },
+    {
+      "number": "30-069H",
+      "name": "Alus",
+      "rarity": "H",
+      "imageUrl": "https://fftcg.cdn.sewest.net/images/cards/full/30-069H_FL_eg.jpg"
+    },
+    {
+      "number": "30-070R",
+      "name": "Aldo",
+      "rarity": "R",
+      "imageUrl": "https://fftcg.cdn.sewest.net/images/cards/full/30-070R_FL_eg.jpg"
+    },
+    {
+      "number": "30-071C",
+      "name": "Artoirel",
+      "rarity": "C",
+      "imageUrl": "https://fftcg.cdn.sewest.net/images/cards/full/30-071C_eg.jpg"
+    },
+    {
+      "number": "30-072C",
+      "name": "Ixion",
+      "rarity": "C",
+      "imageUrl": "https://fftcg.cdn.sewest.net/images/cards/full/30-072C_eg.jpg"
+    },
+    {
+      "number": "30-073C",
+      "name": "Dancer",
+      "rarity": "C",
+      "imageUrl": "https://fftcg.cdn.sewest.net/images/cards/full/30-073C_FL_eg.jpg"
+    },
+    {
+      "number": "30-074C",
+      "name": "Garland",
+      "rarity": "C",
+      "imageUrl": "https://fftcg.cdn.sewest.net/images/cards/full/30-074C_eg.jpg"
+    },
+    {
+      "number": "30-075C",
+      "name": "Caius",
+      "rarity": "C",
+      "imageUrl": "https://fftcg.cdn.sewest.net/images/cards/full/30-075C_eg.jpg"
+    },
+    {
+      "number": "30-076L",
+      "name": "Cloud",
+      "rarity": "L",
+      "imageUrl": "https://fftcg.cdn.sewest.net/images/cards/full/30-076L_eg.jpg"
+    },
+    {
+      "number": "30-077R",
+      "name": "Zack",
+      "rarity": "R",
+      "imageUrl": "https://fftcg.cdn.sewest.net/images/cards/full/30-077R_eg.jpg"
+    },
+    {
+      "number": "30-078C",
+      "name": "Seeq",
+      "rarity": "C",
+      "imageUrl": "https://fftcg.cdn.sewest.net/images/cards/full/30-078C_eg.jpg"
+    },
+    {
+      "number": "30-079C",
+      "name": "Cid Garlond",
+      "rarity": "C",
+      "imageUrl": "https://fftcg.cdn.sewest.net/images/cards/full/30-079C_eg.jpg"
+    },
+    {
+      "number": "30-080L",
+      "name": "Shantotto",
+      "rarity": "L",
+      "imageUrl": "https://fftcg.cdn.sewest.net/images/cards/full/30-080L_eg.jpg"
+    },
+    {
+      "number": "30-081R",
+      "name": "Don Tonberry",
+      "rarity": "R",
+      "imageUrl": "https://fftcg.cdn.sewest.net/images/cards/full/30-081R_eg.jpg"
+    },
+    {
+      "number": "30-082H",
+      "name": "Barbara",
+      "rarity": "H",
+      "imageUrl": "https://fftcg.cdn.sewest.net/images/cards/full/30-082H_eg.jpg"
+    },
+    {
+      "number": "30-083H",
+      "name": "Ravana, Savior of the Gnath",
+      "rarity": "H",
+      "imageUrl": "https://fftcg.cdn.sewest.net/images/cards/full/30-083H_eg.jpg"
+    },
+    {
+      "number": "30-084C",
+      "name": "Ramza",
+      "rarity": "C",
+      "imageUrl": "https://fftcg.cdn.sewest.net/images/cards/full/30-084C_eg.jpg"
+    },
+    {
+      "number": "30-085R",
+      "name": "Lucielle Ovis",
+      "rarity": "R",
+      "imageUrl": "https://fftcg.cdn.sewest.net/images/cards/full/30-085R_eg.jpg"
+    },
+    {
+      "number": "30-086C/6-106H",
+      "name": "Aymeric",
+      "rarity": "C",
+      "imageUrl": "https://fftcg.cdn.sewest.net/images/cards/full/30-086C_eg.jpg"
+    },
+    {
+      "number": "30-087C",
+      "name": "Eiko",
+      "rarity": "C",
+      "imageUrl": "https://fftcg.cdn.sewest.net/images/cards/full/30-087C_eg.jpg"
+    },
+    {
+      "number": "30-088R",
+      "name": "Garnet",
+      "rarity": "R",
+      "imageUrl": "https://fftcg.cdn.sewest.net/images/cards/full/30-088R_eg.jpg"
+    },
+    {
+      "number": "30-089C",
+      "name": "Gernsback",
+      "rarity": "C",
+      "imageUrl": "https://fftcg.cdn.sewest.net/images/cards/full/30-089C_eg.jpg"
+    },
+    {
+      "number": "30-090C",
+      "name": "Quina",
+      "rarity": "C",
+      "imageUrl": "https://fftcg.cdn.sewest.net/images/cards/full/30-090C_eg.jpg"
+    },
+    {
+      "number": "30-091C",
+      "name": "White Mage",
+      "rarity": "C",
+      "imageUrl": "https://fftcg.cdn.sewest.net/images/cards/full/30-091C_FL_eg.jpg"
+    },
+    {
+      "number": "30-092R",
+      "name": "Steiner",
+      "rarity": "R",
+      "imageUrl": "https://fftcg.cdn.sewest.net/images/cards/full/30-092R_eg.jpg"
+    },
+    {
+      "number": "30-093R",
+      "name": "Deah",
+      "rarity": "R",
+      "imageUrl": "https://fftcg.cdn.sewest.net/images/cards/full/30-093R_eg.jpg"
+    },
+    {
+      "number": "30-094R",
+      "name": "Midgardsormr",
+      "rarity": "R",
+      "imageUrl": "https://fftcg.cdn.sewest.net/images/cards/full/30-094R_eg.jpg"
+    },
+    {
+      "number": "30-095C",
+      "name": "Melo",
+      "rarity": "C",
+      "imageUrl": "https://fftcg.cdn.sewest.net/images/cards/full/30-095C_eg.jpg"
+    },
+    {
+      "number": "30-096L",
+      "name": "Yuna",
+      "rarity": "L",
+      "imageUrl": "https://fftcg.cdn.sewest.net/images/cards/full/30-096L_eg.jpg"
+    },
+    {
+      "number": "30-097C",
+      "name": "Leviathan",
+      "rarity": "C",
+      "imageUrl": "https://fftcg.cdn.sewest.net/images/cards/full/30-097C_eg.jpg"
+    },
+    {
+      "number": "30-098H",
+      "name": "Lucia (XIV)",
+      "rarity": "H",
+      "imageUrl": "https://fftcg.cdn.sewest.net/images/cards/full/30-098H_eg.jpg"
+    },
+    {
+      "number": "30-099H",
+      "name": "Leila",
+      "rarity": "H",
+      "imageUrl": "https://fftcg.cdn.sewest.net/images/cards/full/30-099H_FL_eg.jpg"
+    },
+    {
+      "number": "30-100L",
+      "name": "Refia",
+      "rarity": "L",
+      "imageUrl": "https://fftcg.cdn.sewest.net/images/cards/full/30-100L_FL_eg.jpg"
+    },
+    {
+      "number": "30-101H",
+      "name": "Wakka",
+      "rarity": "H",
+      "imageUrl": "https://fftcg.cdn.sewest.net/images/cards/full/30-101H_FL_eg.jpg"
+    },
+    {
+      "number": "30-102C",
+      "name": "Nu Mou",
+      "rarity": "C",
+      "imageUrl": "https://fftcg.cdn.sewest.net/images/cards/full/30-102C_eg.jpg"
+    },
+    {
+      "number": "30-103L",
+      "name": "Ultima Weapon",
+      "rarity": "L",
+      "imageUrl": "https://fftcg.cdn.sewest.net/images/cards/full/30-103L_eg.jpg"
+    },
+    {
+      "number": "30-104H",
+      "name": "Jayden Rundall",
+      "rarity": "H",
+      "imageUrl": "https://fftcg.cdn.sewest.net/images/cards/full/30-104H_eg.jpg"
+    },
+    {
+      "number": "30-105L",
+      "name": "Sephiroth",
+      "rarity": "L",
+      "imageUrl": "https://fftcg.cdn.sewest.net/images/cards/full/30-105L_FL_eg.jpg"
+    },
+    {
+      "number": "30-106H",
+      "name": "Shadow Lord",
+      "rarity": "H",
+      "imageUrl": "https://fftcg.cdn.sewest.net/images/cards/full/30-106H_eg.jpg"
+    },
+    {
+      "number": "30-107H",
+      "name": "Terra",
+      "rarity": "H",
+      "imageUrl": "https://fftcg.cdn.sewest.net/images/cards/full/30-107H_eg.jpg"
+    },
+    {
+      "number": "30-108R",
+      "name": "Lightning",
+      "rarity": "R",
+      "imageUrl": "https://fftcg.cdn.sewest.net/images/cards/full/30-108R_eg.jpg"
+    },
+    {
+      "number": "30-109R",
+      "name": "Kuja",
+      "rarity": "R",
+      "imageUrl": "https://fftcg.cdn.sewest.net/images/cards/full/30-109R_eg.jpg"
+    },
+    {
+      "number": "30-110H",
+      "name": "The Emperor",
+      "rarity": "H",
+      "imageUrl": "https://fftcg.cdn.sewest.net/images/cards/full/30-110H_FL_eg.jpg"
+    },
+    {
+      "number": "30-111H",
+      "name": "Gau",
+      "rarity": "H",
+      "imageUrl": "https://fftcg.cdn.sewest.net/images/cards/full/30-111H_eg.jpg"
+    },
+    {
+      "number": "30-112R",
+      "name": "Maria",
+      "rarity": "R",
+      "imageUrl": "https://fftcg.cdn.sewest.net/images/cards/full/30-112R_eg.jpg"
+    },
+    {
+      "number": "30-113R",
+      "name": "Cloud",
+      "rarity": "R",
+      "imageUrl": "https://fftcg.cdn.sewest.net/images/cards/full/30-113R_eg.jpg"
+    },
+    {
+      "number": "30-114H",
+      "name": "Minfilia",
+      "rarity": "H",
+      "imageUrl": "https://fftcg.cdn.sewest.net/images/cards/full/30-114H_eg.jpg"
+    },
+    {
+      "number": "30-115R",
+      "name": "Mumor",
+      "rarity": "R",
+      "imageUrl": "https://fftcg.cdn.sewest.net/images/cards/full/30-115R_eg.jpg"
+    },
+    {
+      "number": "30-116H",
+      "name": "Yiazmat",
+      "rarity": "H",
+      "imageUrl": "https://fftcg.cdn.sewest.net/images/cards/full/30-116H_eg.jpg"
+    },
+    {
+      "number": "30-117R",
+      "name": "Tidus",
+      "rarity": "R",
+      "imageUrl": "https://fftcg.cdn.sewest.net/images/cards/full/30-117R_eg.jpg"
+    },
+    {
+      "number": "30-118H",
+      "name": "Freya",
+      "rarity": "H",
+      "imageUrl": "https://fftcg.cdn.sewest.net/images/cards/full/30-118H_eg.jpg"
+    }
+  ]
+}
