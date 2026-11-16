@@ -9,3 +9,14 @@
 @media(max-width:720px){.mobile-brand{display:block}.crumb{display:none}.topbar{justify-content:space-between}}
 .catalog-update-banner{display:flex;align-items:center;justify-content:space-between;gap:14px;margin:0 0 22px;padding:14px 16px;border:1px solid #526244;border-radius:9px;background:linear-gradient(110deg,#1d261e,#1b201d);color:#dce8d1}.catalog-update-banner strong{font-size:12px}.catalog-update-banner p{margin:4px 0 0;color:#9ea997;font-size:10px;line-height:1.5}.catalog-update-banner .button{flex-shrink:0}.catalog-update-actions{display:flex;justify-content:flex-end;gap:8px;margin-top:16px;flex-wrap:wrap}.card-image img{object-fit:contain;background:#121513}.tile-title{white-space:normal;display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;line-clamp:2}.card-index{max-width:calc(100% - 16px);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 @media(max-width:520px){.catalog-update-banner{align-items:flex-start;flex-direction:column}.catalog-update-banner .button{width:100%;justify-content:center}.catalog-update-actions{flex-direction:column-reverse}.catalog-update-actions .button{width:100%;justify-content:center}}
+.category-choice{display:flex;gap:6px;margin:0 0 15px;padding:0 0 10px;border-bottom:1px solid #292d2b}
+.category-picker{margin:-2px 0 26px}
+.category-picker .category-choice{max-width:430px;margin:9px 0 0}
+.category-choice button{min-height:34px;padding:0 13px;border:1px solid transparent;border-radius:7px;background:transparent;color:#929a90;font-size:11px}
+.category-choice button:hover{border-color:#353d36;color:#dfe5da}
+.category-choice button.active{border-color:#546342;background:#252d22;color:#d8f49a;font-weight:600}
+.category-empty{margin-top:8px}
+.cover-purple .cover-orb{background:radial-gradient(circle at 37% 60%,#c4a7ff55,#9c7ddf1b 49%,transparent 70%);border-color:#c5a7ff22}
+.cover-purple .cover-tag{color:#c3a9ee}
+.cover-purple .mini-progress i{background:#b49bf1}
+@media(max-width:520px){.category-choice{gap:3px;margin-bottom:12px}.category-choice button{flex:1;min-height:38px;padding:0 8px;font-size:10px}.collection-section .section-heading{align-items:flex-end}.collection-section .section-heading>.button{white-space:nowrap}}

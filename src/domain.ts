@@ -10,7 +10,8 @@ export type Catalog = {
 };
 export type Publisher = { id: string; name: string };
 export type Franchise = { id: string; publisherId: string; name: string };
-export type Series = { id: string; franchiseId: string; name: string };
+export type CollectionCategory = 'cards' | 'media' | 'misc';
+export type Series = { id: string; franchiseId?: string; name: string; category?: CollectionCategory };
 export type CardSet = { id: string; seriesId: string; name: string; releaseNumber?: string; expectedCardCount?: number; rarityScheme?: string[]; sourceCompletionIndicator?: 'complete' | 'incomplete' | 'unmarked'; sourceRow?: number };
 export type CardDefinition = { id: string; setId: string; number: string; name: string; category?: string; rarity?: string; slot?: 'title' | 'numbered'; sourceNote?: string };
 export type CardVariant = { id: string; cardId: string; name: string; imageUrls: ImageSource[] };
@@ -19,20 +20,41 @@ export type Ownership = { cardId: string; variantId?: string; personal: number; 
 export type Acquisition = { id: string; cardId: string; quantity: number; status: 'incoming' | 'received'; acquiredAt?: string; note?: string };
 export type VaultData = { schemaVersion: number; updatedAt: string; catalog: Catalog };
 
-export const CURRENT_SCHEMA_VERSION = 2;
+export const CURRENT_SCHEMA_VERSION = 3;
 export const emptyCatalog = (): Catalog => ({ publishers: [], franchises: [], series: [], sets: [], cards: [], variants: [], ownership: [], acquisitions: [] });
 export function starterCatalog(): Catalog {
   return {
     publishers: [{ id: 'publisher:kayou', name: 'Kayou' }, { id: 'publisher:super-rare-games', name: 'Super Rare Games' }],
     franchises: [{ id: 'franchise:naruto', publisherId: 'publisher:kayou', name: 'Naruto' }, { id: 'franchise:nintendo-switch-release-cards', publisherId: 'publisher:super-rare-games', name: 'Nintendo Switch release cards' }],
-    series: [{ id: 'series:kayou-naruto', franchiseId: 'franchise:naruto', name: 'Kayou Naruto' }, { id: 'series:srg-switch', franchiseId: 'franchise:nintendo-switch-release-cards', name: 'Super Rare Games' }],
+    series: [
+      { id: 'series:kayou-naruto', franchiseId: 'franchise:naruto', name: 'Kayou Naruto', category: 'cards' },
+      { id: 'series:srg-switch', franchiseId: 'franchise:nintendo-switch-release-cards', name: 'Super Rare Games', category: 'cards' },
+      { id: 'series:media:snl-dvds', name: 'SNL DVDs', category: 'media' },
+    ],
     sets: [
       { id: 'set:kayou-naruto-nrea02', seriesId: 'series:kayou-naruto', name: 'NREA02' },
       { id: 'set:kayou-naruto-nrea03', seriesId: 'series:kayou-naruto', name: 'NREA03' },
+      { id: 'set:media:snl-dvds:collection', seriesId: 'series:media:snl-dvds', name: 'DVD collection' },
     ], cards: [], variants: [], ownership: [], acquisitions: [],
   };
 }
 export const emptyVault = (): VaultData => ({ schemaVersion: CURRENT_SCHEMA_VERSION, updatedAt: new Date().toISOString(), catalog: starterCatalog() });
+
+function ensureSnlDvdCollection(catalog: Catalog): Catalog {
+  const seriesId = 'series:media:snl-dvds';
+  const setId = 'set:media:snl-dvds:collection';
+  const series = catalog.series.some((item) => item.id === seriesId)
+    ? catalog.series
+    : [...catalog.series, { id: seriesId, name: 'SNL DVDs', category: 'media' as const }];
+  const sets = catalog.sets.some((item) => item.id === setId)
+    ? catalog.sets
+    : [...catalog.sets, { id: setId, seriesId, name: 'DVD collection' }];
+  return { ...catalog, series, sets };
+}
+
+function isCollectionCategory(value: unknown): value is CollectionCategory {
+  return value === 'cards' || value === 'media' || value === 'misc';
+}
 
 export function validateCatalog(catalog: Catalog): string[] {
   const errors: string[] = [];
@@ -48,7 +70,10 @@ export function validateCatalog(catalog: Catalog): string[] {
   }
   const has = (key: keyof Catalog, id: string) => (catalog[key] as { id: string }[]).some((item) => item.id === id);
   for (const item of catalog.franchises) if (!has('publishers', item.publisherId)) errors.push(`Franchise ${item.id} references missing publisher ${item.publisherId}.`);
-  for (const item of catalog.series) if (!has('franchises', item.franchiseId)) errors.push(`Series ${item.id} references missing franchise ${item.franchiseId}.`);
+  for (const item of catalog.series) {
+    if (item.franchiseId && !has('franchises', item.franchiseId)) errors.push(`Series ${item.id} references missing franchise ${item.franchiseId}.`);
+    if (!isCollectionCategory(item.category)) errors.push(`Series ${item.id} must use Cards, Media, or Misc as its category.`);
+  }
   for (const item of catalog.sets) if (!has('series', item.seriesId)) errors.push(`Set ${item.id} references missing series ${item.seriesId}.`);
   for (const item of catalog.sets) if (item.expectedCardCount !== undefined && catalog.cards.filter((card) => card.setId === item.id).length !== item.expectedCardCount) errors.push(`Set ${item.id} must define exactly ${item.expectedCardCount} cards.`);
   for (const item of catalog.cards) if (!has('sets', item.setId)) errors.push(`Card ${item.id} references missing set ${item.setId}.`);
@@ -78,13 +103,14 @@ export function migrateVault(value: unknown): VaultData {
   if (!value || typeof value !== 'object') throw new Error('Backup must be a JSON object.');
   const source = value as Partial<VaultData>;
   if (source.schemaVersion === CURRENT_SCHEMA_VERSION && source.catalog && validateCatalog(source.catalog).length === 0) return source as VaultData;
-  if ((source.schemaVersion === 0 || source.schemaVersion === 1) && source.catalog) {
-    const previous = source.catalog as Omit<Catalog, 'ownership'> & { ownership: (Partial<Ownership> & { cardId: string; owned?: number })[] };
-    const catalog = { ...previous, ownership: previous.ownership.map((item) => ({
+  if ((source.schemaVersion === 0 || source.schemaVersion === 1 || source.schemaVersion === 2) && source.catalog) {
+    const previous = source.catalog as Omit<Catalog, 'ownership'> & { ownership?: (Partial<Ownership> & { cardId: string; owned?: number })[]; series: Series[] };
+    const migratedCatalog = { ...previous, series: previous.series.map((item) => ({ ...item, category: isCollectionCategory(item.category) ? item.category : 'cards' as const })), ownership: (previous.ownership ?? []).map((item) => ({
       cardId: item.cardId, variantId: item.variantId, personal: item.personal ?? item.owned ?? 0,
       duplicates: item.duplicates ?? 0, ...(item.duplicatesKnown === undefined ? {} : { duplicatesKnown: item.duplicatesKnown }),
       incoming: item.incoming ?? 0, updatedAt: item.updatedAt ?? new Date().toISOString(),
     })) } as Catalog;
+    const catalog = ensureSnlDvdCollection(migratedCatalog);
     const migrated = { ...source, catalog, schemaVersion: CURRENT_SCHEMA_VERSION, updatedAt: source.updatedAt ?? new Date().toISOString() } as VaultData;
     const errors = validateCatalog(migrated.catalog);
     if (errors.length) throw new Error(`Migration failed: ${errors.join(' ')}`);
@@ -120,7 +146,7 @@ export function findConflicts(local: VaultData, remote: VaultData): string[] {
 
 export function filterCards(cards: CardDefinition[], inventory: Ownership[], filter: CardStatus | 'all', query = ''): CardDefinition[] {
   const normalized = query.trim().toLowerCase();
-  return cards.filter((card) => (filter === 'all' || cardStatus(card.id, inventory) === filter) && (!normalized || `${card.name} ${card.number} ${card.rarity ?? ''}`.toLowerCase().includes(normalized)));
+  return cards.filter((card) => (filter === 'all' || cardStatus(card.id, inventory) === filter) && (!normalized || `${card.name} ${card.number} ${card.rarity ?? ''} ${card.category ?? ''}`.toLowerCase().includes(normalized)));
 }
 
 export function validateInventoryRows(rows: Record<string, string>[], cards: CardDefinition[]): { updates: Ownership[]; errors: string[] } {

@@ -65,9 +65,22 @@ describe('collection domain', () => {
     const legacyCard = { ...cards[0], setId: 'set:legacy' };
     const legacyCatalog = { ...current.catalog, sets: [...current.catalog.sets, { id: 'set:legacy', seriesId: 'series:kayou-naruto', name: 'legacy' }], cards: [legacyCard], ownership: [{ cardId: legacyCard.id, owned: 2, incoming: 0, updatedAt: '2026-01-01' }] };
     const old = { ...current, schemaVersion: 1, catalog: legacyCatalog };
-    expect(migrateVault(old).schemaVersion).toBe(2);
+    expect(migrateVault(old).schemaVersion).toBe(3);
     expect(migrateVault(old).catalog.ownership[0]).toMatchObject({ personal: 2, duplicates: 0, incoming: 0 });
     expect(() => migrateVault({ schemaVersion: 99 })).toThrow('Unsupported');
+  });
+  it('migrates schema 2 collections into categories and seeds an empty SNL DVD collection', () => {
+    const old = emptyVault();
+    old.schemaVersion = 2;
+    old.catalog.series = old.catalog.series.filter((series) => series.id !== 'series:media:snl-dvds').map(({ category: _category, ...series }) => series);
+    old.catalog.sets = old.catalog.sets.filter((set) => set.id !== 'set:media:snl-dvds:collection');
+    const migrated = migrateVault(JSON.parse(JSON.stringify(old)));
+    expect(migrated.schemaVersion).toBe(3);
+    expect(migrated.catalog.series.filter((series) => series.category === 'cards')).toHaveLength(2);
+    expect(migrated.catalog.series.find((series) => series.id === 'series:media:snl-dvds')).toMatchObject({ name: 'SNL DVDs', category: 'media' });
+    expect(migrated.catalog.sets.find((set) => set.id === 'set:media:snl-dvds:collection')).toMatchObject({ seriesId: 'series:media:snl-dvds', name: 'DVD collection' });
+    expect(migrated.catalog.cards).toHaveLength(old.catalog.cards.length);
+    expect(validateCatalog(migrated.catalog)).toEqual([]);
   });
   it('detects overlapping records changed in either copy', () => {
     const local = emptyVault(); const remote = emptyVault();

@@ -1,6 +1,6 @@
 # Collect Everything
 
-Collect Everything is a local-first, image-focused collection manager. Version 0.1 currently supports trading-card collections and runs as a standalone React + TypeScript + Vite PWA. It is designed for iPhone portrait use and remains usable on desktop. SNL DVD tracking is not implemented yet; the data model and interface need a general collectible-item layer before DVDs are added.
+Collect Everything is a local-first, image-focused collection manager for Cards, Media, and Misc collections. It runs as a standalone React + TypeScript + Vite PWA, is designed for iPhone portrait use, and remains usable on desktop. Kayou Naruto and Super Rare Games card collections are included. An empty **SNL DVDs** media collection is created without inventing titles, images, or quantities; add DVD titles as you reconcile your collection.
 
 ## Run locally
 
@@ -13,18 +13,19 @@ The app persists its vault in IndexedDB in the current browser. No account is re
 
 ## Use the app
 
-- Open a collection and set, add canonical cards, and track physically owned and incoming quantities separately.
+- Choose Cards, Media, or Misc from the archive categories, then open a collection and set/list.
+- Add cards, DVD titles, or other collectible items and track physically owned, duplicate, and incoming quantities separately.
 - The Gallery, List, and Checklist controls change presentation only. Search and status filters remain active across view changes.
-- Completion counts unique card definitions that have at least one physically owned copy. Extra copies affect duplicate status and quantity, not completion.
+- Completion counts unique item definitions that have at least one physically owned copy. Extra copies affect duplicate status and quantity, not completion.
 - Naruto cards can be enriched with verified names, catalog card codes, and remote thumbnails from NarutoDB. Review and apply the update inside the app; it preserves your inventory quantities and user-added images. Thumbnails stay hosted remotely and are cached after viewing.
 - Card details also accept user-provided image URLs. A URL marked “Verified” is stored with a timestamp; verify that it is the exact card before selecting that option.
 - A Super Rare Games release set requires a release number and creates the six specified slots (Title, 1–5). This slot structure has not yet been reconciled with the source workbook because it was not supplied.
 
 ## Data model
 
-Data is stored as a versioned JSON envelope (`schemaVersion`, `updatedAt`, `catalog`). Catalog entity IDs are stable namespaced strings, such as `publisher:kayou`, `set:kayou-naruto-nrea02`, and `set:kayou-naruto-nrea02:01`. The schema keeps publishers, franchises, series, sets, canonical card definitions, variants and image sources, ownership, and acquisition records distinct. Ownership stores Personal, Dupes, and incoming counts separately. An optional `duplicatesKnown: false` marks an unreported duplicate quantity; it is shown as unknown instead of zero. Completion counts a card definition when Personal + Dupes is greater than zero. Sets can omit rarity schemes; cards can omit rarity. Card identity is the full namespaced ID, never the printed number alone.
+Data is stored as a versioned JSON envelope (`schemaVersion`, `updatedAt`, `catalog`). Catalog entity IDs are stable namespaced strings, such as `publisher:kayou`, `set:kayou-naruto-nrea02`, and `set:kayou-naruto-nrea02:01`. Series are assigned a Cards, Media, or Misc category; a series may be independent of a publisher or franchise. The schema keeps publishers, franchises, series, sets/lists, canonical collectible definitions, variants and image sources, ownership, and acquisition records distinct. Ownership stores Personal, Dupes, and incoming counts separately. An optional `duplicatesKnown: false` marks an unreported duplicate quantity; it is shown as unknown instead of zero. Completion counts unique definitions with a physically owned copy. Cards may use rarity tiers, while media and misc items do not require rarity. A migration upgrades schema v0–v2 to v3 and adds the blank SNL DVD collection if it is not present. Item identity uses the full namespaced ID, never a printed number or title alone.
 
-`src/domain.ts` documents the TypeScript schema and validation rules. Schema migrations are centralized in `migrateVault`; increment `CURRENT_SCHEMA_VERSION` and add a migration before changing persisted structures.
+`src/domain.ts` documents the TypeScript schema and validation rules. Schema migrations are centralized in `migrateVault`; increment `CURRENT_SCHEMA_VERSION` and add a migration before changing persisted structures. The shared `cards` JSON collection remains the current storage name for all catalog items to preserve existing backup compatibility; section/category metadata identifies the item type.
 
 ## Backup and import
 
