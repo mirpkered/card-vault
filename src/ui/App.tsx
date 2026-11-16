@@ -69,10 +69,10 @@ export default function App() {
     const variant: CardVariant = { id: variantId, cardId: card.id, name: 'Standard', imageUrls: [{ url, source: kind, ...(kind === 'verified-remote' ? { verifiedAt: new Date().toISOString() } : {}) }] };
     setVault((prev) => ({ ...prev, catalog: { ...prev.catalog, variants: [...prev.catalog.variants.filter((v) => v.id !== variantId), variant] } }));
   }
-  function exportJson() { download('card-vault-backup.json', JSON.stringify(vault, null, 2), 'application/json'); }
+  function exportJson() { download('collect-everything-backup.json', JSON.stringify(vault, null, 2), 'application/json'); }
   function exportCsv() {
     const rows = [['card_id', 'set_id', 'card_number', 'name', 'personal', 'duplicates', 'incoming'], ...vault.catalog.cards.map((c) => [c.id, c.setId, c.number, c.name, byId.get(c.id)?.personal ?? 0, byId.get(c.id)?.duplicates ?? 0, byId.get(c.id)?.incoming ?? 0])];
-    download('card-vault-inventory.csv', rows.map((row) => row.map(csvCell).join(',')).join('\n'), 'text/csv');
+    download('collect-everything-inventory.csv', rows.map((row) => row.map(csvCell).join(',')).join('\n'), 'text/csv');
   }
   async function importFile(file?: File) {
     if (!file) return;
@@ -103,7 +103,7 @@ export default function App() {
 
   return <div className="app-shell">
     <aside className="sidebar">
-      <div className="brand"><span className="brand-mark"><Archive size={18} /></span><span>card<span className="brand-light">vault</span><small>COLLECTION STUDIO</small></span></div>
+      <div className="brand"><span className="brand-mark"><Archive size={18} /></span><span>Collect<span className="brand-light"> Everything</span><small>COLLECTION STUDIO</small></span></div>
       <button className="nav-item active"><Grid2X2 size={18} /> Overview</button>
       <div className="sidebar-label">YOUR COLLECTIONS <button aria-label="Add a set" className="icon-button small" onClick={() => setModal('add-set')}><Plus size={15} /></button></div>
       {vault.catalog.series.map((series, index) => { const sets = vault.catalog.sets.filter((set) => set.seriesId === series.id); const ids = new Set(sets.map((set) => set.id)); const owned = completion(vault.catalog.cards.filter((card) => ids.has(card.setId)), vault.catalog.ownership).owned; const total = vault.catalog.cards.filter((card) => ids.has(card.setId)).length; return <button className={`collection-nav ${series.id === selectedSeries?.id ? 'chosen' : ''}`} key={series.id} onClick={() => { if (sets[0]) setSetId(sets[0].id); else setModal('add-set'); }}><span className={`collection-dot ${index === 0 ? 'lime' : 'purple'}`}></span><span>{series.name}<small>{series.id === 'series:kayou-naruto' ? 'NREA02 · NREA03' : 'Nintendo Switch releases'}</small></span><span className="nav-count">{owned}/{total}</span></button>; })}
@@ -135,7 +135,7 @@ export default function App() {
         </section>
 
         <section className="local-panel"><div className="panel-icon"><ShieldCheck size={19}/></div><div><strong>Your vault stays yours.</strong><p>Saved locally, ready offline. Make a backup whenever you like.</p></div><div className="panel-actions"><button onClick={exportJson}><Download size={15}/> Backup</button><button onClick={exportCsv}><ArrowUpFromLine size={15}/> CSV</button><label className="panel-import"><Upload size={15}/> Import<input type="file" accept=".json,.csv,application/json,text/csv" onChange={(e) => void importFile(e.target.files?.[0])}/></label></div></section>
-        <footer>MADE FOR THE CARDS THAT MATTER <span>·</span> CARD VAULT 0.1 <button onClick={() => setModal('help')}><Settings2 size={13}/> LOCAL SETTINGS</button></footer>
+        <footer>COLLECT EVERYTHING <span>·</span> VERSION 0.1 <button onClick={() => setModal('help')}><Settings2 size={13}/> LOCAL SETTINGS</button></footer>
       </div>
     </main>
     {notice && <div className="toast success"><Check size={16}/>{notice}</div>}

@@ -1,4 +1,4 @@
-name: Deploy Card Vault to GitHub Pages
+name: Deploy Collect Everything to GitHub Pages
 on:
   push:
     branches: [main]

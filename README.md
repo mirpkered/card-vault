@@ -1,6 +1,6 @@
-# Card Vault
+# Collect Everything
 
-Card Vault is a local-first, image-focused trading card collection tracker. This v0.1 foundation is a standalone React + TypeScript + Vite PWA. It is designed for iPhone portrait use and remains usable on desktop.
+Collect Everything is a local-first, image-focused collection manager. Version 0.1 currently supports trading-card collections and runs as a standalone React + TypeScript + Vite PWA. It is designed for iPhone portrait use and remains usable on desktop. SNL DVD tracking is not implemented yet; the data model and interface need a general collectible-item layer before DVDs are added.
 
 ## Run locally
 
@@ -34,7 +34,7 @@ Data is stored as a versioned JSON envelope (`schemaVersion`, `updatedAt`, `cata
 
 ## GitHub Pages
 
-The `.github/workflows/deploy.yml` workflow builds and publishes the `main` branch to GitHub Pages. The live app is [Card Vault](https://mirpkered.github.io/card-vault/). The Pages build was verified after deployment. Its Vite base path is set for a repository named `card-vault`; change `base` in `vite.config.ts` and the workflow setting if the repository name differs.
+The `.github/workflows/deploy.yml` workflow builds and publishes the `main` branch to GitHub Pages. The live app is [Collect Everything](https://mirpkered.github.io/card-vault/). The Pages build was verified after deployment. The repository URL remains `card-vault` for stability; its Vite base path matches that URL.
 
 On iPhone, open the app in Safari and use **Share → Add to Home Screen**. Use **Import** in the app to load a JSON backup from Files. Catalog and inventory data stay in that browser’s IndexedDB and are not uploaded to the public repository. Private GitHub synchronization is not connected.
 
@@ -52,7 +52,7 @@ Run the converter with Python 3, using the workbook path and a local-only output
 python scripts/import_srg_workbook.py "/path/to/Super Rare Card Intentory.xlsx" private-data/card-vault-srg-import.json
 ```
 
-The generated backup contains personal inventory data. `private-data/` is ignored by Git and is not part of the production build. In Card Vault, use **Import** and select that JSON to merge the catalog into this browser’s IndexedDB. Conflicting local records stop the restore for review; unmatched records are retained. The converter reports marker mismatches and unmarked release titles, and the app preserves these source states for review. Card notes in the workbook are preserved verbatim as source notes.
+The generated backup contains personal inventory data. `private-data/` is ignored by Git and is not part of the production build. In Collect Everything, use **Import** and select that JSON to merge the catalog into this browser’s IndexedDB. Conflicting local records stop the restore for review; unmatched records are retained. The converter reports marker mismatches and unmarked release titles, and the app preserves these source states for review. Card notes in the workbook are preserved verbatim as source notes.
 
 The three Kayou source inventory notes were not part of the provided files, so the NREA02/NREA03 sets remain empty. No canonical Naruto cards or quantities have been added.
 

@@ -1,4 +1,4 @@
-const CACHE = 'card-vault-v1';
+const CACHE = 'collect-everything-v2';
 self.addEventListener('install', (event) => {
   event.waitUntil(caches.open(CACHE).then((cache) => cache.addAll(['./', './index.html', './manifest.webmanifest', './vault.svg'])));
   self.skipWaiting();

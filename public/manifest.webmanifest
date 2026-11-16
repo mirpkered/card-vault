@@ -1,7 +1,7 @@
 {
-  "name": "Card Vault — Collection Tracker",
-  "short_name": "Card Vault",
-  "description": "A quiet home for every card in your collection.",
+  "name": "Collect Everything",
+  "short_name": "Collect",
+  "description": "A quiet home for your collections.",
   "start_url": ".",
   "scope": ".",
   "display": "standalone",

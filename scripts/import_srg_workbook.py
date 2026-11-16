@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Convert the supplied SRG workbook into a Card Vault backup.
+"""Convert the supplied SRG workbook into a Collect Everything backup.
 
 Uses only Python's standard library and reads the source workbook without saving it.
 The backup is personal inventory data; write it to the ignored private-data directory.
@@ -266,7 +266,7 @@ def import_workbook(source: Path) -> tuple[dict, dict]:
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("workbook", type=Path, help="Source .xlsx. It will not be changed.")
-    parser.add_argument("output", type=Path, help="Private Card Vault JSON backup output path.")
+    parser.add_argument("output", type=Path, help="Private Collect Everything JSON backup output path.")
     args = parser.parse_args()
     if not args.workbook.is_file():
         parser.error(f"Workbook not found: {args.workbook}")
