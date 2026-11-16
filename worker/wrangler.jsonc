@@ -1,0 +1,20 @@
+{
+  "$schema": "../node_modules/wrangler/config-schema.json",
+  "name": "collect-everything-private-sync",
+  "account_id": "7a02270ea84445c011f7625f78b6ecb1",
+  "main": "src/index.ts",
+  "compatibility_date": "2026-11-16",
+  "workers_dev": true,
+  "assets": {
+    "directory": "../dist",
+    "binding": "ASSETS",
+    "not_found_handling": "single-page-application",
+    "run_worker_first": ["/api/*"]
+  },
+  "vars": {
+    "GITHUB_ALLOWED_LOGIN": "mirpkered",
+    "GITHUB_REPO_OWNER": "mirpkered",
+    "GITHUB_REPO_NAME": "collect-everything-data",
+    "GITHUB_REPO_BRANCH": "main"
+  }
+}

@@ -1,4 +1,4 @@
-const CACHE = 'collect-everything-v5';
+const CACHE = 'collect-everything-v6';
 self.addEventListener('install', (event) => {
   event.waitUntil(caches.open(CACHE).then((cache) => cache.addAll(['./', './index.html', './manifest.webmanifest', './favicon.png', './apple-touch-icon.png', './collect-icon-192.png', './collect-icon-512.png', './collect-wordmark.svg', './collect-wordmark.png', './naruto-catalog.json'])));
   self.skipWaiting();
@@ -11,6 +11,7 @@ self.addEventListener('fetch', (event) => {
   const request = event.request;
   if (request.method !== 'GET') return;
   const url = new URL(request.url);
+  if (url.origin === self.location.origin && url.pathname.startsWith('/api/')) return;
   if (url.origin !== self.location.origin && !request.destination.includes('image')) return;
   if (request.mode === 'navigate') {
     event.respondWith(fetch(request).then((response) => { const copy = response.clone(); caches.open(CACHE).then((cache) => cache.put(request, copy)); return response; }).catch(() => caches.match(request).then((hit) => hit || caches.match('./index.html'))));

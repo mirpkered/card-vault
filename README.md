@@ -37,11 +37,25 @@ Data is stored as a versioned JSON envelope (`schemaVersion`, `updatedAt`, `cata
 
 The `.github/workflows/deploy.yml` workflow builds and publishes the `main` branch to GitHub Pages. The live app is [Collect Everything](https://mirpkered.github.io/card-vault/). The Pages build was verified after deployment. The repository URL remains `card-vault` for stability; its Vite base path matches that URL.
 
-On iPhone, open the app in Safari and use **Share → Add to Home Screen**. Use **Import** in the app to load a JSON backup from Files. Catalog and inventory data stay in that browser’s IndexedDB and are not uploaded to the public repository. Private GitHub synchronization is not connected.
+On iPhone, open the app in Safari and use **Share → Add to Home Screen**. The Pages address remains local-only: browser storage is isolated by site, and this public repository never receives catalog quantities or access tokens. Private sync runs from the separate Cloudflare Worker address described below.
 
 ## Synchronization and security
 
-Manual private GitHub data-repository synchronization is not connected in v0.1. No token is requested or stored in this public application. A future sync implementation needs a token-safe backend or user-side GitHub OAuth/device flow, remote snapshot versioning, and a review UI that shows record-level differences before applying a merge. Until then use JSON backup/restore to move data, and review reported conflicts in the two backup files before deciding which values to keep.
+The sync foundation serves the Vite app and `/api/*` from one Cloudflare Worker origin, following the Resale Tracker pattern. The Worker signs the user in with GitHub Device Flow, pins access to one configured private data repository, encrypts expiring GitHub tokens inside an `HttpOnly`, `Secure` session cookie, and writes versioned vault snapshots. Access tokens are never sent to app JavaScript or stored in this public repository. The service worker bypasses API paths so it cannot cache a private response.
+
+After you explicitly create the first private backup, subsequent edits sync automatically after a short pause. GitHub commits keep the previous snapshot under `backups/` and in repository history. Every write checks the current snapshot revision and advances the branch without force; if another device saves first, the local changes stay in IndexedDB and the app opens a record-by-record review. Records that exist on only one side are retained. No record is silently deleted or overwritten during merge.
+
+### Remaining account setup
+
+The sync foundation is provisioned, but the app code has not yet replaced the temporary “Hello World” Worker. The GitHub App **Collect Everything Private Sync** is enabled for Device Flow and expiring user tokens, with **Contents: Read and write** plus required **Metadata: Read**, and is installed only on the private [`collect-everything-data` repository](https://github.com/mirpkered/collect-everything-data). The Worker is [collect-everything-private-sync.mirpkered.workers.dev](https://collect-everything-private-sync.mirpkered.workers.dev/). The data repository is still empty; no collection data has been uploaded.
+
+To activate sync:
+
+1. Deploy the app code with the manual **Deploy private sync app** GitHub Actions workflow. It runs only when manually started and reads `CLOUDFLARE_API_TOKEN` from GitHub Actions secrets. Use an account API token named **Collect Everything Worker Deploy**, set to **Individual Workers → Editor** for `collect-everything-private-sync` only. It expires after one year and cannot edit the Resale Tracker Worker. The Cloudflare account ID is in `worker/wrangler.jsonc`; do not create a broad account-wide token.
+2. Add Worker secrets in Cloudflare under **Workers & Pages → collect-everything-private-sync → Settings → Variables and Secrets**: `GITHUB_APP_CLIENT_ID`, `GITHUB_APP_CLIENT_SECRET`, and `SESSION_ENCRYPTION_KEY`. Generate a 32-byte encryption key locally with `node -e "console.log(require('node:crypto').randomBytes(32).toString('base64'))"`. Enter secrets directly into Cloudflare; never put them in app source, GitHub Pages, chat, or a committed `.dev.vars` file. `worker/.dev.vars` is ignored by Git for local development; use `worker/.dev.vars.example` as the local template.
+3. Open the Worker URL, sign in, import a JSON backup from the Pages browser if needed, then choose **Save first private backup**. Other browsers can sign in at that Worker URL and load the shared vault. If you install it on iPhone, add the Worker URL to the Home Screen and sign in inside the installed app.
+
+Until deployment and secret configuration are complete, GitHub Pages remains local-only and the Worker URL still serves its temporary placeholder. GitHub Pages and the Worker are different browser origins, so move existing Pages IndexedDB data with a JSON backup. Data is not sent to the private repository until you explicitly save the first backup. The app and Worker are configured for one owner and a single private JSON snapshot; this is not a multi-user or real-time collaboration service. The Worker currently accepts the current vault schema version and must be updated alongside future schema migrations.
 
 ## Import the Super Rare Games workbook
 

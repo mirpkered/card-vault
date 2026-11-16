@@ -5,10 +5,12 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "tsc -b && vite build",
+    "build": "tsc -b && tsc -p worker/tsconfig.json --pretty false && vite build",
     "preview": "vite preview",
-    "typecheck": "tsc -b --pretty",
-    "test": "vitest run"
+    "typecheck": "tsc -b --pretty && tsc -p worker/tsconfig.json --pretty",
+    "typecheck:worker": "tsc -p worker/tsconfig.json --pretty",
+    "test": "vitest run",
+    "deploy:worker": "npm run build && wrangler deploy --config worker/wrangler.jsonc"
   },
   "dependencies": {
     "lucide-react": "^0.468.0",
@@ -24,6 +26,7 @@
     "jsdom": "^25.0.1",
     "typescript": "~5.7.2",
     "vite": "^6.0.5",
-    "vitest": "^5.1.0"
+    "vitest": "^5.1.0",
+    "wrangler": "^4.163.0"
   }
 }
