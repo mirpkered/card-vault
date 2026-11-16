@@ -20,3 +20,4 @@
 .cover-purple .cover-tag{color:#c3a9ee}
 .cover-purple .mini-progress i{background:#b49bf1}
 @media(max-width:520px){.category-choice{gap:3px;margin-bottom:12px}.category-choice button{flex:1;min-height:38px;padding:0 8px;font-size:10px}.collection-section .section-heading{align-items:flex-end}.collection-section .section-heading>.button{white-space:nowrap}}
+.tile-title-line{display:flex;align-items:center;gap:7px;min-width:0}.tile-title-line .tile-title{flex:1;min-width:0}.tile-number{flex:0 1 auto;max-width:46%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;border:1px solid #384237;border-radius:4px;background:#202720;color:#a9c77b;padding:3px 5px;font:8px/1.2 var(--mono)}
