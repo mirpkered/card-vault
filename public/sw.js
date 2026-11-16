@@ -1,4 +1,4 @@
-const CACHE = 'collect-everything-v6';
+const CACHE = 'collect-everything-v7';
 self.addEventListener('install', (event) => {
   event.waitUntil(caches.open(CACHE).then((cache) => cache.addAll(['./', './index.html', './manifest.webmanifest', './favicon.png', './apple-touch-icon.png', './collect-icon-192.png', './collect-icon-512.png', './collect-wordmark.svg', './collect-wordmark.png', './naruto-catalog.json'])));
   self.skipWaiting();
