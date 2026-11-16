@@ -44,4 +44,30 @@ describe('private sync merge review', () => {
     expect(merged.catalog.cards[0].name).toBe('Device name');
     expect(merged.updatedAt).toBe('2026-11-16T12:00:00.000Z');
   });
+
+  it('keeps ownership for different card versions separate during sync merge', () => {
+    const device = vault();
+    const remote = vault();
+    device.catalog.ownership.push({ cardId: device.catalog.cards[0].id, variantId: `${device.catalog.cards[0].id}:normal`, personal: 1, duplicates: 0, incoming: 0, updatedAt: 'device' });
+    remote.catalog.ownership.push({ cardId: remote.catalog.cards[0].id, variantId: `${remote.catalog.cards[0].id}:foil`, personal: 2, duplicates: 0, incoming: 0, updatedAt: 'private' });
+    const plan = prepareVaultMerge(device, remote);
+    expect(plan.conflicts).toEqual([]);
+    expect(plan.merged.catalog.ownership.map((item) => item.variantId)).toEqual([
+      `${device.catalog.cards[0].id}:normal`, `${remote.catalog.cards[0].id}:foil`,
+    ]);
+  });
+
+  it('flags competing quantity edits to the same card version for review', () => {
+    const device = vault();
+    const remote = vault();
+    const cardId = device.catalog.cards[0].id;
+    const variantId = `${cardId}:foil`;
+    device.catalog.ownership.push({ cardId, variantId, personal: 1, duplicates: 0, incoming: 0, updatedAt: 'device' });
+    remote.catalog.ownership.push({ cardId, variantId, personal: 2, duplicates: 0, incoming: 0, updatedAt: 'private' });
+    const plan = prepareVaultMerge(device, remote);
+    expect(plan.conflicts).toHaveLength(1);
+    expect(plan.conflicts[0].collection).toBe('ownership');
+    const merged = applyVaultMerge(plan, { [plan.conflicts[0].key]: 'device' });
+    expect(merged.catalog.ownership[0].personal).toBe(1);
+  });
 });

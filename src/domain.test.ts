@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { cardStatus, completion, emptyVault, filterCards, findConflicts, getTrackedCards, migrateVault, parseCsv, validateCatalog, validateInventoryRows, type CardDefinition, type Ownership } from './domain';
+import { cardStatus, completion, emptyVault, filterCards, findConflicts, getTrackedCards, migrateVault, parseCsv, validateCatalog, validateInventoryRows, type CardDefinition, type CardVariant, type Ownership } from './domain';
 
 const cards: CardDefinition[] = [
   { id: 'set:one:01', setId: 'set:one', number: '01', name: 'Kakashi', rarity: 'Rare' },
@@ -30,6 +30,26 @@ describe('collection domain', () => {
   it('calculates completion from unique owned card definitions', () => {
     expect(completion(cards, inventory)).toEqual({ owned: 1, total: 3, percent: 33 });
   });
+  it('tracks each printing independently while counting its definition once', () => {
+    const normal: CardVariant = { id: `${cards[0].id}:normal`, cardId: cards[0].id, name: 'Normal', treatment: 'normal', imageUrls: [] };
+    const foil: CardVariant = { id: `${cards[0].id}:foil`, cardId: cards[0].id, name: 'Foil', treatment: 'foil', imageUrls: [] };
+    const versions: Ownership[] = [
+      { cardId: cards[0].id, variantId: normal.id, personal: 1, duplicates: 0, incoming: 0, updatedAt: '' },
+      { cardId: cards[0].id, variantId: foil.id, personal: 1, duplicates: 1, incoming: 2, updatedAt: '' },
+    ];
+    const catalog = emptyVault().catalog;
+    catalog.sets.push({ id: 'set:one', seriesId: 'series:kayou-naruto', name: 'one', tracked: true }, { id: 'set:two', seriesId: 'series:kayou-naruto', name: 'two', tracked: true });
+    catalog.cards = cards;
+    catalog.variants = [normal, foil];
+    catalog.ownership = versions;
+    expect(validateCatalog(catalog)).toEqual([]);
+    expect(validateCatalog({ ...catalog, ownership: [...versions, { ...versions[0] }] })).toContain('A card version may have only one ownership record.');
+    expect(cardStatus(cards[0].id, versions)).toBe('duplicate');
+    expect(completion(cards, versions)).toEqual({ owned: 1, total: 3, percent: 33 });
+    const oneOfEach = versions.map((item) => ({ ...item, personal: 1, duplicates: 0 }));
+    expect(cardStatus(cards[0].id, oneOfEach)).toBe('owned');
+    expect(completion(cards, oneOfEach)).toEqual({ owned: 1, total: 3, percent: 33 });
+  });
   it('excludes turned-off sets from progress while retaining their card records', () => {
     const catalog = emptyVault().catalog;
     const activeCard = { id: `${catalog.sets[0].id}:01`, setId: catalog.sets[0].id, number: '01', name: 'Active' };
@@ -59,6 +79,22 @@ describe('collection domain', () => {
     expect(parsed.rows[0]).toMatchObject({ card_id: 'set:one:01', personal: '1', duplicates: '2' });
     expect(validateInventoryRows(parsed.rows, cards).errors).toEqual([]);
     expect(validateInventoryRows([{ card_id: 'unknown', personal: '-1', duplicates: '0', incoming: '0' }], cards).errors).toHaveLength(2);
+  });
+  it('validates variant-specific CSV rows and defaults legacy rows to Normal', () => {
+    const variants: CardVariant[] = [
+      { id: `${cards[0].id}:normal`, cardId: cards[0].id, name: 'Normal', treatment: 'normal', imageUrls: [] },
+      { id: `${cards[0].id}:foil`, cardId: cards[0].id, name: 'Foil', treatment: 'foil', imageUrls: [] },
+    ];
+    const legacy = validateInventoryRows([{ card_id: cards[0].id, personal: '1', incoming: '0' }], cards, variants);
+    expect(legacy.errors).toEqual([]);
+    expect(legacy.updates[0].variantId).toBe(variants[0].id);
+    const separate = validateInventoryRows([
+      { card_id: cards[0].id, variant_id: variants[0].id, personal: '1', incoming: '0' },
+      { card_id: cards[0].id, variant_id: variants[1].id, personal: '2', incoming: '0' },
+    ], cards, variants);
+    expect(separate.errors).toEqual([]);
+    expect(separate.updates).toHaveLength(2);
+    expect(validateInventoryRows([{ card_id: cards[0].id, variant_id: 'foreign', personal: '1', incoming: '0' }], cards, variants).errors).toContain('Row 2 references an unknown card variant foreign.');
   });
   it('preserves an unknown duplicate quantity instead of treating it as zero', () => {
     const parsed = parseCsv('card_id,personal,duplicates,duplicates_known,incoming\n"set:one:01",1,0,false,0');

@@ -14,7 +14,14 @@ export type CollectionCategory = 'cards' | 'media' | 'misc';
 export type Series = { id: string; franchiseId?: string; name: string; category?: CollectionCategory };
 export type CardSet = { id: string; seriesId: string; name: string; releaseNumber?: string; expectedCardCount?: number; rarityScheme?: string[]; tracked: boolean; sourceCompletionIndicator?: 'complete' | 'incomplete' | 'unmarked'; sourceRow?: number };
 export type CardDefinition = { id: string; setId: string; number: string; name: string; category?: string; rarity?: string; slot?: 'title' | 'numbered'; sourceNote?: string };
-export type CardVariant = { id: string; cardId: string; name: string; imageUrls: ImageSource[] };
+export type CardVariant = {
+  id: string;
+  cardId: string;
+  name: string;
+  imageUrls: ImageSource[];
+  treatment?: 'normal' | 'foil' | 'full-art' | 'special';
+  imageNote?: string;
+};
 export type ImageSource = { url: string; source: 'verified-remote' | 'user-provided'; verifiedAt?: string };
 export type Ownership = { cardId: string; variantId?: string; personal: number; duplicates: number; duplicatesKnown?: boolean; incoming: number; updatedAt: string };
 export type Acquisition = { id: string; cardId: string; quantity: number; status: 'incoming' | 'received'; acquiredAt?: string; note?: string };
@@ -78,13 +85,21 @@ export function validateCatalog(catalog: Catalog): string[] {
   for (const item of catalog.sets) if (typeof item.tracked !== 'boolean') errors.push(`Set ${item.id} must record whether it is tracked.`);
   for (const item of catalog.sets) if (item.expectedCardCount !== undefined && catalog.cards.filter((card) => card.setId === item.id).length !== item.expectedCardCount) errors.push(`Set ${item.id} must define exactly ${item.expectedCardCount} cards.`);
   for (const item of catalog.cards) if (!has('sets', item.setId)) errors.push(`Card ${item.id} references missing set ${item.setId}.`);
-  for (const item of catalog.variants) if (!has('cards', item.cardId)) errors.push(`Variant ${item.id} references missing card ${item.cardId}.`);
+  const variantById = new Map(catalog.variants.map((variant) => [variant.id, variant]));
+  for (const item of catalog.variants) {
+    if (!has('cards', item.cardId)) errors.push(`Variant ${item.id} references missing card ${item.cardId}.`);
+    if (item.treatment !== undefined && !['normal', 'foil', 'full-art', 'special'].includes(item.treatment)) errors.push(`Variant ${item.id} has an unsupported treatment.`);
+    if (!Array.isArray(item.imageUrls)) errors.push(`Variant ${item.id} must contain an image list.`);
+    if (item.imageNote !== undefined && typeof item.imageNote !== 'string') errors.push(`Variant ${item.id} has an invalid image note.`);
+  }
   for (const item of catalog.ownership) {
     if (!has('cards', item.cardId)) errors.push(`Ownership references missing card ${item.cardId}.`);
+    if (item.variantId && variantById.get(item.variantId)?.cardId !== item.cardId) errors.push(`Ownership for ${item.cardId} references a missing or mismatched card version ${item.variantId}.`);
     if (!Number.isInteger(item.personal) || item.personal < 0 || !Number.isInteger(item.duplicates) || item.duplicates < 0 || !Number.isInteger(item.incoming) || item.incoming < 0) errors.push(`Ownership for ${item.cardId} must use non-negative whole quantities.`);
     if (item.duplicatesKnown !== undefined && typeof item.duplicatesKnown !== 'boolean') errors.push(`Ownership for ${item.cardId} must mark duplicate quantity knowledge as true or false.`);
   }
-  if (new Set(catalog.ownership.map((item) => item.cardId)).size !== catalog.ownership.length) errors.push('A card may have only one ownership record.');
+  const ownershipKeys = catalog.ownership.map((item) => JSON.stringify([item.cardId, item.variantId ?? null]));
+  if (new Set(ownershipKeys).size !== catalog.ownership.length) errors.push('A card version may have only one ownership record.');
   for (const item of catalog.acquisitions) {
     if (!has('cards', item.cardId)) errors.push(`Acquisition ${item.id} references missing card ${item.cardId}.`);
     if (!Number.isInteger(item.quantity) || item.quantity < 1) errors.push(`Acquisition ${item.id} must have a positive whole quantity.`);
@@ -122,11 +137,15 @@ export function migrateVault(value: unknown): VaultData {
 
 export type CardStatus = 'owned' | 'missing' | 'incoming' | 'duplicate';
 export function cardStatus(cardId: string, inventory: Ownership[]): CardStatus {
-  const qty = inventory.find((item) => item.cardId === cardId);
-  const total = (qty?.personal ?? 0) + (qty?.duplicates ?? 0);
-  if ((qty?.duplicates ?? 0) > 0 || total > 1) return 'duplicate';
+  const records = inventory.filter((item) => item.cardId === cardId);
+  const hasDuplicateVersion = records.some((item) => item.duplicates > 0 || item.personal + item.duplicates > 1);
+  const personal = records.reduce((sum, item) => sum + item.personal, 0);
+  const duplicates = records.reduce((sum, item) => sum + item.duplicates, 0);
+  const incoming = records.reduce((sum, item) => sum + item.incoming, 0);
+  const total = personal + duplicates;
+  if (hasDuplicateVersion) return 'duplicate';
   if (total > 0) return 'owned';
-  if ((qty?.incoming ?? 0) > 0) return 'incoming';
+  if (incoming > 0) return 'incoming';
   return 'missing';
 }
 export function completion(cards: CardDefinition[], inventory: Ownership[]) {
@@ -143,8 +162,9 @@ export function findConflicts(local: VaultData, remote: VaultData): string[] {
     const remoteById = new Map(remote.catalog[key].map((x) => [x.id, x]));
     for (const record of local.catalog[key]) if (remoteById.has(record.id) && JSON.stringify(record) !== JSON.stringify(remoteById.get(record.id))) conflicts.push(`${key.slice(0, -1)} ${record.id} differs between local and remote data.`);
   }
-  const localInventory = new Map(local.catalog.ownership.map((x) => [x.cardId, x]));
-  const remoteInventory = new Map(remote.catalog.ownership.map((x) => [x.cardId, x]));
+  const ownershipKey = (item: Ownership) => JSON.stringify([item.cardId, item.variantId ?? null]);
+  const localInventory = new Map(local.catalog.ownership.map((x) => [ownershipKey(x), x]));
+  const remoteInventory = new Map(remote.catalog.ownership.map((x) => [ownershipKey(x), x]));
   for (const [id, record] of localInventory) if (remoteInventory.has(id) && JSON.stringify(record) !== JSON.stringify(remoteInventory.get(id))) conflicts.push(`Ownership for ${id} differs between local and remote data.`);
   return conflicts;
 }
@@ -154,20 +174,24 @@ export function filterCards(cards: CardDefinition[], inventory: Ownership[], fil
   return cards.filter((card) => (filter === 'all' || cardStatus(card.id, inventory) === filter) && (!normalized || `${card.name} ${card.number} ${card.rarity ?? ''} ${card.category ?? ''}`.toLowerCase().includes(normalized)));
 }
 
-export function validateInventoryRows(rows: Record<string, string>[], cards: CardDefinition[]): { updates: Ownership[]; errors: string[] } {
+export function validateInventoryRows(rows: Record<string, string>[], cards: CardDefinition[], variants: CardVariant[] = []): { updates: Ownership[]; errors: string[] } {
   const errors: string[] = []; const known = new Set(cards.map((card) => card.id)); const updates: Ownership[] = [];
+  const knownVariants = new Map(variants.map((variant) => [variant.id, variant.cardId]));
+  const normalVariantByCard = new Map(variants.filter((variant) => variant.treatment === 'normal').map((variant) => [variant.cardId, variant.id]));
   rows.forEach((row, index) => {
     const line = index + 2;
     if (!known.has(row.card_id)) errors.push(`Row ${line} references unknown card ID ${row.card_id}.`);
+    const variantId = row.variant_id?.trim() || normalVariantByCard.get(row.card_id);
+    if (variantId && knownVariants.get(variantId) !== row.card_id) errors.push(`Row ${line} references an unknown card variant ${variantId}.`);
     const personal = Number(row.personal ?? row.owned); const duplicates = Number(row.duplicates ?? row.dupes ?? 0); const incoming = Number(row.incoming);
     if (![personal, duplicates, incoming].every((x) => Number.isInteger(x) && x >= 0)) errors.push(`Row ${line} has invalid Personal, Dupes, or incoming quantities.`);
     else {
       const duplicateFlag = row.duplicates_known?.trim().toLowerCase();
       if (duplicateFlag && duplicateFlag !== 'true' && duplicateFlag !== 'false') errors.push(`Row ${line} has invalid duplicates_known; use true or false.`);
-      else updates.push({ cardId: row.card_id, personal, duplicates, incoming, ...(duplicateFlag ? { duplicatesKnown: duplicateFlag === 'true' } : {}), updatedAt: new Date().toISOString() });
+      else updates.push({ cardId: row.card_id, ...(variantId ? { variantId } : {}), personal, duplicates, incoming, ...(duplicateFlag ? { duplicatesKnown: duplicateFlag === 'true' } : {}), updatedAt: new Date().toISOString() });
     }
   });
-  if (new Set(updates.map((x) => x.cardId)).size !== updates.length) errors.push('CSV contains duplicate card_id rows.');
+  if (new Set(updates.map((x) => JSON.stringify([x.cardId, x.variantId ?? null]))).size !== updates.length) errors.push('CSV contains duplicate card and variant rows.');
   return { updates, errors };
 }
 

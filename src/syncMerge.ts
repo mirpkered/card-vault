@@ -19,7 +19,7 @@ type SyncRecord = Record<string, unknown> & { id?: string; cardId?: string };
 const collections: (keyof Catalog)[] = ['publishers', 'franchises', 'series', 'sets', 'cards', 'variants', 'ownership', 'acquisitions'];
 
 function keyOf(collection: keyof Catalog, row: SyncRecord): string {
-  return String(collection === 'ownership' ? row.cardId : row.id);
+  return String(collection === 'ownership' ? JSON.stringify([row.cardId, row.variantId ?? null]) : row.id);
 }
 
 function same(left: unknown, right: unknown): boolean {

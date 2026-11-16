@@ -18,6 +18,36 @@ function slugify(value) {
     .replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
 }
 
+function imageFileName(url) {
+  return new URL(url).pathname.split('/').pop() ?? '';
+}
+
+function deriveVariants(setName, cardNumber, imageUrls) {
+  const normalImages = imageUrls.filter((url) => {
+    const file = imageFileName(url);
+    return !/(?:_FL|_premium|_SP|_SS2|_ho)(?:_|\.|$)/i.test(file);
+  });
+  const primaryCode = cardNumber.split('/')[0];
+  const normalUrl = normalImages.find((url) => imageFileName(url).toLowerCase() === `${primaryCode.toLowerCase()}_eg.jpg`)
+    ?? normalImages[0] ?? imageUrls[0];
+  const premiumImages = imageUrls.filter((url) => /_premium(?:_eg)?\.jpg$/i.test(imageFileName(url)) || /_eg_premium\.jpg$/i.test(imageFileName(url)) || /_ho\.jpg$/i.test(imageFileName(url)));
+  const fullArtImages = imageUrls.filter((url) => /_FL(?:_eg)?(?:_[0-9]+)?\.jpg$/i.test(imageFileName(url)) || /_eg_FL(?:_[0-9]+)?\.jpg$/i.test(imageFileName(url)));
+  const isNoirTreatment = setName === 'Memories of Life' && cardNumber === '7-034L';
+  const specialImages = imageUrls.filter((url) => /_(?:SP|SS2)(?:_|\.|$)/i.test(imageFileName(url)));
+  return [
+    { treatment: 'normal', name: 'Normal', imageUrls: [normalUrl] },
+    {
+      treatment: 'foil',
+      name: 'Foil',
+      imageUrls: premiumImages.length ? premiumImages : [normalUrl],
+      ...(!premiumImages.length ? { imageNote: 'The foil finish is not visible in Square Enix’s available catalog image.' } : {}),
+    },
+    ...(fullArtImages.length && !isNoirTreatment ? [{ treatment: 'full-art', name: 'Full Art', imageUrls: fullArtImages }] : []),
+    ...(isNoirTreatment ? [{ treatment: 'special', name: 'Noir', imageUrls: fullArtImages }] : []),
+    ...(specialImages.length ? [{ treatment: 'special', name: 'Special', imageUrls: specialImages }] : []),
+  ];
+}
+
 const page = await fetch(browserUrl);
 if (!page.ok) throw new Error(`Square Enix Card Browser returned HTTP ${page.status}.`);
 const html = await page.text();
@@ -70,6 +100,7 @@ for (const sourceCard of result.cards) {
       name,
       ...(rarity ? { rarity } : {}),
       imageUrls,
+      variants: deriveVariants(setName, sourceCard.code.trim(), imageUrls),
       ...(!name || !rarity ? { sourceNote: `The Square Enix Card Browser did not provide an English name${!rarity ? ' or rarity' : ''} for this entry.` } : {}),
     });
   }
@@ -98,7 +129,7 @@ const cards = setNames.flatMap((name) => {
 });
 const unnamed = cards.filter((card) => !card.name).length;
 const output = {
-  schemaVersion: 2,
+  schemaVersion: 3,
   source: 'Square Enix official Card Browser',
   cataloguedAt: new Date().toISOString(),
   browserUrl,

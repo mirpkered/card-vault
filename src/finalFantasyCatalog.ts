@@ -16,16 +16,24 @@ export type FinalFantasyCatalogSet = {
   rarityCounts: Record<string, number>;
   trackedByDefault: boolean;
 };
+export type FinalFantasyVariantTreatment = 'normal' | 'foil' | 'full-art' | 'special';
+export type FinalFantasyCatalogVariant = {
+  treatment: FinalFantasyVariantTreatment;
+  name: string;
+  imageUrls: string[];
+  imageNote?: string;
+};
 export type FinalFantasyCatalogCard = {
   setId: string;
   number: string;
   name: string;
   rarity?: string;
   imageUrls: string[];
+  variants: FinalFantasyCatalogVariant[];
   sourceNote?: string;
 };
 export type FinalFantasyCatalogUpdate = {
-  schemaVersion: 2;
+  schemaVersion: 3;
   source: 'Square Enix official Card Browser';
   cataloguedAt: string;
   browserUrl: string;
@@ -39,7 +47,10 @@ export type FinalFantasyCatalogUpdatePlan = {
   setsToAdd: number;
   cardsToAdd: number;
   cardDetailsToFill: number;
+  variantRecordsToAdd: number;
+  variantDetailsToUpdate: number;
   imagesToAdd: number;
+  ownershipToNormalize: number;
   conflicts: string[];
   hasChanges: boolean;
 };
@@ -69,10 +80,48 @@ function imageSource(url: string, cataloguedAt: string) {
   return { url, source: 'verified-remote' as const, verifiedAt: cataloguedAt };
 }
 
+export function finalFantasyVariantId(cardDefinitionId: string, treatment: FinalFantasyVariantTreatment, name?: string) {
+  const suffix = treatment === 'special' && name ? `special:${slugify(name)}` : treatment;
+  return `${cardDefinitionId}:fftcg:${suffix}`;
+}
+
+function imageFileName(url: string) { return new URL(url).pathname.split('/').pop() ?? ''; }
+
+function deriveVariants(setName: string, cardNumber: string, imageUrls: string[]): FinalFantasyCatalogVariant[] {
+  const normalImages = imageUrls.filter((url) => !/(?:_FL|_premium|_SP|_SS2|_ho)(?:_|\.|$)/i.test(imageFileName(url)));
+  const primaryCode = cardNumber.split('/')[0];
+  const normalUrl = normalImages.find((url) => imageFileName(url).toLowerCase() === `${primaryCode.toLowerCase()}_eg.jpg`) ?? normalImages[0] ?? imageUrls[0];
+  const premiumImages = imageUrls.filter((url) => /_premium(?:_eg)?\.jpg$/i.test(imageFileName(url)) || /_eg_premium\.jpg$/i.test(imageFileName(url)) || /_ho\.jpg$/i.test(imageFileName(url)));
+  const fullArtImages = imageUrls.filter((url) => /_FL(?:_eg)?(?:_[0-9]+)?\.jpg$/i.test(imageFileName(url)) || /_eg_FL(?:_[0-9]+)?\.jpg$/i.test(imageFileName(url)));
+  const isNoirTreatment = setName === 'Memories of Life' && cardNumber === '7-034L';
+  const specialImages = imageUrls.filter((url) => /_(?:SP|SS2)(?:_|\.|$)/i.test(imageFileName(url)));
+  return [
+    { treatment: 'normal', name: 'Normal', imageUrls: [normalUrl] },
+    {
+      treatment: 'foil', name: 'Foil', imageUrls: premiumImages.length ? premiumImages : [normalUrl],
+      ...(!premiumImages.length ? { imageNote: 'The foil finish is not visible in Square Enix’s available catalog image.' } : {}),
+    },
+    ...(fullArtImages.length && !isNoirTreatment ? [{ treatment: 'full-art' as const, name: 'Full Art', imageUrls: fullArtImages }] : []),
+    ...(isNoirTreatment ? [{ treatment: 'special' as const, name: 'Noir', imageUrls: fullArtImages }] : []),
+    ...(specialImages.length ? [{ treatment: 'special' as const, name: 'Special', imageUrls: specialImages }] : []),
+  ];
+}
+
+function imageVariantRecord(cardId: string, variant: FinalFantasyCatalogVariant, cataloguedAt: string): CardVariant {
+  return {
+    id: finalFantasyVariantId(cardId, variant.treatment, variant.name),
+    cardId,
+    name: variant.name,
+    treatment: variant.treatment,
+    imageUrls: variant.imageUrls.map((url) => imageSource(url, cataloguedAt)),
+    ...(variant.imageNote ? { imageNote: variant.imageNote } : {}),
+  };
+}
+
 export function parseFinalFantasyCatalogUpdate(value: unknown): FinalFantasyCatalogUpdate {
   if (!value || typeof value !== 'object') throw new Error('Final Fantasy catalog update must be a JSON object.');
   const update = value as Partial<FinalFantasyCatalogUpdate>;
-  if (update.schemaVersion !== 2 || update.source !== SOURCE || update.browserUrl !== BROWSER_URL
+  if (update.schemaVersion !== 3 || update.source !== SOURCE || update.browserUrl !== BROWSER_URL
     || !Number.isFinite(Date.parse(update.cataloguedAt ?? ''))
     || !Number.isInteger(update.sourceCardCount) || (update.sourceCardCount ?? 0) < 1
     || !Array.isArray(update.sets) || !Array.isArray(update.cards)) {
@@ -83,6 +132,7 @@ export function parseFinalFantasyCatalogUpdate(value: unknown): FinalFantasyCata
   }
 
   const entriesBySet = new Map<string, FinalFantasyCatalogCard[]>();
+  const setNames = new Map<string, string>();
   for (const set of update.sets) {
     if (!set || set.id !== setId(set.name) || set.seriesId !== SERIES_ID
       || !Number.isInteger(set.cardCount) || set.cardCount < 1
@@ -93,6 +143,7 @@ export function parseFinalFantasyCatalogUpdate(value: unknown): FinalFantasyCata
       throw new Error(`Final Fantasy set ${set?.name ?? '(unknown)'} failed validation.`);
     }
     entriesBySet.set(set.id, []);
+    setNames.set(set.id, set.name);
   }
 
   for (const card of update.cards) {
@@ -102,9 +153,13 @@ export function parseFinalFantasyCatalogUpdate(value: unknown): FinalFantasyCata
       || (card.sourceNote !== undefined && typeof card.sourceNote !== 'string')
       || (!card.name.trim() || !card.rarity) && !card.sourceNote
       || !Array.isArray(card.imageUrls) || card.imageUrls.length < 1 || new Set(card.imageUrls).size !== card.imageUrls.length
-      || !card.imageUrls.every((url) => typeof url === 'string' && isOfficialImageUrl(url))) {
+      || !card.imageUrls.every((url) => typeof url === 'string' && isOfficialImageUrl(url))
+      || !Array.isArray(card.variants)) {
       throw new Error('Final Fantasy catalog contains a card with invalid identity, details, or image source.');
     }
+    const expectedVariants = deriveVariants(setNames.get(card.setId)!, card.number, card.imageUrls);
+    if (!sameRecord(card.variants, expectedVariants)) throw new Error(`Final Fantasy card ${card.number} has variant details that do not match its official image files.`);
+    if (new Set(expectedVariants.map((variant) => finalFantasyVariantId(cardId(card.setId, card.number), variant.treatment, variant.name))).size !== expectedVariants.length) throw new Error(`Final Fantasy card ${card.number} repeats a version identity.`);
     entries.push(card);
   }
   for (const set of update.sets) {
@@ -134,7 +189,10 @@ export function planFinalFantasyCatalogUpdate(vault: VaultData, update: FinalFan
   let setsToAdd = 0;
   let cardsToAdd = 0;
   let cardDetailsToFill = 0;
+  let variantRecordsToAdd = 0;
+  let variantDetailsToUpdate = 0;
   let imagesToAdd = 0;
+  let ownershipToNormalize = 0;
   const publisher: Publisher = { id: 'publisher:square-enix', name: 'Square Enix' };
   const franchise: Franchise = { id: 'franchise:final-fantasy', publisherId: publisher.id, name: 'Final Fantasy' };
   const series: Series = { id: SERIES_ID, franchiseId: franchise.id, name: 'Final Fantasy TCG', category: 'cards' };
@@ -168,14 +226,31 @@ export function planFinalFantasyCatalogUpdate(vault: VaultData, update: FinalFan
       if (!current) cardsToAdd++;
       else if (current.setId !== sourceSet.id) conflicts.push(`Card ${id} belongs to a different set.`);
       else if ((!current.name.trim() && !!entry.name.trim()) || (!current.rarity && !!entry.rarity)) cardDetailsToFill++;
-      const variantId = id + ':square-enix-official';
-      const existing = existingVariants.get(variantId);
-      if (!existing) imagesToAdd += entry.imageUrls.length;
-      else if (existing.cardId !== id) conflicts.push(`Official image record for ${entry.number} belongs to a different card.`);
-      else imagesToAdd += entry.imageUrls.filter((url) => !existing.imageUrls.some((source) => source.url === url)).length;
+      for (const sourceVariant of entry.variants) {
+        const expectedVariant = imageVariantRecord(id, sourceVariant, update.cataloguedAt);
+        const existing = existingVariants.get(expectedVariant.id);
+        if (!existing) {
+          variantRecordsToAdd++;
+          imagesToAdd += expectedVariant.imageUrls.length;
+        } else if (existing.cardId !== id) conflicts.push(`Official ${sourceVariant.name} version for ${entry.number} belongs to a different card.`);
+        else {
+          imagesToAdd += expectedVariant.imageUrls.filter((source) => !existing.imageUrls.some((current) => current.url === source.url)).length;
+          if (existing.name !== expectedVariant.name || existing.treatment !== expectedVariant.treatment || existing.imageNote !== expectedVariant.imageNote) variantDetailsToUpdate++;
+        }
+      }
     }
   }
-  return { recordsToAdd, setsToAdd, cardsToAdd, cardDetailsToFill, imagesToAdd, conflicts, hasChanges: recordsToAdd + cardsToAdd + cardDetailsToFill + imagesToAdd > 0 || update.sets.some((sourceSet) => {
+  const incomingCardIds = new Set(update.cards.map((entry) => cardId(entry.setId, entry.number)));
+  const normalVariantIds = new Set(update.cards.map((entry) => finalFantasyVariantId(cardId(entry.setId, entry.number), 'normal')));
+  const explicitNormalOwnership = new Set(vault.catalog.ownership.filter((item) => item.variantId && normalVariantIds.has(item.variantId)).map((item) => item.variantId));
+  for (const item of vault.catalog.ownership) {
+    if (!item.variantId && incomingCardIds.has(item.cardId)) {
+      const normalId = finalFantasyVariantId(item.cardId, 'normal');
+      if (explicitNormalOwnership.has(normalId)) conflicts.push(`Card ${item.cardId} has both legacy and Normal-version quantities; review them before importing.`);
+      else ownershipToNormalize++;
+    }
+  }
+  return { recordsToAdd, setsToAdd, cardsToAdd, cardDetailsToFill, variantRecordsToAdd, variantDetailsToUpdate, imagesToAdd, ownershipToNormalize, conflicts, hasChanges: recordsToAdd + cardsToAdd + cardDetailsToFill + variantRecordsToAdd + variantDetailsToUpdate + imagesToAdd + ownershipToNormalize > 0 || update.sets.some((sourceSet) => {
     const current = existingSets.get(sourceSet.id);
     return current?.expectedCardCount !== sourceSet.cardCount || !sameRecord(current?.rarityScheme ?? [], sourceSet.rarityScheme);
   }) };
@@ -225,18 +300,23 @@ export function applyFinalFantasyCatalogUpdate(vault: VaultData, update: FinalFa
         ...(currentCard.sourceNote || !entry.sourceNote ? {} : { sourceNote: entry.sourceNote }),
       });
     }
-    const variantId = id + ':square-enix-official';
-    const currentVariant = variants.get(variantId);
-    const currentUrls = currentVariant?.imageUrls ?? [];
-    const newUrls = entry.imageUrls.filter((url) => !currentUrls.some((source) => source.url === url)).map((url) => imageSource(url, update.cataloguedAt));
-    const mergedVariant: CardVariant = {
-      id: variantId,
-      cardId: id,
-      name: currentVariant?.name ?? 'Official card images',
-      imageUrls: [...currentUrls, ...newUrls],
-    };
-    variants.set(variantId, mergedVariant);
+    for (const sourceVariant of entry.variants) {
+      const expectedVariant = imageVariantRecord(id, sourceVariant, update.cataloguedAt);
+      const currentVariant = variants.get(expectedVariant.id);
+      const currentUrls = currentVariant?.imageUrls ?? [];
+      const newUrls = expectedVariant.imageUrls.filter((source) => !currentUrls.some((current) => current.url === source.url));
+      const mergedVariant: CardVariant = {
+        ...expectedVariant,
+        imageUrls: [...currentUrls, ...newUrls],
+      };
+      variants.set(expectedVariant.id, mergedVariant);
+    }
   }
+
+  const incomingCardIds = new Set(update.cards.map((entry) => cardId(entry.setId, entry.number)));
+  const ownership = vault.catalog.ownership.map((item) => item.cardId && incomingCardIds.has(item.cardId) && !item.variantId
+    ? { ...item, variantId: finalFantasyVariantId(item.cardId, 'normal') }
+    : item);
 
   const result: VaultData = {
     ...vault,
@@ -249,6 +329,7 @@ export function applyFinalFantasyCatalogUpdate(vault: VaultData, update: FinalFa
       sets: [...sets.values()],
       cards: [...cards.values()],
       variants: [...variants.values()],
+      ownership,
     },
   };
   const errors = validateCatalog(result.catalog);
