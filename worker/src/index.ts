@@ -1,4 +1,4 @@
-import { validateVault, type VaultData } from '../../src/domain';
+import { migrateVault, validateVault, type VaultData } from '../../src/domain';
 
 export interface Env {
   ASSETS: { fetch(request: Request): Promise<Response> };
@@ -131,11 +131,22 @@ async function getCanonical(env: Env, token: string): Promise<Canonical> {
   if (!file) return { exists: false, data: null, revision: null, commitSha: ref.object.sha, treeSha: commit.tree.sha, updatedAt: null };
   const blob = await githubApi<{ content: string; size: number }>(`${root}/git/blobs/${file.sha}`, token);
   if (blob.size > MAX_SNAPSHOT_BYTES) throw new ServiceError('The private snapshot exceeds the supported size.', 502, 'snapshot_too_large');
-  let data: unknown;
-  try { data = JSON.parse(decodeBase64(blob.content)); }
+  let snapshot: unknown;
+  try { snapshot = JSON.parse(decodeBase64(blob.content)); }
   catch { throw new ServiceError('The canonical private snapshot is not valid JSON. Restore a previous repository revision before syncing.', 502, 'invalid_remote_json'); }
-  if (!validateVault(data)) throw new ServiceError('The canonical private snapshot has an unsupported schema or invalid catalog records. No change was applied.', 502, 'invalid_remote_snapshot');
+  const data = migrateRemoteSnapshot(snapshot);
   return { exists: true, data, revision: file.sha, commitSha: ref.object.sha, treeSha: commit.tree.sha, updatedAt: data.updatedAt };
+}
+
+/** Migrate older canonical snapshots in memory; reading never writes to the private repository. */
+export function migrateRemoteSnapshot(value: unknown): VaultData {
+  try {
+    const migrated = migrateVault(value);
+    if (validateVault(migrated)) return migrated;
+  } catch {
+    // Return one consistent sync error without exposing private snapshot contents.
+  }
+  throw new ServiceError('The canonical private snapshot has an unsupported schema or invalid catalog records. No change was applied.', 502, 'invalid_remote_snapshot');
 }
 
 export function assertExpectedRevision(expected: string | null, current: string | null): void {
