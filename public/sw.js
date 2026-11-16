@@ -1,6 +1,6 @@
-const CACHE = 'collect-everything-v3';
+const CACHE = 'collect-everything-v4';
 self.addEventListener('install', (event) => {
-  event.waitUntil(caches.open(CACHE).then((cache) => cache.addAll(['./', './index.html', './manifest.webmanifest', './collect-icon.svg', './collect-wordmark.svg'])));
+  event.waitUntil(caches.open(CACHE).then((cache) => cache.addAll(['./', './index.html', './manifest.webmanifest', './favicon.png', './apple-touch-icon.png', './collect-icon-192.png', './collect-icon-512.png', './collect-wordmark.svg', './collect-wordmark.png'])));
   self.skipWaiting();
 });
 self.addEventListener('activate', (event) => {
