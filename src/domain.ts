@@ -12,7 +12,7 @@ export type Publisher = { id: string; name: string };
 export type Franchise = { id: string; publisherId: string; name: string };
 export type CollectionCategory = 'cards' | 'media' | 'misc';
 export type Series = { id: string; franchiseId?: string; name: string; category?: CollectionCategory };
-export type CardSet = { id: string; seriesId: string; name: string; releaseNumber?: string; expectedCardCount?: number; rarityScheme?: string[]; sourceCompletionIndicator?: 'complete' | 'incomplete' | 'unmarked'; sourceRow?: number };
+export type CardSet = { id: string; seriesId: string; name: string; releaseNumber?: string; expectedCardCount?: number; rarityScheme?: string[]; tracked: boolean; sourceCompletionIndicator?: 'complete' | 'incomplete' | 'unmarked'; sourceRow?: number };
 export type CardDefinition = { id: string; setId: string; number: string; name: string; category?: string; rarity?: string; slot?: 'title' | 'numbered'; sourceNote?: string };
 export type CardVariant = { id: string; cardId: string; name: string; imageUrls: ImageSource[] };
 export type ImageSource = { url: string; source: 'verified-remote' | 'user-provided'; verifiedAt?: string };
@@ -20,7 +20,7 @@ export type Ownership = { cardId: string; variantId?: string; personal: number; 
 export type Acquisition = { id: string; cardId: string; quantity: number; status: 'incoming' | 'received'; acquiredAt?: string; note?: string };
 export type VaultData = { schemaVersion: number; updatedAt: string; catalog: Catalog };
 
-export const CURRENT_SCHEMA_VERSION = 3;
+export const CURRENT_SCHEMA_VERSION = 4;
 export const emptyCatalog = (): Catalog => ({ publishers: [], franchises: [], series: [], sets: [], cards: [], variants: [], ownership: [], acquisitions: [] });
 export function starterCatalog(): Catalog {
   return {
@@ -32,9 +32,9 @@ export function starterCatalog(): Catalog {
       { id: 'series:media:snl-dvds', name: 'SNL DVDs', category: 'media' },
     ],
     sets: [
-      { id: 'set:kayou-naruto-nrea02', seriesId: 'series:kayou-naruto', name: 'NREA02' },
-      { id: 'set:kayou-naruto-nrea03', seriesId: 'series:kayou-naruto', name: 'NREA03' },
-      { id: 'set:media:snl-dvds:collection', seriesId: 'series:media:snl-dvds', name: 'DVD collection' },
+      { id: 'set:kayou-naruto-nrea02', seriesId: 'series:kayou-naruto', name: 'NREA02', tracked: true },
+      { id: 'set:kayou-naruto-nrea03', seriesId: 'series:kayou-naruto', name: 'NREA03', tracked: true },
+      { id: 'set:media:snl-dvds:collection', seriesId: 'series:media:snl-dvds', name: 'DVD collection', tracked: true },
     ], cards: [], variants: [], ownership: [], acquisitions: [],
   };
 }
@@ -48,7 +48,7 @@ function ensureSnlDvdCollection(catalog: Catalog): Catalog {
     : [...catalog.series, { id: seriesId, name: 'SNL DVDs', category: 'media' as const }];
   const sets = catalog.sets.some((item) => item.id === setId)
     ? catalog.sets
-    : [...catalog.sets, { id: setId, seriesId, name: 'DVD collection' }];
+    : [...catalog.sets, { id: setId, seriesId, name: 'DVD collection', tracked: true }];
   return { ...catalog, series, sets };
 }
 
@@ -75,6 +75,7 @@ export function validateCatalog(catalog: Catalog): string[] {
     if (!isCollectionCategory(item.category)) errors.push(`Series ${item.id} must use Cards, Media, or Misc as its category.`);
   }
   for (const item of catalog.sets) if (!has('series', item.seriesId)) errors.push(`Set ${item.id} references missing series ${item.seriesId}.`);
+  for (const item of catalog.sets) if (typeof item.tracked !== 'boolean') errors.push(`Set ${item.id} must record whether it is tracked.`);
   for (const item of catalog.sets) if (item.expectedCardCount !== undefined && catalog.cards.filter((card) => card.setId === item.id).length !== item.expectedCardCount) errors.push(`Set ${item.id} must define exactly ${item.expectedCardCount} cards.`);
   for (const item of catalog.cards) if (!has('sets', item.setId)) errors.push(`Card ${item.id} references missing set ${item.setId}.`);
   for (const item of catalog.variants) if (!has('cards', item.cardId)) errors.push(`Variant ${item.id} references missing card ${item.cardId}.`);
@@ -103,9 +104,9 @@ export function migrateVault(value: unknown): VaultData {
   if (!value || typeof value !== 'object') throw new Error('Backup must be a JSON object.');
   const source = value as Partial<VaultData>;
   if (source.schemaVersion === CURRENT_SCHEMA_VERSION && source.catalog && validateCatalog(source.catalog).length === 0) return source as VaultData;
-  if ((source.schemaVersion === 0 || source.schemaVersion === 1 || source.schemaVersion === 2) && source.catalog) {
+  if ((source.schemaVersion === 0 || source.schemaVersion === 1 || source.schemaVersion === 2 || source.schemaVersion === 3) && source.catalog) {
     const previous = source.catalog as Omit<Catalog, 'ownership'> & { ownership?: (Partial<Ownership> & { cardId: string; owned?: number })[]; series: Series[] };
-    const migratedCatalog = { ...previous, series: previous.series.map((item) => ({ ...item, category: isCollectionCategory(item.category) ? item.category : 'cards' as const })), ownership: (previous.ownership ?? []).map((item) => ({
+    const migratedCatalog = { ...previous, sets: previous.sets.map((item) => ({ ...item, tracked: typeof item.tracked === 'boolean' ? item.tracked : true })), series: previous.series.map((item) => ({ ...item, category: isCollectionCategory(item.category) ? item.category : 'cards' as const })), ownership: (previous.ownership ?? []).map((item) => ({
       cardId: item.cardId, variantId: item.variantId, personal: item.personal ?? item.owned ?? 0,
       duplicates: item.duplicates ?? 0, ...(item.duplicatesKnown === undefined ? {} : { duplicatesKnown: item.duplicatesKnown }),
       incoming: item.incoming ?? 0, updatedAt: item.updatedAt ?? new Date().toISOString(),
@@ -131,6 +132,10 @@ export function cardStatus(cardId: string, inventory: Ownership[]): CardStatus {
 export function completion(cards: CardDefinition[], inventory: Ownership[]) {
   const owned = new Set(inventory.filter((item) => item.personal + item.duplicates > 0).map((item) => item.cardId));
   return { owned: cards.filter((card) => owned.has(card.id)).length, total: cards.length, percent: cards.length ? Math.round(cards.filter((card) => owned.has(card.id)).length / cards.length * 100) : 0 };
+}
+export function getTrackedCards(catalog: Pick<Catalog, 'sets' | 'cards'>): CardDefinition[] {
+  const trackedSetIds = new Set(catalog.sets.filter((set) => set.tracked).map((set) => set.id));
+  return catalog.cards.filter((card) => trackedSetIds.has(card.setId));
 }
 export function findConflicts(local: VaultData, remote: VaultData): string[] {
   const conflicts: string[] = [];

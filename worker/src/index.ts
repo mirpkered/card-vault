@@ -49,8 +49,11 @@ export default {
         const { session, cookie } = await getSession(request, env);
         const input = await readJsonLimited<{ expectedRevision?: unknown; data?: unknown }>(request, MAX_SNAPSHOT_BYTES);
         if (input.expectedRevision !== null && (typeof input.expectedRevision !== 'string' || !/^[a-f0-9]{40}$/i.test(input.expectedRevision))) throw new ServiceError('Invalid expected revision. Reload the private backup and try again.', 400, 'invalid_revision');
-        if (!input.data || !validateVault(input.data)) throw new ServiceError('Invalid vault snapshot. Check the schema version and catalog relationships before syncing.', 400, 'invalid_snapshot');
-        return json(await commitSnapshot(env, session, input.expectedRevision as string | null, input.data), 200, cookie);
+        let data: VaultData;
+        try { data = migrateVault(input.data); }
+        catch { throw new ServiceError('Invalid vault snapshot. Check the schema version and catalog relationships before syncing.', 400, 'invalid_snapshot'); }
+        if (!validateVault(data)) throw new ServiceError('Invalid vault snapshot. Check the schema version and catalog relationships before syncing.', 400, 'invalid_snapshot');
+        return json(await commitSnapshot(env, session, input.expectedRevision as string | null, data), 200, cookie);
       }
       return json({ error: 'not_found', message: 'This private sync route was not found.' }, 404);
     } catch (cause) {

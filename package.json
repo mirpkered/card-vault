@@ -10,7 +10,7 @@
     "typecheck": "tsc -b --pretty && tsc -p worker/tsconfig.json --pretty",
     "typecheck:worker": "tsc -p worker/tsconfig.json --pretty",
     "test": "vitest run",
-    "catalog:fftcg:memories-of-life": "node scripts/import-fftcg-memories-of-life.mjs",
+    "catalog:fftcg": "node scripts/import-fftcg-catalog.mjs",
     "deploy:worker": "npm run build && wrangler deploy --config worker/wrangler.jsonc"
   },
   "dependencies": {

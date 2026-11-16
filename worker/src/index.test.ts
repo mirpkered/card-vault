@@ -9,14 +9,14 @@ describe('canonical private snapshots', () => {
     old.catalog.series = old.catalog.series
       .filter((series) => series.id !== 'series:media:snl-dvds')
       .map(({ category: _category, ...series }) => series);
-    old.catalog.sets = old.catalog.sets.filter((set) => set.id !== 'set:media:snl-dvds:collection');
+    Object.assign(old.catalog, { sets: old.catalog.sets.filter((set) => set.id !== 'set:media:snl-dvds:collection').map(({ tracked: _tracked, ...set }) => set) });
     old.catalog.cards.push({ id: 'set:kayou-naruto-nrea02:R001', setId: 'set:kayou-naruto-nrea02', number: 'R001', name: 'Test card' });
     old.catalog.ownership.push({ cardId: 'set:kayou-naruto-nrea02:R001', personal: 2, duplicates: 1, incoming: 1, updatedAt: '2026-01-01T00:00:00.000Z' });
     const original = JSON.stringify(old);
 
     const migrated = migrateRemoteSnapshot(old);
 
-    expect(migrated.schemaVersion).toBe(3);
+    expect(migrated.schemaVersion).toBe(4);
     expect(migrated.catalog.cards).toContainEqual({ id: 'set:kayou-naruto-nrea02:R001', setId: 'set:kayou-naruto-nrea02', number: 'R001', name: 'Test card' });
     expect(migrated.catalog.ownership[0]).toMatchObject({ personal: 2, duplicates: 1, incoming: 1 });
     expect(migrated.catalog.series.find((series) => series.id === 'series:media:snl-dvds')).toMatchObject({ category: 'media' });

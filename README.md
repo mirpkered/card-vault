@@ -1,6 +1,6 @@
 # Collect Everything
 
-Collect Everything is a local-first, image-focused collection manager for Cards, Media, and Misc collections. It runs as a standalone React + TypeScript + Vite PWA, is designed for iPhone portrait use, and remains usable on desktop. Kayou Naruto and Super Rare Games card collections are included. An empty **SNL DVDs** media collection is created without inventing titles, images, or quantities; add DVD titles as you reconcile your collection.
+Collect Everything is a local-first, image-focused collection manager for Cards, Media, and Misc collections. It runs as a standalone React + TypeScript + Vite PWA, is designed for iPhone portrait use, and remains usable on desktop. Kayou Naruto and Super Rare Games card collections are included, with a Square Enix sourced catalog for Final Fantasy TCG releases. An empty **SNL DVDs** media collection is created without inventing titles, images, or quantities; add DVD titles as you reconcile your collection.
 
 ## Run locally
 
@@ -14,16 +14,17 @@ The app persists its vault in IndexedDB in the current browser. No account is re
 ## Use the app
 
 - Choose Cards, Media, or Misc from the archive categories, then open a collection and set/list.
+- Use **Manage sets** to turn releases on or off. Hidden sets and their inventory remain saved; only tracked sets appear in navigation and collection progress.
 - Add cards, DVD titles, or other collectible items and track physically owned, duplicate, and incoming quantities separately.
 - The Gallery, List, and Checklist controls change presentation only. Search and status filters remain active across view changes.
 - Completion counts unique item definitions that have at least one physically owned copy. Extra copies affect duplicate status and quantity, not completion.
 - Naruto cards can be enriched with verified names, catalog card codes, and remote thumbnails from NarutoDB. Review and apply the update inside the app; it preserves your inventory quantities and user-added images. Thumbnails stay hosted remotely and are cached after viewing.
 - Card details also accept user-provided image URLs. A URL marked “Verified” is stored with a timestamp; verify that it is the exact card before selecting that option.
-- A Super Rare Games release set requires a release number and creates the six specified slots (Title, 1–5). This slot structure has not yet been reconciled with the source workbook because it was not supplied.
+- Super Rare Games imports preserve Personal and Dupes quantities separately, keep the workbook’s colored completion markers for review, and use six release slots (Title, 1–5). New release sets start with those six slots.
 
 ## Data model
 
-Data is stored as a versioned JSON envelope (`schemaVersion`, `updatedAt`, `catalog`). Catalog entity IDs are stable namespaced strings, such as `publisher:kayou`, `set:kayou-naruto-nrea02`, and `set:kayou-naruto-nrea02:01`. Series are assigned a Cards, Media, or Misc category; a series may be independent of a publisher or franchise. The schema keeps publishers, franchises, series, sets/lists, canonical collectible definitions, variants and image sources, ownership, and acquisition records distinct. Ownership stores Personal, Dupes, and incoming counts separately. An optional `duplicatesKnown: false` marks an unreported duplicate quantity; it is shown as unknown instead of zero. Completion counts unique definitions with a physically owned copy. Cards may use rarity tiers, while media and misc items do not require rarity. A migration upgrades schema v0–v2 to v3 and adds the blank SNL DVD collection if it is not present. Item identity uses the full namespaced ID, never a printed number or title alone.
+Data is stored as a versioned JSON envelope (`schemaVersion`, `updatedAt`, `catalog`). Catalog entity IDs are stable namespaced strings, such as `publisher:kayou`, `set:kayou-naruto-nrea02`, and `set:kayou-naruto-nrea02:01`. Series are assigned a Cards, Media, or Misc category; a series may be independent of a publisher or franchise. The schema keeps publishers, franchises, series, sets/lists, canonical collectible definitions, variants and image sources, ownership, and acquisition records distinct. Ownership stores Personal, Dupes, and incoming counts separately. An optional `duplicatesKnown: false` marks an unreported duplicate quantity; it is shown as unknown instead of zero. Each set has a `tracked` flag, which controls whether it appears in navigation and progress without removing its catalog or inventory records. Completion counts unique definitions with a physically owned copy in tracked sets. Cards may use rarity tiers, while media and misc items do not require rarity. A migration upgrades schema v0–v3 to v4 and adds the blank SNL DVD collection if it is not present. Item identity uses the full namespaced ID, never a printed number or title alone.
 
 `src/domain.ts` documents the TypeScript schema and validation rules. Schema migrations are centralized in `migrateVault`; increment `CURRENT_SCHEMA_VERSION` and add a migration before changing persisted structures. The shared `cards` JSON collection remains the current storage name for all catalog items to preserve existing backup compatibility; section/category metadata identifies the item type.
 
@@ -36,7 +37,7 @@ Data is stored as a versioned JSON envelope (`schemaVersion`, `updatedAt`, `cata
 
 ## GitHub Pages
 
-The `.github/workflows/deploy.yml` workflow builds and publishes the `main` branch to GitHub Pages. The live app is [Collect Everything](https://mirpkered.github.io/card-vault/). The Pages build was verified after deployment. The repository URL remains `card-vault` for stability; its Vite base path matches that URL.
+The `.github/workflows/deploy.yml` workflow builds and publishes the `main` branch to GitHub Pages. The repository URL remains `card-vault` for stability; its Vite base path matches that URL. The shared private-sync app is served from [the Collect Everything Cloudflare Worker](https://collect-everything-private-sync.mirpkered.workers.dev/); use that address when signing in or opening the same collection on another browser.
 
 On iPhone, open the app in Safari and use **Share → Add to Home Screen**. The Pages address remains local-only: browser storage is isolated by site, and this public repository never receives catalog quantities or access tokens. Private sync runs from the separate Cloudflare Worker address described below.
 
@@ -46,17 +47,15 @@ The sync foundation serves the Vite app and `/api/*` from one Cloudflare Worker 
 
 After you explicitly create the first private backup, subsequent edits sync automatically after a short pause. GitHub commits keep the previous snapshot under `backups/` and in repository history. Every write checks the current snapshot revision and advances the branch without force; if another device saves first, the local changes stay in IndexedDB and the app opens a record-by-record review. Records that exist on only one side are retained. No record is silently deleted or overwritten during merge.
 
-### Remaining account setup
+### Private sync status
 
-The sync app is deployed on [collect-everything-private-sync.mirpkered.workers.dev](https://collect-everything-private-sync.mirpkered.workers.dev/). Private sign-in is not active until the GitHub App client secret and session encryption key are added. The GitHub App **Collect Everything Private Sync** is enabled for Device Flow and expiring user tokens, with **Contents: Read and write** plus required **Metadata: Read**, and is installed only on the private [`collect-everything-data` repository](https://github.com/mirpkered/collect-everything-data). The data repository is still empty; no collection data has been uploaded.
+The sync app is deployed on [collect-everything-private-sync.mirpkered.workers.dev](https://collect-everything-private-sync.mirpkered.workers.dev/), and its health endpoint currently reports it is configured. The GitHub App **Collect Everything Private Sync** uses Device Flow and expiring user tokens, with **Contents: Read and write** plus required **Metadata: Read**, and is installed only on the private [`collect-everything-data` repository](https://github.com/mirpkered/collect-everything-data). The Worker holds its client secret and session encryption key; these values must stay out of the public repository.
 
-To activate sync:
+To deploy a future Worker update, push the code and manually run **Deploy private sync app** in GitHub Actions. The workflow reads `CLOUDFLARE_API_TOKEN` from GitHub Actions secrets and runs the build before deployment. That token is scoped to the Collect Everything Worker only.
 
-1. The app code is deployed. For future code changes, use the manual **Deploy private sync app** GitHub Actions workflow. It reads `CLOUDFLARE_API_TOKEN` from GitHub Actions secrets and only runs when manually started. The token is named **Collect Everything Worker Deploy**, set to **Individual Workers → Editor** for `collect-everything-private-sync` only, and expires after one year; it cannot edit the Resale Tracker Worker. The Cloudflare account ID is in `worker/wrangler.jsonc`.
-2. In GitHub App **Collect Everything Private Sync → Credentials**, create a client secret. Add `GITHUB_APP_CLIENT_SECRET` and `SESSION_ENCRYPTION_KEY` as Worker secrets in Cloudflare under **Workers & Pages → collect-everything-private-sync → Settings → Variables and Secrets**. The non-secret Client ID is already configured in `worker/wrangler.jsonc`. Generate a 32-byte encryption key locally with `node -e "console.log(require('node:crypto').randomBytes(32).toString('base64'))"`. Enter secret values directly into Cloudflare; never put them in GitHub Pages, chat, or a committed `.dev.vars` file. `worker/.dev.vars` is ignored by Git for local development; use `worker/.dev.vars.example` as the local template.
-3. Open the Worker URL, sign in, import a JSON backup from the Pages browser if needed, then choose **Save first private backup**. Other browsers can sign in at that Worker URL and load the shared vault. If you install it on iPhone, add the Worker URL to the Home Screen and sign in inside the installed app.
+Sign in at the Worker URL from each browser. If the private repository has no snapshot yet, the app will offer **Save first private backup** after you review the local vault. On iPhone, open the Worker URL in Safari and use **Share → Add to Home Screen**.
 
-Until the GitHub App client secret and session encryption key are configured, the Worker serves the app in local-only mode. GitHub Pages and the Worker are different browser origins, so move existing Pages IndexedDB data with a JSON backup. Data is not sent to the private repository until you explicitly save the first backup. The app and Worker are configured for one owner and a single private JSON snapshot; this is not a multi-user or real-time collaboration service. The Worker currently accepts the current vault schema version and must be updated alongside future schema migrations.
+GitHub Pages and the Worker are different browser origins, so move existing Pages IndexedDB data with a JSON backup. Data is not sent to the private repository until you explicitly save the first backup. The app and Worker are configured for one owner and a single private JSON snapshot; this is not a multi-user or real-time collaboration service. The Worker accepts the current vault schema and migrates supported older snapshots before saving them.
 
 ## Import the Super Rare Games workbook
 
@@ -86,17 +85,17 @@ The generated inventory backup stays local and contains personal data. `private-
 
 ## Final Fantasy TCG catalog
 
-The Memories of Life (Opus 30) catalog import contains the 118 standard card definitions published by Square Enix, with verified names, rarity codes, and direct links to exact card images on the official CDN. Image files are not copied into this repository. The product announcement also describes 12 Heavensward starter-exclusive cards and premium, foil, and alternate-art printings; this first checklist does not create separate quantity slots for those items. No ownership quantities are included.
+The catalog is built from all 34 release filters currently shown in the [Square Enix official Card Browser](https://fftcg.square-enix-games.com/na/card-browser). The checked-in JSON contains 4,404 set-specific definitions from 4,391 browser records, including the same printed code in separate sets when Square Enix assigns it to multiple releases. IDs include the release namespace. The import includes official names, rarity values when provided, and exact remote image URLs; image files are not downloaded or copied into this repository. Eight entries lack an English name or rarity in the browser and remain identified by their official card codes.
 
-On the app, review the **Memories of Life catalog is ready** banner and select **Add checklist** to add the release. The operation adds the Square Enix publisher, Final Fantasy franchise, Final Fantasy TCG series, set, card definitions, and official image links. It preserves existing ownership and user-provided images and does not overwrite conflicting catalog records.
+On the app, review the **Final Fantasy TCG catalog is ready** banner and select **Add all releases**. The operation adds the Square Enix publisher, Final Fantasy franchise, Final Fantasy TCG series, sets, card definitions, and official image links. Only Memories of Life is tracked by default; use **Manage sets** to turn on other releases when you want to chase them. Turning a set off does not delete cards or ownership. The import contains no personal quantities and preserves existing quantities, explicit set visibility choices, and user-provided images. Existing overlapping records that no longer match the source pause the update for review.
 
-To refresh the catalog file from the official card browser, run:
+To validate and refresh the static catalog file from the official card browser, run:
 
 ```sh
-npm run catalog:fftcg:memories-of-life
+npm run catalog:fftcg
 ```
 
-The importer filters the official browser to Memories of Life's 118 standard records, validates the per-rarity counts, namespaced identities, and official image hosts, then writes `public/fftcg-memories-of-life.json`. It stops without writing if the source structure or expected counts change. Source references: [Square Enix card browser](https://fftcg.square-enix-games.com/na/card-browser) and [Memories of Life product announcement](https://fftcg.square-enix-games.com/na/news/new-product-information-memories-of-life-booster-set).
+The importer reads the official filter list and complete card-browser response, verifies the expected release names, validates per-set totals and image hosts, then writes `public/fftcg-catalog.json`. It stops without writing if the official set list or response structure changes. Source reference: [Square Enix card browser](https://fftcg.square-enix-games.com/na/card-browser).
 
 ## Validate
 

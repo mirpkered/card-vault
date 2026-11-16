@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { cardStatus, completion, emptyVault, filterCards, findConflicts, migrateVault, parseCsv, validateCatalog, validateInventoryRows, type CardDefinition, type Ownership } from './domain';
+import { cardStatus, completion, emptyVault, filterCards, findConflicts, getTrackedCards, migrateVault, parseCsv, validateCatalog, validateInventoryRows, type CardDefinition, type Ownership } from './domain';
 
 const cards: CardDefinition[] = [
   { id: 'set:one:01', setId: 'set:one', number: '01', name: 'Kakashi', rarity: 'Rare' },
@@ -29,6 +29,17 @@ describe('collection domain', () => {
   });
   it('calculates completion from unique owned card definitions', () => {
     expect(completion(cards, inventory)).toEqual({ owned: 1, total: 3, percent: 33 });
+  });
+  it('excludes turned-off sets from progress while retaining their card records', () => {
+    const catalog = emptyVault().catalog;
+    const activeCard = { id: `${catalog.sets[0].id}:01`, setId: catalog.sets[0].id, number: '01', name: 'Active' };
+    const hiddenCard = { id: `${catalog.sets[1].id}:01`, setId: catalog.sets[1].id, number: '01', name: 'Hidden' };
+    catalog.cards.push(activeCard, hiddenCard);
+    catalog.sets[1].tracked = false;
+    const active = getTrackedCards(catalog);
+    expect(active).toEqual([activeCard]);
+    expect(catalog.cards).toHaveLength(2);
+    expect(completion(active, [{ cardId: activeCard.id, personal: 1, duplicates: 0, incoming: 0, updatedAt: '' }])).toEqual({ owned: 1, total: 1, percent: 100 });
   });
   it('combines status and text filters', () => {
     expect(filterCards(cards, inventory, 'duplicate', 'kak')).toEqual([cards[0]]);
@@ -65,7 +76,7 @@ describe('collection domain', () => {
     const legacyCard = { ...cards[0], setId: 'set:legacy' };
     const legacyCatalog = { ...current.catalog, sets: [...current.catalog.sets, { id: 'set:legacy', seriesId: 'series:kayou-naruto', name: 'legacy' }], cards: [legacyCard], ownership: [{ cardId: legacyCard.id, owned: 2, incoming: 0, updatedAt: '2026-01-01' }] };
     const old = { ...current, schemaVersion: 1, catalog: legacyCatalog };
-    expect(migrateVault(old).schemaVersion).toBe(3);
+    expect(migrateVault(old).schemaVersion).toBe(4);
     expect(migrateVault(old).catalog.ownership[0]).toMatchObject({ personal: 2, duplicates: 0, incoming: 0 });
     expect(() => migrateVault({ schemaVersion: 99 })).toThrow('Unsupported');
   });
@@ -75,12 +86,21 @@ describe('collection domain', () => {
     old.catalog.series = old.catalog.series.filter((series) => series.id !== 'series:media:snl-dvds').map(({ category: _category, ...series }) => series);
     old.catalog.sets = old.catalog.sets.filter((set) => set.id !== 'set:media:snl-dvds:collection');
     const migrated = migrateVault(JSON.parse(JSON.stringify(old)));
-    expect(migrated.schemaVersion).toBe(3);
+    expect(migrated.schemaVersion).toBe(4);
     expect(migrated.catalog.series.filter((series) => series.category === 'cards')).toHaveLength(2);
     expect(migrated.catalog.series.find((series) => series.id === 'series:media:snl-dvds')).toMatchObject({ name: 'SNL DVDs', category: 'media' });
     expect(migrated.catalog.sets.find((set) => set.id === 'set:media:snl-dvds:collection')).toMatchObject({ seriesId: 'series:media:snl-dvds', name: 'DVD collection' });
     expect(migrated.catalog.cards).toHaveLength(old.catalog.cards.length);
     expect(validateCatalog(migrated.catalog)).toEqual([]);
+  });
+  it('migrates schema 3 sets to tracked by default and preserves explicit hidden states', () => {
+    const old = emptyVault();
+    old.schemaVersion = 3;
+    Object.assign(old.catalog, { sets: old.catalog.sets.map(({ tracked: _tracked, ...set }, index) => index === 0 ? set : { ...set, tracked: false }) });
+    const migrated = migrateVault(JSON.parse(JSON.stringify(old)));
+    expect(migrated.schemaVersion).toBe(4);
+    expect(migrated.catalog.sets[0].tracked).toBe(true);
+    expect(migrated.catalog.sets[1].tracked).toBe(false);
   });
   it('detects overlapping records changed in either copy', () => {
     const local = emptyVault(); const remote = emptyVault();
