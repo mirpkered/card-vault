@@ -1,0 +1,2585 @@
+{
+  "schemaVersion": 1,
+  "source": "NarutoDB",
+  "cataloguedAt": "2026-11-16T16:03:45Z",
+  "sourcePages": {
+    "NREA02": "https://narutodb.com/kayou/sets/NREA02",
+    "NREA03": "https://narutodb.com/kayou/sets/NREA03"
+  },
+  "sets": [
+    {
+      "id": "set:kayou-naruto-nrea02",
+      "name": "NREA02",
+      "cardCount": 133,
+      "sourceUrl": "https://narutodb.com/kayou/sets/NREA02"
+    },
+    {
+      "id": "set:kayou-naruto-nrea03",
+      "name": "NREA03",
+      "cardCount": 123,
+      "sourceUrl": "https://narutodb.com/kayou/sets/NREA03"
+    }
+  ],
+  "cards": [
+    {
+      "id": "kayou-naruto:NREA02:CR001",
+      "setId": "set:kayou-naruto-nrea02",
+      "provisionalNumber": "CR001",
+      "number": "NREA02-CR-001L5",
+      "name": "Kimimaro",
+      "rarity": "CR",
+      "imageUrl": "https://cdn.narutodb.com/storage/cards/official/NREA02-CR-001L5-thumb.png",
+      "isPromo": false
+    },
+    {
+      "id": "kayou-naruto:NREA02:CR002",
+      "setId": "set:kayou-naruto-nrea02",
+      "provisionalNumber": "CR002",
+      "number": "NREA02-CR-002L5",
+      "name": "Tsunade",
+      "rarity": "CR",
+      "imageUrl": "https://cdn.narutodb.com/storage/cards/official/NREA02-CR-002L5-thumb.png",
+      "isPromo": false
+    },
+    {
+      "id": "kayou-naruto:NREA02:CR003",
+      "setId": "set:kayou-naruto-nrea02",
+      "provisionalNumber": "CR003",
+      "number": "NREA02-CR-003L5",
+      "name": "Itachi Uchiha",
+      "rarity": "CR",
+      "imageUrl": "https://cdn.narutodb.com/storage/cards/official/NREA02-CR-003L5-thumb.png",
+      "isPromo": false
+    },
+    {
+      "id": "kayou-naruto:NREA02:CR004",
+      "setId": "set:kayou-naruto-nrea02",
+      "provisionalNumber": "CR004",
+      "number": "NREA02-CR-004L5",
+      "name": "Jiraiya",
+      "rarity": "CR",
+      "imageUrl": "https://cdn.narutodb.com/storage/cards/official/NREA02-CR-004L5-thumb.png",
+      "isPromo": false
+    },
+    {
+      "id": "kayou-naruto:NREA02:PARALLEL_UR001",
+      "setId": "set:kayou-naruto-nrea02",
+      "provisionalNumber": "PARALLEL_UR001",
+      "number": "NREA02-◇UR-001L3",
+      "name": "Naruto Uzumaki",
+      "rarity": "◇UR",
+      "imageUrl": "https://cdn.narutodb.com/storage/cards/official/NREA02-◇UR-001L3-thumb.png",
+      "isPromo": false
+    },
+    {
+      "id": "kayou-naruto:NREA02:PARALLEL_UR002",
+      "setId": "set:kayou-naruto-nrea02",
+      "provisionalNumber": "PARALLEL_UR002",
+      "number": "NREA02-◇UR-002L3",
+      "name": "Sasuke Uchiha",
+      "rarity": "◇UR",
+      "imageUrl": "https://cdn.narutodb.com/storage/cards/official/NREA02-◇UR-002L3-thumb.png",
+      "isPromo": false
+    },
+    {
+      "id": "kayou-naruto:NREA02:PARALLEL_UR003",
+      "setId": "set:kayou-naruto-nrea02",
+      "provisionalNumber": "PARALLEL_UR003",
+      "number": "NREA02-◇UR-003L3",
+      "name": "Sakura Haruno",
+      "rarity": "◇UR",
+      "imageUrl": "https://cdn.narutodb.com/storage/cards/official/NREA02-◇UR-003L3-thumb.png",
+      "isPromo": false
+    },
+    {
+      "id": "kayou-naruto:NREA02:PARALLEL_UR004",
+      "setId": "set:kayou-naruto-nrea02",
+      "provisionalNumber": "PARALLEL_UR004",
+      "number": "NREA02-◇UR-004L3",
+      "name": "Kakashi Hatake",
+      "rarity": "◇UR",
+      "imageUrl": "https://cdn.narutodb.com/storage/cards/official/NREA02-◇UR-004L3-thumb.png",
+      "isPromo": false
+    },
+    {
+      "id": "kayou-naruto:NREA02:AR001",
+      "setId": "set:kayou-naruto-nrea02",
+      "provisionalNumber": "AR001",
+      "number": "NREA02-AR-001L4",
+      "name": "Jirobo",
+      "rarity": "AR",
+      "imageUrl": "https://cdn.narutodb.com/storage/cards/official/NREA02-AR-001L4-thumb.png",
+      "isPromo": false
+    },
+    {
+      "id": "kayou-naruto:NREA02:AR002",
+      "setId": "set:kayou-naruto-nrea02",
+      "provisionalNumber": "AR002",
+      "number": "NREA02-AR-002L4",
+      "name": "Choji Akimichi",
+      "rarity": "AR",
+      "imageUrl": "https://cdn.narutodb.com/storage/cards/official/NREA02-AR-002L4-thumb.png",
+      "isPromo": false
+    },
+    {
+      "id": "kayou-naruto:NREA02:AR003",
+      "setId": "set:kayou-naruto-nrea02",
+      "provisionalNumber": "AR003",
+      "number": "NREA02-AR-003L4",
+      "name": "Gaara",
+      "rarity": "AR",
+      "imageUrl": "https://cdn.narutodb.com/storage/cards/official/NREA02-AR-003L4-thumb.png",
+      "isPromo": false
+    },
+    {
+      "id": "kayou-naruto:NREA02:AR004",
+      "setId": "set:kayou-naruto-nrea02",
+      "provisionalNumber": "AR004",
+      "number": "NREA02-AR-004L4",
+      "name": "Kimimaro",
+      "rarity": "AR",
+      "imageUrl": "https://cdn.narutodb.com/storage/cards/official/NREA02-AR-004L4-thumb.png",
+      "isPromo": false
+    },
+    {
+      "id": "kayou-naruto:NREA02:AR005",
+      "setId": "set:kayou-naruto-nrea02",
+      "provisionalNumber": "AR005",
+      "number": "NREA02-AR-005L4",
+      "name": "Kimimaro",
+      "rarity": "AR",
+      "imageUrl": "https://cdn.narutodb.com/storage/cards/official/NREA02-AR-005L4-thumb.png",
+      "isPromo": false
+    },
+    {
+      "id": "kayou-naruto:NREA02:AR006",
+      "setId": "set:kayou-naruto-nrea02",
+      "provisionalNumber": "AR006",
+      "number": "NREA02-AR-006L4",
+      "name": "Rock Lee",
+      "rarity": "AR",
+      "imageUrl": "https://cdn.narutodb.com/storage/cards/official/NREA02-AR-006L4-thumb.png",
+      "isPromo": false
+    },
+    {
+      "id": "kayou-naruto:NREA02:AR007",
+      "setId": "set:kayou-naruto-nrea02",
+      "provisionalNumber": "AR007",
+      "number": "NREA02-AR-007L4",
+      "name": "Sasuke Uchiha",
+      "rarity": "AR",
+      "imageUrl": "https://cdn.narutodb.com/storage/cards/official/NREA02-AR-007L4-thumb.png",
+      "isPromo": false
+    },
+    {
+      "id": "kayou-naruto:NREA02:AR008",
+      "setId": "set:kayou-naruto-nrea02",
+      "provisionalNumber": "AR008",
+      "number": "NREA02-AR-008L4",
+      "name": "Naruto Uzumaki",
+      "rarity": "AR",
+      "imageUrl": "https://cdn.narutodb.com/storage/cards/official/NREA02-AR-008L4-thumb.png",
+      "isPromo": false
+    },
+    {
+      "id": "kayou-naruto:NREA02:AR009",
+      "setId": "set:kayou-naruto-nrea02",
+      "provisionalNumber": "AR009",
+      "number": "NREA02-AR-009L4",
+      "name": "Neji Hyuga",
+      "rarity": "AR",
+      "imageUrl": "https://cdn.narutodb.com/storage/cards/official/NREA02-AR-009L4-thumb.png",
+      "isPromo": false
+    },
+    {
+      "id": "kayou-naruto:NREA02:AR010",
+      "setId": "set:kayou-naruto-nrea02",
+      "provisionalNumber": "AR010",
+      "number": "NREA02-AR-010L4",
+      "name": "Kidomaru",
+      "rarity": "AR",
+      "imageUrl": "https://cdn.narutodb.com/storage/cards/official/NREA02-AR-010L4-thumb.png",
+      "isPromo": false
+    },
+    {
+      "id": "kayou-naruto:NREA02:MR001",
+      "setId": "set:kayou-naruto-nrea02",
+      "provisionalNumber": "MR001",
+      "number": "NREA02-MR-001L4",
+      "name": "Kabuto Yakushi",
+      "rarity": "MR",
+      "imageUrl": "https://cdn.narutodb.com/storage/cards/official/NREA02-MR-001L4-thumb.png",
+      "isPromo": false
+    },
+    {
+      "id": "kayou-naruto:NREA02:MR002",
+      "setId": "set:kayou-naruto-nrea02",
+      "provisionalNumber": "MR002",
+      "number": "NREA02-MR-002L4",
+      "name": "Tsunade",
+      "rarity": "MR",
+      "imageUrl": "https://cdn.narutodb.com/storage/cards/official/NREA02-MR-002L4-thumb.png",
+      "isPromo": false
+    },
+    {
+      "id": "kayou-naruto:NREA02:MR003",
+      "setId": "set:kayou-naruto-nrea02",
+      "provisionalNumber": "MR003",
+      "number": "NREA02-MR-003L4",
+      "name": "Itachi Uchiha",
+      "rarity": "MR",
+      "imageUrl": "https://cdn.narutodb.com/storage/cards/official/NREA02-MR-003L4-thumb.png",
+      "isPromo": false
+    },
+    {
+      "id": "kayou-naruto:NREA02:MR004",
+      "setId": "set:kayou-naruto-nrea02",
+      "provisionalNumber": "MR004",
+      "number": "NREA02-MR-004L4",
+      "name": "Jiraiya",
+      "rarity": "MR",
+      "imageUrl": "https://cdn.narutodb.com/storage/cards/official/NREA02-MR-004L4-thumb.png",
+      "isPromo": false
+    },
+    {
+      "id": "kayou-naruto:NREA02:UR001",
+      "setId": "set:kayou-naruto-nrea02",
+      "provisionalNumber": "UR001",
+      "number": "NREA02-UR-001L3",
+      "name": "Jirobo",
+      "rarity": "UR",
+      "imageUrl": "https://cdn.narutodb.com/storage/cards/official/NREA02-UR-001L3-thumb.png",
+      "isPromo": false
+    },
+    {
+      "id": "kayou-naruto:NREA02:UR002",
+      "setId": "set:kayou-naruto-nrea02",
+      "provisionalNumber": "UR002",
+      "number": "NREA02-UR-002L3",
+      "name": "Choji Akimichi",
+      "rarity": "UR",
+      "imageUrl": "https://cdn.narutodb.com/storage/cards/official/NREA02-UR-002L3-thumb.png",
+      "isPromo": false
+    },
+    {
+      "id": "kayou-naruto:NREA02:UR003",
+      "setId": "set:kayou-naruto-nrea02",
+      "provisionalNumber": "UR003",
+      "number": "NREA02-UR-003L3",
+      "name": "Tayuya",
+      "rarity": "UR",
+      "imageUrl": "https://cdn.narutodb.com/storage/cards/official/NREA02-UR-003L3-thumb.png",
+      "isPromo": false
+    },
+    {
+      "id": "kayou-naruto:NREA02:UR004",
+      "setId": "set:kayou-naruto-nrea02",
+      "provisionalNumber": "UR004",
+      "number": "NREA02-UR-004L3",
+      "name": "Tsunade",
+      "rarity": "UR",
+      "imageUrl": "https://cdn.narutodb.com/storage/cards/official/NREA02-UR-004L3-thumb.png",
+      "isPromo": false
+    },
+    {
+      "id": "kayou-naruto:NREA02:UR005",
+      "setId": "set:kayou-naruto-nrea02",
+      "provisionalNumber": "UR005",
+      "number": "NREA02-UR-005L3",
+      "name": "Tsunade",
+      "rarity": "UR",
+      "imageUrl": "https://cdn.narutodb.com/storage/cards/official/NREA02-UR-005L3-thumb.png",
+      "isPromo": false
+    },
+    {
+      "id": "kayou-naruto:NREA02:UR006",
+      "setId": "set:kayou-naruto-nrea02",
+      "provisionalNumber": "UR006",
+      "number": "NREA02-UR-006L3",
+      "name": "Kidomaru",
+      "rarity": "UR",
+      "imageUrl": "https://cdn.narutodb.com/storage/cards/official/NREA02-UR-006L3-thumb.png",
+      "isPromo": false
+    },
+    {
+      "id": "kayou-naruto:NREA02:UR007",
+      "setId": "set:kayou-naruto-nrea02",
+      "provisionalNumber": "UR007",
+      "number": "NREA02-UR-007L3",
+      "name": "Kurenai Yuhi",
+      "rarity": "UR",
+      "imageUrl": "https://cdn.narutodb.com/storage/cards/official/NREA02-UR-007L3-thumb.png",
+      "isPromo": false
+    },
+    {
+      "id": "kayou-naruto:NREA02:UR008",
+      "setId": "set:kayou-naruto-nrea02",
+      "provisionalNumber": "UR008",
+      "number": "NREA02-UR-008L3",
+      "name": "Dan",
+      "rarity": "UR",
+      "imageUrl": "https://cdn.narutodb.com/storage/cards/official/NREA02-UR-008L3-thumb.png",
+      "isPromo": false
+    },
+    {
+      "id": "kayou-naruto:NREA02:UR009",
+      "setId": "set:kayou-naruto-nrea02",
+      "provisionalNumber": "UR009",
+      "number": "NREA02-UR-009L3",
+      "name": "Kimimaro",
+      "rarity": "UR",
+      "imageUrl": "https://cdn.narutodb.com/storage/cards/official/NREA02-UR-009L3-thumb.png",
+      "isPromo": false
+    },
+    {
+      "id": "kayou-naruto:NREA02:UR010",
+      "setId": "set:kayou-naruto-nrea02",
+      "provisionalNumber": "UR010",
+      "number": "NREA02-UR-010L3",
+      "name": "Kimimaro",
+      "rarity": "UR",
+      "imageUrl": "https://cdn.narutodb.com/storage/cards/official/NREA02-UR-010L3-thumb.png",
+      "isPromo": false
+    },
+    {
+      "id": "kayou-naruto:NREA02:UR011",
+      "setId": "set:kayou-naruto-nrea02",
+      "provisionalNumber": "UR011",
+      "number": "NREA02-UR-011L3",
+      "name": "Rock Lee",
+      "rarity": "UR",
+      "imageUrl": "https://cdn.narutodb.com/storage/cards/official/NREA02-UR-011L3-thumb.png",
+      "isPromo": false
+    },
+    {
+      "id": "kayou-naruto:NREA02:UR012",
+      "setId": "set:kayou-naruto-nrea02",
+      "provisionalNumber": "UR012",
+      "number": "NREA02-UR-012L3",
+      "name": "Itachi Uchiha",
+      "rarity": "UR",
+      "imageUrl": "https://cdn.narutodb.com/storage/cards/official/NREA02-UR-012L3-thumb.png",
+      "isPromo": false
+    },
+    {
+      "id": "kayou-naruto:NREA02:UR013",
+      "setId": "set:kayou-naruto-nrea02",
+      "provisionalNumber": "UR013",
+      "number": "NREA02-UR-013L3",
+      "name": "Sakon & Ukon",
+      "rarity": "UR",
+      "imageUrl": "https://cdn.narutodb.com/storage/cards/official/NREA02-UR-013L3-thumb.png",
+      "isPromo": false
+    },
+    {
+      "id": "kayou-naruto:NREA02:UR014",
+      "setId": "set:kayou-naruto-nrea02",
+      "provisionalNumber": "UR014",
+      "number": "NREA02-UR-014L3",
+      "name": "Naruto Uzumaki",
+      "rarity": "UR",
+      "imageUrl": "https://cdn.narutodb.com/storage/cards/official/NREA02-UR-014L3-thumb.png",
+      "isPromo": false
+    },
+    {
+      "id": "kayou-naruto:NREA02:UR015",
+      "setId": "set:kayou-naruto-nrea02",
+      "provisionalNumber": "UR015",
+      "number": "NREA02-UR-015L3",
+      "name": "Mitsuki",
+      "rarity": "UR",
+      "imageUrl": "https://cdn.narutodb.com/storage/cards/official/NREA02-UR-015L3-thumb.png",
+      "isPromo": false
+    },
+    {
+      "id": "kayou-naruto:NREA02:SSR001",
+      "setId": "set:kayou-naruto-nrea02",
+      "provisionalNumber": "SSR001",
+      "number": "NREA02-SSR-001L3",
+      "name": "Kankuro",
+      "rarity": "SSR",
+      "imageUrl": "https://cdn.narutodb.com/storage/cards/official/NREA02-SSR-001L3-thumb.png",
+      "isPromo": false
+    },
+    {
+      "id": "kayou-naruto:NREA02:SSR002",
+      "setId": "set:kayou-naruto-nrea02",
+      "provisionalNumber": "SSR002",
+      "number": "NREA02-SSR-002L3",
+      "name": "Sakon & Ukon",
+      "rarity": "SSR",
+      "imageUrl": "https://cdn.narutodb.com/storage/cards/official/NREA02-SSR-002L3-thumb.png",
+      "isPromo": false
+    },
+    {
+      "id": "kayou-naruto:NREA02:SSR003",
+      "setId": "set:kayou-naruto-nrea02",
+      "provisionalNumber": "SSR003",
+      "number": "NREA02-SSR-003L3",
+      "name": "Tayuya",
+      "rarity": "SSR",
+      "imageUrl": "https://cdn.narutodb.com/storage/cards/official/NREA02-SSR-003L3-thumb.png",
+      "isPromo": false
+    },
+    {
+      "id": "kayou-naruto:NREA02:SSR004",
+      "setId": "set:kayou-naruto-nrea02",
+      "provisionalNumber": "SSR004",
+      "number": "NREA02-SSR-004L3",
+      "name": "Temari",
+      "rarity": "SSR",
+      "imageUrl": "https://cdn.narutodb.com/storage/cards/official/NREA02-SSR-004L3-thumb.png",
+      "isPromo": false
+    },
+    {
+      "id": "kayou-naruto:NREA02:SSR005",
+      "setId": "set:kayou-naruto-nrea02",
+      "provisionalNumber": "SSR005",
+      "number": "NREA02-SSR-005L3",
+      "name": "Kimimaro",
+      "rarity": "SSR",
+      "imageUrl": "https://cdn.narutodb.com/storage/cards/official/NREA02-SSR-005L3-thumb.png",
+      "isPromo": false
+    },
+    {
+      "id": "kayou-naruto:NREA02:SSR006",
+      "setId": "set:kayou-naruto-nrea02",
+      "provisionalNumber": "SSR006",
+      "number": "NREA02-SSR-006L3",
+      "name": "Gaara",
+      "rarity": "SSR",
+      "imageUrl": "https://cdn.narutodb.com/storage/cards/official/NREA02-SSR-006L3-thumb.png",
+      "isPromo": false
+    },
+    {
+      "id": "kayou-naruto:NREA02:SSR007",
+      "setId": "set:kayou-naruto-nrea02",
+      "provisionalNumber": "SSR007",
+      "number": "NREA02-SSR-007L3",
+      "name": "Kimimaro",
+      "rarity": "SSR",
+      "imageUrl": "https://cdn.narutodb.com/storage/cards/official/NREA02-SSR-007L3-thumb.png",
+      "isPromo": false
+    },
+    {
+      "id": "kayou-naruto:NREA02:SSR008",
+      "setId": "set:kayou-naruto-nrea02",
+      "provisionalNumber": "SSR008",
+      "number": "NREA02-SSR-008L3",
+      "name": "Rock Lee",
+      "rarity": "SSR",
+      "imageUrl": "https://cdn.narutodb.com/storage/cards/official/NREA02-SSR-008L3-thumb.png",
+      "isPromo": false
+    },
+    {
+      "id": "kayou-naruto:NREA02:SSR009",
+      "setId": "set:kayou-naruto-nrea02",
+      "provisionalNumber": "SSR009",
+      "number": "NREA02-SSR-009L3",
+      "name": "Naruto Uzumaki",
+      "rarity": "SSR",
+      "imageUrl": "https://cdn.narutodb.com/storage/cards/official/NREA02-SSR-009L3-thumb.png",
+      "isPromo": false
+    },
+    {
+      "id": "kayou-naruto:NREA02:SSR010",
+      "setId": "set:kayou-naruto-nrea02",
+      "provisionalNumber": "SSR010",
+      "number": "NREA02-SSR-010L3",
+      "name": "Sasuke Uchiha",
+      "rarity": "SSR",
+      "imageUrl": "https://cdn.narutodb.com/storage/cards/official/NREA02-SSR-010L3-thumb.png",
+      "isPromo": false
+    },
+    {
+      "id": "kayou-naruto:NREA02:SSR011",
+      "setId": "set:kayou-naruto-nrea02",
+      "provisionalNumber": "SSR011",
+      "number": "NREA02-SSR-011L3",
+      "name": "Jirobo",
+      "rarity": "SSR",
+      "imageUrl": "https://cdn.narutodb.com/storage/cards/official/NREA02-SSR-011L3-thumb.png",
+      "isPromo": false
+    },
+    {
+      "id": "kayou-naruto:NREA02:SSR012",
+      "setId": "set:kayou-naruto-nrea02",
+      "provisionalNumber": "SSR012",
+      "number": "NREA02-SSR-012L3",
+      "name": "Sakon & Ukon",
+      "rarity": "SSR",
+      "imageUrl": "https://cdn.narutodb.com/storage/cards/official/NREA02-SSR-012L3-thumb.png",
+      "isPromo": false
+    },
+    {
+      "id": "kayou-naruto:NREA02:SSR013",
+      "setId": "set:kayou-naruto-nrea02",
+      "provisionalNumber": "SSR013",
+      "number": "NREA02-SSR-013L3",
+      "name": "Kidomaru",
+      "rarity": "SSR",
+      "imageUrl": "https://cdn.narutodb.com/storage/cards/official/NREA02-SSR-013L3-thumb.png",
+      "isPromo": false
+    },
+    {
+      "id": "kayou-naruto:NREA02:SSR014",
+      "setId": "set:kayou-naruto-nrea02",
+      "provisionalNumber": "SSR014",
+      "number": "NREA02-SSR-014L3",
+      "name": "Tayuya",
+      "rarity": "SSR",
+      "imageUrl": "https://cdn.narutodb.com/storage/cards/official/NREA02-SSR-014L3-thumb.png",
+      "isPromo": false
+    },
+    {
+      "id": "kayou-naruto:NREA02:SSR015",
+      "setId": "set:kayou-naruto-nrea02",
+      "provisionalNumber": "SSR015",
+      "number": "NREA02-SSR-015L3",
+      "name": "Choji Akimichi",
+      "rarity": "SSR",
+      "imageUrl": "https://cdn.narutodb.com/storage/cards/official/NREA02-SSR-015L3-thumb.png",
+      "isPromo": false
+    },
+    {
+      "id": "kayou-naruto:NREA02:SSR016",
+      "setId": "set:kayou-naruto-nrea02",
+      "provisionalNumber": "SSR016",
+      "number": "NREA02-SSR-016L3",
+      "name": "Tsunade",
+      "rarity": "SSR",
+      "imageUrl": "https://cdn.narutodb.com/storage/cards/official/NREA02-SSR-016L3-thumb.png",
+      "isPromo": false
+    },
+    {
+      "id": "kayou-naruto:NREA02:SSR017",
+      "setId": "set:kayou-naruto-nrea02",
+      "provisionalNumber": "SSR017",
+      "number": "NREA02-SSR-017L3",
+      "name": "Naruto Uzumaki",
+      "rarity": "SSR",
+      "imageUrl": "https://cdn.narutodb.com/storage/cards/official/NREA02-SSR-017L3-thumb.png",
+      "isPromo": false
+    },
+    {
+      "id": "kayou-naruto:NREA02:SSR018",
+      "setId": "set:kayou-naruto-nrea02",
+      "provisionalNumber": "SSR018",
+      "number": "NREA02-SSR-018L3",
+      "name": "Kisame Hoshigaki",
+      "rarity": "SSR",
+      "imageUrl": "https://cdn.narutodb.com/storage/cards/official/NREA02-SSR-018L3-thumb.png",
+      "isPromo": false
+    },
+    {
+      "id": "kayou-naruto:NREA02:SSR019",
+      "setId": "set:kayou-naruto-nrea02",
+      "provisionalNumber": "SSR019",
+      "number": "NREA02-SSR-019L3",
+      "name": "Kimimaro",
+      "rarity": "SSR",
+      "imageUrl": "https://cdn.narutodb.com/storage/cards/official/NREA02-SSR-019L3-thumb.png",
+      "isPromo": false
+    },
+    {
+      "id": "kayou-naruto:NREA02:SSR020",
+      "setId": "set:kayou-naruto-nrea02",
+      "provisionalNumber": "SSR020",
+      "number": "NREA02-SSR-020L3",
+      "name": "Kimimaro",
+      "rarity": "SSR",
+      "imageUrl": "https://cdn.narutodb.com/storage/cards/official/NREA02-SSR-020L3-thumb.png",
+      "isPromo": false
+    },
+    {
+      "id": "kayou-naruto:NREA02:SSR021",
+      "setId": "set:kayou-naruto-nrea02",
+      "provisionalNumber": "SSR021",
+      "number": "NREA02-SSR-021L3",
+      "name": "Sasuke Uchiha",
+      "rarity": "SSR",
+      "imageUrl": "https://cdn.narutodb.com/storage/cards/official/NREA02-SSR-021L3-thumb.png",
+      "isPromo": false
+    },
+    {
+      "id": "kayou-naruto:NREA02:SSR022",
+      "setId": "set:kayou-naruto-nrea02",
+      "provisionalNumber": "SSR022",
+      "number": "NREA02-SSR-022L3",
+      "name": "Rock Lee",
+      "rarity": "SSR",
+      "imageUrl": "https://cdn.narutodb.com/storage/cards/official/NREA02-SSR-022L3-thumb.png",
+      "isPromo": false
+    },
+    {
+      "id": "kayou-naruto:NREA02:SSR023",
+      "setId": "set:kayou-naruto-nrea02",
+      "provisionalNumber": "SSR023",
+      "number": "NREA02-SSR-023L3",
+      "name": "Itachi Uchiha",
+      "rarity": "SSR",
+      "imageUrl": "https://cdn.narutodb.com/storage/cards/official/NREA02-SSR-023L3-thumb.png",
+      "isPromo": false
+    },
+    {
+      "id": "kayou-naruto:NREA02:SSR024",
+      "setId": "set:kayou-naruto-nrea02",
+      "provisionalNumber": "SSR024",
+      "number": "NREA02-SSR-024L3",
+      "name": "Boruto Uzumaki",
+      "rarity": "SSR",
+      "imageUrl": "https://cdn.narutodb.com/storage/cards/official/NREA02-SSR-024L3-thumb.png",
+      "isPromo": false
+    },
+    {
+      "id": "kayou-naruto:NREA02:SSR025",
+      "setId": "set:kayou-naruto-nrea02",
+      "provisionalNumber": "SSR025",
+      "number": "NREA02-SSR-025L3",
+      "name": "Mitsuki",
+      "rarity": "SSR",
+      "imageUrl": "https://cdn.narutodb.com/storage/cards/official/NREA02-SSR-025L3-thumb.png",
+      "isPromo": false
+    },
+    {
+      "id": "kayou-naruto:NREA02:SR001",
+      "setId": "set:kayou-naruto-nrea02",
+      "provisionalNumber": "SR001",
+      "number": "NREA02-SR-001L2",
+      "name": "Tsunade",
+      "rarity": "SR",
+      "imageUrl": "https://cdn.narutodb.com/storage/cards/official/NREA02-SR-001L2-thumb.png",
+      "isPromo": false
+    },
+    {
+      "id": "kayou-naruto:NREA02:SR002",
+      "setId": "set:kayou-naruto-nrea02",
+      "provisionalNumber": "SR002",
+      "number": "NREA02-SR-002L2",
+      "name": "Shizune",
+      "rarity": "SR",
+      "imageUrl": "https://cdn.narutodb.com/storage/cards/official/NREA02-SR-002L2-thumb.png",
+      "isPromo": false
+    },
+    {
+      "id": "kayou-naruto:NREA02:SR003",
+      "setId": "set:kayou-naruto-nrea02",
+      "provisionalNumber": "SR003",
+      "number": "NREA02-SR-003L2",
+      "name": "Kidomaru",
+      "rarity": "SR",
+      "imageUrl": "https://cdn.narutodb.com/storage/cards/official/NREA02-SR-003L2-thumb.png",
+      "isPromo": false
+    },
+    {
+      "id": "kayou-naruto:NREA02:SR004",
+      "setId": "set:kayou-naruto-nrea02",
+      "provisionalNumber": "SR004",
+      "number": "NREA02-SR-004L2",
+      "name": "Kimimaro",
+      "rarity": "SR",
+      "imageUrl": "https://cdn.narutodb.com/storage/cards/official/NREA02-SR-004L2-thumb.png",
+      "isPromo": false
+    },
+    {
+      "id": "kayou-naruto:NREA02:SR005",
+      "setId": "set:kayou-naruto-nrea02",
+      "provisionalNumber": "SR005",
+      "number": "NREA02-SR-005L2",
+      "name": "Kakashi Hatake",
+      "rarity": "SR",
+      "imageUrl": "https://cdn.narutodb.com/storage/cards/official/NREA02-SR-005L2-thumb.png",
+      "isPromo": false
+    },
+    {
+      "id": "kayou-naruto:NREA02:SR006",
+      "setId": "set:kayou-naruto-nrea02",
+      "provisionalNumber": "SR006",
+      "number": "NREA02-SR-006L2",
+      "name": "Choji Akimichi",
+      "rarity": "SR",
+      "imageUrl": "https://cdn.narutodb.com/storage/cards/official/NREA02-SR-006L2-thumb.png",
+      "isPromo": false
+    },
+    {
+      "id": "kayou-naruto:NREA02:SR007",
+      "setId": "set:kayou-naruto-nrea02",
+      "provisionalNumber": "SR007",
+      "number": "NREA02-SR-007L2",
+      "name": "Naruto Uzumaki",
+      "rarity": "SR",
+      "imageUrl": "https://cdn.narutodb.com/storage/cards/official/NREA02-SR-007L2-thumb.png",
+      "isPromo": false
+    },
+    {
+      "id": "kayou-naruto:NREA02:SR008",
+      "setId": "set:kayou-naruto-nrea02",
+      "provisionalNumber": "SR008",
+      "number": "NREA02-SR-008L2",
+      "name": "Neji Hyuga",
+      "rarity": "SR",
+      "imageUrl": "https://cdn.narutodb.com/storage/cards/official/NREA02-SR-008L2-thumb.png",
+      "isPromo": false
+    },
+    {
+      "id": "kayou-naruto:NREA02:SR009",
+      "setId": "set:kayou-naruto-nrea02",
+      "provisionalNumber": "SR009",
+      "number": "NREA02-SR-009L2",
+      "name": "Tayuya",
+      "rarity": "SR",
+      "imageUrl": "https://cdn.narutodb.com/storage/cards/official/NREA02-SR-009L2-thumb.png",
+      "isPromo": false
+    },
+    {
+      "id": "kayou-naruto:NREA02:SR010",
+      "setId": "set:kayou-naruto-nrea02",
+      "provisionalNumber": "SR010",
+      "number": "NREA02-SR-010L2",
+      "name": "Kiba Inuzuka",
+      "rarity": "SR",
+      "imageUrl": "https://cdn.narutodb.com/storage/cards/official/NREA02-SR-010L2-thumb.png",
+      "isPromo": false
+    },
+    {
+      "id": "kayou-naruto:NREA02:SR011",
+      "setId": "set:kayou-naruto-nrea02",
+      "provisionalNumber": "SR011",
+      "number": "NREA02-SR-011L2",
+      "name": "Sakura Haruno",
+      "rarity": "SR",
+      "imageUrl": "https://cdn.narutodb.com/storage/cards/official/NREA02-SR-011L2-thumb.png",
+      "isPromo": false
+    },
+    {
+      "id": "kayou-naruto:NREA02:SR012",
+      "setId": "set:kayou-naruto-nrea02",
+      "provisionalNumber": "SR012",
+      "number": "NREA02-SR-012L2",
+      "name": "Tsume Inuzuka",
+      "rarity": "SR",
+      "imageUrl": "https://cdn.narutodb.com/storage/cards/official/NREA02-SR-012L2-thumb.png",
+      "isPromo": false
+    },
+    {
+      "id": "kayou-naruto:NREA02:SR013",
+      "setId": "set:kayou-naruto-nrea02",
+      "provisionalNumber": "SR013",
+      "number": "NREA02-SR-013L2",
+      "name": "Jiraiya",
+      "rarity": "SR",
+      "imageUrl": "https://cdn.narutodb.com/storage/cards/official/NREA02-SR-013L2-thumb.png",
+      "isPromo": false
+    },
+    {
+      "id": "kayou-naruto:NREA02:SR014",
+      "setId": "set:kayou-naruto-nrea02",
+      "provisionalNumber": "SR014",
+      "number": "NREA02-SR-014L2",
+      "name": "Sakon & Ukon",
+      "rarity": "SR",
+      "imageUrl": "https://cdn.narutodb.com/storage/cards/official/NREA02-SR-014L2-thumb.png",
+      "isPromo": false
+    },
+    {
+      "id": "kayou-naruto:NREA02:SR015",
+      "setId": "set:kayou-naruto-nrea02",
+      "provisionalNumber": "SR015",
+      "number": "NREA02-SR-015L2",
+      "name": "Jirobo",
+      "rarity": "SR",
+      "imageUrl": "https://cdn.narutodb.com/storage/cards/official/NREA02-SR-015L2-thumb.png",
+      "isPromo": false
+    },
+    {
+      "id": "kayou-naruto:NREA02:SR016",
+      "setId": "set:kayou-naruto-nrea02",
+      "provisionalNumber": "SR016",
+      "number": "NREA02-SR-016L2",
+      "name": "Sasuke Uchiha",
+      "rarity": "SR",
+      "imageUrl": "https://cdn.narutodb.com/storage/cards/official/NREA02-SR-016L2-thumb.png",
+      "isPromo": false
+    },
+    {
+      "id": "kayou-naruto:NREA02:SR017",
+      "setId": "set:kayou-naruto-nrea02",
+      "provisionalNumber": "SR017",
+      "number": "NREA02-SR-017L2",
+      "name": "Boruto Uzumaki",
+      "rarity": "SR",
+      "imageUrl": "https://cdn.narutodb.com/storage/cards/official/NREA02-SR-017L2-thumb.png",
+      "isPromo": false
+    },
+    {
+      "id": "kayou-naruto:NREA02:SR018",
+      "setId": "set:kayou-naruto-nrea02",
+      "provisionalNumber": "SR018",
+      "number": "NREA02-SR-018L2",
+      "name": "Sarada Uchiha",
+      "rarity": "SR",
+      "imageUrl": "https://cdn.narutodb.com/storage/cards/official/NREA02-SR-018L2-thumb.png",
+      "isPromo": false
+    },
+    {
+      "id": "kayou-naruto:NREA02:SR019",
+      "setId": "set:kayou-naruto-nrea02",
+      "provisionalNumber": "SR019",
+      "number": "NREA02-SR-019L2",
+      "name": "Metal Lee",
+      "rarity": "SR",
+      "imageUrl": "https://cdn.narutodb.com/storage/cards/official/NREA02-SR-019L2-thumb.png",
+      "isPromo": false
+    },
+    {
+      "id": "kayou-naruto:NREA02:SR020",
+      "setId": "set:kayou-naruto-nrea02",
+      "provisionalNumber": "SR020",
+      "number": "NREA02-SR-020L2",
+      "name": "ChoCho Akimichi",
+      "rarity": "SR",
+      "imageUrl": "https://cdn.narutodb.com/storage/cards/official/NREA02-SR-020L2-thumb.png",
+      "isPromo": false
+    },
+    {
+      "id": "kayou-naruto:NREA02:R001",
+      "setId": "set:kayou-naruto-nrea02",
+      "provisionalNumber": "R001",
+      "number": "NREA02-R-001L1",
+      "name": "Eye to Eye: Sharingan vs Sharingan",
+      "rarity": "R",
+      "imageUrl": "https://cdn.narutodb.com/storage/cards/official/NREA02-R-001L1-thumb.png",
+      "isPromo": false
+    },
+    {
+      "id": "kayou-naruto:NREA02:R002",
+      "setId": "set:kayou-naruto-nrea02",
+      "provisionalNumber": "R002",
+      "number": "NREA02-R-002L1",
+      "name": "Eye to Eye: Sharingan vs Sharingan",
+      "rarity": "R",
+      "imageUrl": "https://cdn.narutodb.com/storage/cards/official/NREA02-R-002L1-thumb.png",
+      "isPromo": false
+    },
+    {
+      "id": "kayou-naruto:NREA02:R003",
+      "setId": "set:kayou-naruto-nrea02",
+      "provisionalNumber": "R003",
+      "number": "NREA02-R-003L1",
+      "name": "Roar, Chidori! Brother vs Brother",
+      "rarity": "R",
+      "imageUrl": "https://cdn.narutodb.com/storage/cards/official/NREA02-R-003L1-thumb.png",
+      "isPromo": false
+    },
+    {
+      "id": "kayou-naruto:NREA02:R004",
+      "setId": "set:kayou-naruto-nrea02",
+      "provisionalNumber": "R004",
+      "number": "NREA02-R-004L1",
+      "name": "Roar, Chidori! Brother vs Brother",
+      "rarity": "R",
+      "imageUrl": "https://cdn.narutodb.com/storage/cards/official/NREA02-R-004L1-thumb.png",
+      "isPromo": false
+    },
+    {
+      "id": "kayou-naruto:NREA02:R005",
+      "setId": "set:kayou-naruto-nrea02",
+      "provisionalNumber": "R005",
+      "number": "NREA02-R-005L1",
+      "name": "Keep on Training: Pop Goes the Water Balloon! (1/2)",
+      "rarity": "R",
+      "imageUrl": "https://cdn.narutodb.com/storage/cards/official/NREA02-R-005L1-thumb.png",
+      "isPromo": false
+    },
+    {
+      "id": "kayou-naruto:NREA02:R006",
+      "setId": "set:kayou-naruto-nrea02",
+      "provisionalNumber": "R006",
+      "number": "NREA02-R-006L1",
+      "name": "Keep on Training: Pop Goes the Water Balloon! (2/2)",
+      "rarity": "R",
+      "imageUrl": "https://cdn.narutodb.com/storage/cards/official/NREA02-R-006L1-thumb.png",
+      "isPromo": false
+    },
+    {
+      "id": "kayou-naruto:NREA02:R007",
+      "setId": "set:kayou-naruto-nrea02",
+      "provisionalNumber": "R007",
+      "number": "NREA02-R-007L1",
+      "name": "Unforgivable! A Total Lack of Respect",
+      "rarity": "R",
+      "imageUrl": "https://cdn.narutodb.com/storage/cards/official/NREA02-R-007L1-thumb.png",
+      "isPromo": false
+    },
+    {
+      "id": "kayou-naruto:NREA02:R008",
+      "setId": "set:kayou-naruto-nrea02",
+      "provisionalNumber": "R008",
+      "number": "NREA02-R-008L1",
+      "name": "Unforgivable! A Total Lack of Respect",
+      "rarity": "R",
+      "imageUrl": "https://cdn.narutodb.com/storage/cards/official/NREA02-R-008L1-thumb.png",
+      "isPromo": false
+    },
+    {
+      "id": "kayou-naruto:NREA02:R009",
+      "setId": "set:kayou-naruto-nrea02",
+      "provisionalNumber": "R009",
+      "number": "NREA02-R-009L1",
+      "name": "Unforgivable! A Total Lack of Respect",
+      "rarity": "R",
+      "imageUrl": "https://cdn.narutodb.com/storage/cards/official/NREA02-R-009L1-thumb.png",
+      "isPromo": false
+    },
+    {
+      "id": "kayou-naruto:NREA02:R010",
+      "setId": "set:kayou-naruto-nrea02",
+      "provisionalNumber": "R010",
+      "number": "NREA02-R-010L1",
+      "name": "Unforgivable! A Total Lack of Respect",
+      "rarity": "R",
+      "imageUrl": "https://cdn.narutodb.com/storage/cards/official/NREA02-R-010L1-thumb.png",
+      "isPromo": false
+    },
+    {
+      "id": "kayou-naruto:NREA02:R011",
+      "setId": "set:kayou-naruto-nrea02",
+      "provisionalNumber": "R011",
+      "number": "NREA02-R-011L1",
+      "name": "Attack! Fury of the Rasengan",
+      "rarity": "R",
+      "imageUrl": "https://cdn.narutodb.com/storage/cards/official/NREA02-R-011L1-thumb.png",
+      "isPromo": false
+    },
+    {
+      "id": "kayou-naruto:NREA02:R012",
+      "setId": "set:kayou-naruto-nrea02",
+      "provisionalNumber": "R012",
+      "number": "NREA02-R-012L1",
+      "name": "Attack! Fury of the Rasengan",
+      "rarity": "R",
+      "imageUrl": "https://cdn.narutodb.com/storage/cards/official/NREA02-R-012L1-thumb.png",
+      "isPromo": false
+    },
+    {
+      "id": "kayou-naruto:NREA02:R013",
+      "setId": "set:kayou-naruto-nrea02",
+      "provisionalNumber": "R013",
+      "number": "NREA02-R-013L1",
+      "name": "The Fifth Hokage! A Life on the Line",
+      "rarity": "R",
+      "imageUrl": "https://cdn.narutodb.com/storage/cards/official/NREA02-R-013L1-thumb.png",
+      "isPromo": false
+    },
+    {
+      "id": "kayou-naruto:NREA02:R014",
+      "setId": "set:kayou-naruto-nrea02",
+      "provisionalNumber": "R014",
+      "number": "NREA02-R-014L1",
+      "name": "The Fifth Hokage! A Life on the Line",
+      "rarity": "R",
+      "imageUrl": "https://cdn.narutodb.com/storage/cards/official/NREA02-R-014L1-thumb.png",
+      "isPromo": false
+    },
+    {
+      "id": "kayou-naruto:NREA02:R015",
+      "setId": "set:kayou-naruto-nrea02",
+      "provisionalNumber": "R015",
+      "number": "NREA02-R-015L1",
+      "name": "The Fifth Hokage! A Life on the Line",
+      "rarity": "R",
+      "imageUrl": "https://cdn.narutodb.com/storage/cards/official/NREA02-R-015L1-thumb.png",
+      "isPromo": false
+    },
+    {
+      "id": "kayou-naruto:NREA02:R016",
+      "setId": "set:kayou-naruto-nrea02",
+      "provisionalNumber": "R016",
+      "number": "NREA02-R-016L1",
+      "name": "Gotta See! Gotta Know! Kakashi Sensei's True Face",
+      "rarity": "R",
+      "imageUrl": "https://cdn.narutodb.com/storage/cards/official/NREA02-R-016L1-thumb.png",
+      "isPromo": false
+    },
+    {
+      "id": "kayou-naruto:NREA02:R017",
+      "setId": "set:kayou-naruto-nrea02",
+      "provisionalNumber": "R017",
+      "number": "NREA02-R-017L1",
+      "name": "Gotta See! Gotta Know! Kakashi Sensei's True Face",
+      "rarity": "R",
+      "imageUrl": "https://cdn.narutodb.com/storage/cards/official/NREA02-R-017L1-thumb.png",
+      "isPromo": false
+    },
+    {
+      "id": "kayou-naruto:NREA02:R018",
+      "setId": "set:kayou-naruto-nrea02",
+      "provisionalNumber": "R018",
+      "number": "NREA02-R-018L1",
+      "name": "Gotta See! Gotta Know! Kakashi Sensei's True Face",
+      "rarity": "R",
+      "imageUrl": "https://cdn.narutodb.com/storage/cards/official/NREA02-R-018L1-thumb.png",
+      "isPromo": false
+    },
+    {
+      "id": "kayou-naruto:NREA02:R019",
+      "setId": "set:kayou-naruto-nrea02",
+      "provisionalNumber": "R019",
+      "number": "NREA02-R-019L1",
+      "name": "Gotta See! Gotta Know! Kakashi Sensei's True Face",
+      "rarity": "R",
+      "imageUrl": "https://cdn.narutodb.com/storage/cards/official/NREA02-R-019L1-thumb.png",
+      "isPromo": false
+    },
+    {
+      "id": "kayou-naruto:NREA02:R020",
+      "setId": "set:kayou-naruto-nrea02",
+      "provisionalNumber": "R020",
+      "number": "NREA02-R-020L1",
+      "name": "Gotta See! Gotta Know! Kakashi Sensei's True Face",
+      "rarity": "R",
+      "imageUrl": "https://cdn.narutodb.com/storage/cards/official/NREA02-R-020L1-thumb.png",
+      "isPromo": false
+    },
+    {
+      "id": "kayou-naruto:NREA02:R021",
+      "setId": "set:kayou-naruto-nrea02",
+      "provisionalNumber": "R021",
+      "number": "NREA02-R-021L1",
+      "name": "An Invitation from the Sound",
+      "rarity": "R",
+      "imageUrl": "https://cdn.narutodb.com/storage/cards/official/NREA02-R-021L1-thumb.png",
+      "isPromo": false
+    },
+    {
+      "id": "kayou-naruto:NREA02:R022",
+      "setId": "set:kayou-naruto-nrea02",
+      "provisionalNumber": "R022",
+      "number": "NREA02-R-022L1",
+      "name": "An Invitation from the Sound",
+      "rarity": "R",
+      "imageUrl": "https://cdn.narutodb.com/storage/cards/official/NREA02-R-022L1-thumb.png",
+      "isPromo": false
+    },
+    {
+      "id": "kayou-naruto:NREA02:R023",
+      "setId": "set:kayou-naruto-nrea02",
+      "provisionalNumber": "R023",
+      "number": "NREA02-R-023L1",
+      "name": "An Invitation from the Sound",
+      "rarity": "R",
+      "imageUrl": "https://cdn.narutodb.com/storage/cards/official/NREA02-R-023L1-thumb.png",
+      "isPromo": false
+    },
+    {
+      "id": "kayou-naruto:NREA02:R024",
+      "setId": "set:kayou-naruto-nrea02",
+      "provisionalNumber": "R024",
+      "number": "NREA02-R-024L1",
+      "name": "Formation! The Sasuke Retrieval Squad",
+      "rarity": "R",
+      "imageUrl": "https://cdn.narutodb.com/storage/cards/official/NREA02-R-024L1-thumb.png",
+      "isPromo": false
+    },
+    {
+      "id": "kayou-naruto:NREA02:R025",
+      "setId": "set:kayou-naruto-nrea02",
+      "provisionalNumber": "R025",
+      "number": "NREA02-R-025L1",
+      "name": "Squad Mutiny: Everything Falls Apart",
+      "rarity": "R",
+      "imageUrl": "https://cdn.narutodb.com/storage/cards/official/NREA02-R-025L1-thumb.png",
+      "isPromo": false
+    },
+    {
+      "id": "kayou-naruto:NREA02:R026",
+      "setId": "set:kayou-naruto-nrea02",
+      "provisionalNumber": "R026",
+      "number": "NREA02-R-026L1",
+      "name": "Good-bye Old Friend. I'll Always Believe in You",
+      "rarity": "R",
+      "imageUrl": "https://cdn.narutodb.com/storage/cards/official/NREA02-R-026L1-thumb.png",
+      "isPromo": false
+    },
+    {
+      "id": "kayou-naruto:NREA02:R027",
+      "setId": "set:kayou-naruto-nrea02",
+      "provisionalNumber": "R027",
+      "number": "NREA02-R-027L1",
+      "name": "Good-bye Old Friend. I'll Always Believe in You",
+      "rarity": "R",
+      "imageUrl": "https://cdn.narutodb.com/storage/cards/official/NREA02-R-027L1-thumb.png",
+      "isPromo": false
+    },
+    {
+      "id": "kayou-naruto:NREA02:R028",
+      "setId": "set:kayou-naruto-nrea02",
+      "provisionalNumber": "R028",
+      "number": "NREA02-R-028L1",
+      "name": "360 Degrees of Vision: The Byakugan's Blind Spot (1/2)",
+      "rarity": "R",
+      "imageUrl": "https://cdn.narutodb.com/storage/cards/official/NREA02-R-028L1-thumb.png",
+      "isPromo": false
+    },
+    {
+      "id": "kayou-naruto:NREA02:R029",
+      "setId": "set:kayou-naruto-nrea02",
+      "provisionalNumber": "R029",
+      "number": "NREA02-R-029L1",
+      "name": "360 Degrees of Vision: The Byakugan's Blind Spot (2/2)",
+      "rarity": "R",
+      "imageUrl": "https://cdn.narutodb.com/storage/cards/official/NREA02-R-029L1-thumb.png",
+      "isPromo": false
+    },
+    {
+      "id": "kayou-naruto:NREA02:R030",
+      "setId": "set:kayou-naruto-nrea02",
+      "provisionalNumber": "R030",
+      "number": "NREA02-R-030L1",
+      "name": "Roar and Howl! The Ultimate Tag Team",
+      "rarity": "R",
+      "imageUrl": "https://cdn.narutodb.com/storage/cards/official/NREA02-R-030L1-thumb.png",
+      "isPromo": false
+    },
+    {
+      "id": "kayou-naruto:NREA02:R031",
+      "setId": "set:kayou-naruto-nrea02",
+      "provisionalNumber": "R031",
+      "number": "NREA02-R-031L1",
+      "name": "To Each His Own Battle",
+      "rarity": "R",
+      "imageUrl": "https://cdn.narutodb.com/storage/cards/official/NREA02-R-031L1-thumb.png",
+      "isPromo": false
+    },
+    {
+      "id": "kayou-naruto:NREA02:R032",
+      "setId": "set:kayou-naruto-nrea02",
+      "provisionalNumber": "R032",
+      "number": "NREA02-R-032L1",
+      "name": "The Beast Within",
+      "rarity": "R",
+      "imageUrl": "https://cdn.narutodb.com/storage/cards/official/NREA02-R-032L1-thumb.png",
+      "isPromo": false
+    },
+    {
+      "id": "kayou-naruto:NREA02:R033",
+      "setId": "set:kayou-naruto-nrea02",
+      "provisionalNumber": "R033",
+      "number": "NREA02-R-033L1",
+      "name": "The Beast Within",
+      "rarity": "R",
+      "imageUrl": "https://cdn.narutodb.com/storage/cards/official/NREA02-R-033L1-thumb.png",
+      "isPromo": false
+    },
+    {
+      "id": "kayou-naruto:NREA02:R034",
+      "setId": "set:kayou-naruto-nrea02",
+      "provisionalNumber": "R034",
+      "number": "NREA02-R-034L1",
+      "name": "The Beast Within",
+      "rarity": "R",
+      "imageUrl": "https://cdn.narutodb.com/storage/cards/official/NREA02-R-034L1-thumb.png",
+      "isPromo": false
+    },
+    {
+      "id": "kayou-naruto:NREA02:R035",
+      "setId": "set:kayou-naruto-nrea02",
+      "provisionalNumber": "R035",
+      "number": "NREA02-R-035L1",
+      "name": "The Beast Within",
+      "rarity": "R",
+      "imageUrl": "https://cdn.narutodb.com/storage/cards/official/NREA02-R-035L1-thumb.png",
+      "isPromo": false
+    },
+    {
+      "id": "kayou-naruto:NREA02:R036",
+      "setId": "set:kayou-naruto-nrea02",
+      "provisionalNumber": "R036",
+      "number": "NREA02-R-036L1",
+      "name": "The Beast Within",
+      "rarity": "R",
+      "imageUrl": "https://cdn.narutodb.com/storage/cards/official/NREA02-R-036L1-thumb.png",
+      "isPromo": false
+    },
+    {
+      "id": "kayou-naruto:NREA02:R037",
+      "setId": "set:kayou-naruto-nrea02",
+      "provisionalNumber": "R037",
+      "number": "NREA02-R-037L1",
+      "name": "The Sand Shinobi: Allies of the Leaf",
+      "rarity": "R",
+      "imageUrl": "https://cdn.narutodb.com/storage/cards/official/NREA02-R-037L1-thumb.png",
+      "isPromo": false
+    },
+    {
+      "id": "kayou-naruto:NREA02:R038",
+      "setId": "set:kayou-naruto-nrea02",
+      "provisionalNumber": "R038",
+      "number": "NREA02-R-038L1",
+      "name": "The Sand Shinobi: Allies of the Leaf",
+      "rarity": "R",
+      "imageUrl": "https://cdn.narutodb.com/storage/cards/official/NREA02-R-038L1-thumb.png",
+      "isPromo": false
+    },
+    {
+      "id": "kayou-naruto:NREA02:R039",
+      "setId": "set:kayou-naruto-nrea02",
+      "provisionalNumber": "R039",
+      "number": "NREA02-R-039L1",
+      "name": "The Sand Shinobi: Allies of the Leaf",
+      "rarity": "R",
+      "imageUrl": "https://cdn.narutodb.com/storage/cards/official/NREA02-R-039L1-thumb.png",
+      "isPromo": false
+    },
+    {
+      "id": "kayou-naruto:NREA02:R040",
+      "setId": "set:kayou-naruto-nrea02",
+      "provisionalNumber": "R040",
+      "number": "NREA02-R-040L1",
+      "name": "A Cry on Deaf Ears",
+      "rarity": "R",
+      "imageUrl": "https://cdn.narutodb.com/storage/cards/official/NREA02-R-040L1-thumb.png",
+      "isPromo": false
+    },
+    {
+      "id": "kayou-naruto:NREA02:R041",
+      "setId": "set:kayou-naruto-nrea02",
+      "provisionalNumber": "R041",
+      "number": "NREA02-R-041L1",
+      "name": "A Cry on Deaf Ears",
+      "rarity": "R",
+      "imageUrl": "https://cdn.narutodb.com/storage/cards/official/NREA02-R-041L1-thumb.png",
+      "isPromo": false
+    },
+    {
+      "id": "kayou-naruto:NREA02:R042",
+      "setId": "set:kayou-naruto-nrea02",
+      "provisionalNumber": "R042",
+      "number": "NREA02-R-042L1",
+      "name": "A Cry on Deaf Ears",
+      "rarity": "R",
+      "imageUrl": "https://cdn.narutodb.com/storage/cards/official/NREA02-R-042L1-thumb.png",
+      "isPromo": false
+    },
+    {
+      "id": "kayou-naruto:NREA02:R043",
+      "setId": "set:kayou-naruto-nrea02",
+      "provisionalNumber": "R043",
+      "number": "NREA02-R-043L1",
+      "name": "A Cry on Deaf Ears",
+      "rarity": "R",
+      "imageUrl": "https://cdn.narutodb.com/storage/cards/official/NREA02-R-043L1-thumb.png",
+      "isPromo": false
+    },
+    {
+      "id": "kayou-naruto:NREA02:R044",
+      "setId": "set:kayou-naruto-nrea02",
+      "provisionalNumber": "R044",
+      "number": "NREA02-R-044L1",
+      "name": "For a Friend...",
+      "rarity": "R",
+      "imageUrl": "https://cdn.narutodb.com/storage/cards/official/NREA02-R-044L1-thumb.png",
+      "isPromo": false
+    },
+    {
+      "id": "kayou-naruto:NREA02:R045",
+      "setId": "set:kayou-naruto-nrea02",
+      "provisionalNumber": "R045",
+      "number": "NREA02-R-045L1",
+      "name": "For a Friend...",
+      "rarity": "R",
+      "imageUrl": "https://cdn.narutodb.com/storage/cards/official/NREA02-R-045L1-thumb.png",
+      "isPromo": false
+    },
+    {
+      "id": "kayou-naruto:NREA02:R046",
+      "setId": "set:kayou-naruto-nrea02",
+      "provisionalNumber": "R046",
+      "number": "NREA02-R-046L1",
+      "name": "For a Friend...",
+      "rarity": "R",
+      "imageUrl": "https://cdn.narutodb.com/storage/cards/official/NREA02-R-046L1-thumb.png",
+      "isPromo": false
+    },
+    {
+      "id": "kayou-naruto:NREA02:R047",
+      "setId": "set:kayou-naruto-nrea02",
+      "provisionalNumber": "R047",
+      "number": "NREA02-R-047L1",
+      "name": "A Plea from a Friend",
+      "rarity": "R",
+      "imageUrl": "https://cdn.narutodb.com/storage/cards/official/NREA02-R-047L1-thumb.png",
+      "isPromo": false
+    },
+    {
+      "id": "kayou-naruto:NREA02:R048",
+      "setId": "set:kayou-naruto-nrea02",
+      "provisionalNumber": "R048",
+      "number": "NREA02-R-048L1",
+      "name": "A Plea from a Friend",
+      "rarity": "R",
+      "imageUrl": "https://cdn.narutodb.com/storage/cards/official/NREA02-R-048L1-thumb.png",
+      "isPromo": false
+    },
+    {
+      "id": "kayou-naruto:NREA02:R049",
+      "setId": "set:kayou-naruto-nrea02",
+      "provisionalNumber": "R049",
+      "number": "NREA02-R-049L1",
+      "name": "The End of Tears",
+      "rarity": "R",
+      "imageUrl": "https://cdn.narutodb.com/storage/cards/official/NREA02-R-049L1-thumb.png",
+      "isPromo": false
+    },
+    {
+      "id": "kayou-naruto:NREA02:R050",
+      "setId": "set:kayou-naruto-nrea02",
+      "provisionalNumber": "R050",
+      "number": "NREA02-R-050L1",
+      "name": "The End of Tears",
+      "rarity": "R",
+      "imageUrl": "https://cdn.narutodb.com/storage/cards/official/NREA02-R-050L1-thumb.png",
+      "isPromo": false
+    },
+    {
+      "id": "kayou-naruto:NREA02:PR003",
+      "setId": "set:kayou-naruto-nrea02",
+      "provisionalNumber": "PR003",
+      "number": "NREA-PR-003",
+      "name": "Naruto Uzumaki",
+      "rarity": "PR",
+      "imageUrl": "https://cdn.narutodb.com/storage/cards/NREA/NREA-PR-003_thumb.png?v=1779725309",
+      "isPromo": true
+    },
+    {
+      "id": "kayou-naruto:NREA03:CR001",
+      "setId": "set:kayou-naruto-nrea03",
+      "provisionalNumber": "CR001",
+      "number": "NREA03-CR-001L5",
+      "name": "Naruto Uzumaki",
+      "rarity": "CR",
+      "imageUrl": "https://cdn.narutodb.com/storage/cards/official/NREA03-CR-001L5-thumb.png?v=5",
+      "isPromo": false
+    },
+    {
+      "id": "kayou-naruto:NREA03:CR002",
+      "setId": "set:kayou-naruto-nrea03",
+      "provisionalNumber": "CR002",
+      "number": "NREA03-CR-002L5",
+      "name": "Zabuza Momochi",
+      "rarity": "CR",
+      "imageUrl": "https://cdn.narutodb.com/storage/cards/official/NREA03-CR-002L5-thumb.png?v=5",
+      "isPromo": false
+    },
+    {
+      "id": "kayou-naruto:NREA03:CR003",
+      "setId": "set:kayou-naruto-nrea03",
+      "provisionalNumber": "CR003",
+      "number": "NREA03-CR-003L5",
+      "name": "Haku",
+      "rarity": "CR",
+      "imageUrl": "https://cdn.narutodb.com/storage/cards/official/NREA03-CR-003L5-thumb.png?v=5",
+      "isPromo": false
+    },
+    {
+      "id": "kayou-naruto:NREA03:CR004",
+      "setId": "set:kayou-naruto-nrea03",
+      "provisionalNumber": "CR004",
+      "number": "NREA03-CR-004L5",
+      "name": "Boruto Uzumaki",
+      "rarity": "CR",
+      "imageUrl": "https://cdn.narutodb.com/storage/cards/official/NREA03-CR-004L5-thumb.png?v=5",
+      "isPromo": false
+    },
+    {
+      "id": "kayou-naruto:NREA03:SP001",
+      "setId": "set:kayou-naruto-nrea03",
+      "provisionalNumber": "SP001",
+      "number": "NREA03-SP-001L5",
+      "name": "Naruto Uzumaki",
+      "rarity": "SP",
+      "imageUrl": "https://cdn.narutodb.com/storage/cards/official/NREA03-SP-001L5-thumb.png?v=5",
+      "isPromo": false
+    },
+    {
+      "id": "kayou-naruto:NREA03:SP002",
+      "setId": "set:kayou-naruto-nrea03",
+      "provisionalNumber": "SP002",
+      "number": "NREA03-SP-002L5",
+      "name": "Zabuza Momochi",
+      "rarity": "SP",
+      "imageUrl": "https://cdn.narutodb.com/storage/cards/official/NREA03-SP-002L5-thumb.png?v=5",
+      "isPromo": false
+    },
+    {
+      "id": "kayou-naruto:NREA03:SP003",
+      "setId": "set:kayou-naruto-nrea03",
+      "provisionalNumber": "SP003",
+      "number": "NREA03-SP-003L5",
+      "name": "Haku",
+      "rarity": "SP",
+      "imageUrl": "https://cdn.narutodb.com/storage/cards/official/NREA03-SP-003L5-thumb.png?v=5",
+      "isPromo": false
+    },
+    {
+      "id": "kayou-naruto:NREA03:SP004",
+      "setId": "set:kayou-naruto-nrea03",
+      "provisionalNumber": "SP004",
+      "number": "NREA03-SP-004L5",
+      "name": "Boruto Uzumaki",
+      "rarity": "SP",
+      "imageUrl": "https://cdn.narutodb.com/storage/cards/official/NREA03-SP-004L5-thumb.png?v=5",
+      "isPromo": false
+    },
+    {
+      "id": "kayou-naruto:NREA03:MR001",
+      "setId": "set:kayou-naruto-nrea03",
+      "provisionalNumber": "MR001",
+      "number": "NREA03-MR-001L4",
+      "name": "Naruto Uzumaki",
+      "rarity": "MR",
+      "imageUrl": "https://cdn.narutodb.com/storage/cards/official/NREA03-MR-001L4-thumb.png?v=5",
+      "isPromo": false
+    },
+    {
+      "id": "kayou-naruto:NREA03:MR002",
+      "setId": "set:kayou-naruto-nrea03",
+      "provisionalNumber": "MR002",
+      "number": "NREA03-MR-002L4",
+      "name": "Sasuke Uchiha",
+      "rarity": "MR",
+      "imageUrl": "https://cdn.narutodb.com/storage/cards/official/NREA03-MR-002L4-thumb.png?v=5",
+      "isPromo": false
+    },
+    {
+      "id": "kayou-naruto:NREA03:MR003",
+      "setId": "set:kayou-naruto-nrea03",
+      "provisionalNumber": "MR003",
+      "number": "NREA03-MR-003L4",
+      "name": "Sakura Haruno",
+      "rarity": "MR",
+      "imageUrl": "https://cdn.narutodb.com/storage/cards/official/NREA03-MR-003L4-thumb.png?v=5",
+      "isPromo": false
+    },
+    {
+      "id": "kayou-naruto:NREA03:MR004",
+      "setId": "set:kayou-naruto-nrea03",
+      "provisionalNumber": "MR004",
+      "number": "NREA03-MR-004L4",
+      "name": "Kakashi Hatake",
+      "rarity": "MR",
+      "imageUrl": "https://cdn.narutodb.com/storage/cards/official/NREA03-MR-004L4-thumb.png?v=5",
+      "isPromo": false
+    },
+    {
+      "id": "kayou-naruto:NREA03:UR001",
+      "setId": "set:kayou-naruto-nrea03",
+      "provisionalNumber": "UR001",
+      "number": "NREA03-UR-001L3",
+      "name": "Naruto Uzumaki",
+      "rarity": "UR",
+      "imageUrl": "https://cdn.narutodb.com/storage/cards/official/NREA03-UR-001L3-thumb.png?v=5",
+      "isPromo": false
+    },
+    {
+      "id": "kayou-naruto:NREA03:UR002",
+      "setId": "set:kayou-naruto-nrea03",
+      "provisionalNumber": "UR002",
+      "number": "NREA03-UR-002L3",
+      "name": "Sakura Haruno",
+      "rarity": "UR",
+      "imageUrl": "https://cdn.narutodb.com/storage/cards/official/NREA03-UR-002L3-thumb.png?v=5",
+      "isPromo": false
+    },
+    {
+      "id": "kayou-naruto:NREA03:UR003",
+      "setId": "set:kayou-naruto-nrea03",
+      "provisionalNumber": "UR003",
+      "number": "NREA03-UR-003L3",
+      "name": "Kakashi Hatake",
+      "rarity": "UR",
+      "imageUrl": "https://cdn.narutodb.com/storage/cards/official/NREA03-UR-003L3-thumb.png?v=5",
+      "isPromo": false
+    },
+    {
+      "id": "kayou-naruto:NREA03:UR004",
+      "setId": "set:kayou-naruto-nrea03",
+      "provisionalNumber": "UR004",
+      "number": "NREA03-UR-004L3",
+      "name": "Iruka Umino",
+      "rarity": "UR",
+      "imageUrl": "https://cdn.narutodb.com/storage/cards/official/NREA03-UR-004L3-thumb.png?v=5",
+      "isPromo": false
+    },
+    {
+      "id": "kayou-naruto:NREA03:UR005",
+      "setId": "set:kayou-naruto-nrea03",
+      "provisionalNumber": "UR005",
+      "number": "NREA03-UR-005L3",
+      "name": "Kakashi Hatake",
+      "rarity": "UR",
+      "imageUrl": "https://cdn.narutodb.com/storage/cards/official/NREA03-UR-005L3-thumb.png?v=5",
+      "isPromo": false
+    },
+    {
+      "id": "kayou-naruto:NREA03:UR006",
+      "setId": "set:kayou-naruto-nrea03",
+      "provisionalNumber": "UR006",
+      "number": "NREA03-UR-006L3",
+      "name": "Zabuza Momochi",
+      "rarity": "UR",
+      "imageUrl": "https://cdn.narutodb.com/storage/cards/official/NREA03-UR-006L3-thumb.png?v=5",
+      "isPromo": false
+    },
+    {
+      "id": "kayou-naruto:NREA03:UR007",
+      "setId": "set:kayou-naruto-nrea03",
+      "provisionalNumber": "UR007",
+      "number": "NREA03-UR-007L3",
+      "name": "Gaara",
+      "rarity": "UR",
+      "imageUrl": "https://cdn.narutodb.com/storage/cards/official/NREA03-UR-007L3-thumb.png?v=5",
+      "isPromo": false
+    },
+    {
+      "id": "kayou-naruto:NREA03:UR008",
+      "setId": "set:kayou-naruto-nrea03",
+      "provisionalNumber": "UR008",
+      "number": "NREA03-UR-008L3",
+      "name": "Haku",
+      "rarity": "UR",
+      "imageUrl": "https://cdn.narutodb.com/storage/cards/official/NREA03-UR-008L3-thumb.png?v=5",
+      "isPromo": false
+    },
+    {
+      "id": "kayou-naruto:NREA03:UR009",
+      "setId": "set:kayou-naruto-nrea03",
+      "provisionalNumber": "UR009",
+      "number": "NREA03-UR-009L3",
+      "name": "Rock Lee",
+      "rarity": "UR",
+      "imageUrl": "https://cdn.narutodb.com/storage/cards/official/NREA03-UR-009L3-thumb.png?v=5",
+      "isPromo": false
+    },
+    {
+      "id": "kayou-naruto:NREA03:UR010",
+      "setId": "set:kayou-naruto-nrea03",
+      "provisionalNumber": "UR010",
+      "number": "NREA03-UR-010L3",
+      "name": "Might Guy",
+      "rarity": "UR",
+      "imageUrl": "https://cdn.narutodb.com/storage/cards/official/NREA03-UR-010L3-thumb.png?v=5",
+      "isPromo": false
+    },
+    {
+      "id": "kayou-naruto:NREA03:UR011",
+      "setId": "set:kayou-naruto-nrea03",
+      "provisionalNumber": "UR011",
+      "number": "NREA03-UR-011L3",
+      "name": "Ebisu",
+      "rarity": "UR",
+      "imageUrl": "https://cdn.narutodb.com/storage/cards/official/NREA03-UR-011L3-thumb.png?v=5",
+      "isPromo": false
+    },
+    {
+      "id": "kayou-naruto:NREA03:UR012",
+      "setId": "set:kayou-naruto-nrea03",
+      "provisionalNumber": "UR012",
+      "number": "NREA03-UR-012L3",
+      "name": "Hyuga Hanabi",
+      "rarity": "UR",
+      "imageUrl": "https://cdn.narutodb.com/storage/cards/official/NREA03-UR-012L3-thumb.png?v=5",
+      "isPromo": false
+    },
+    {
+      "id": "kayou-naruto:NREA03:UR013",
+      "setId": "set:kayou-naruto-nrea03",
+      "provisionalNumber": "UR013",
+      "number": "NREA03-UR-013L3",
+      "name": "Sarada Uchiha",
+      "rarity": "UR",
+      "imageUrl": "https://cdn.narutodb.com/storage/cards/official/NREA03-UR-013L3-thumb.png?v=5",
+      "isPromo": false
+    },
+    {
+      "id": "kayou-naruto:NREA03:UR014",
+      "setId": "set:kayou-naruto-nrea03",
+      "provisionalNumber": "UR014",
+      "number": "NREA03-UR-014L3",
+      "name": "Boruto Uzumaki",
+      "rarity": "UR",
+      "imageUrl": "https://cdn.narutodb.com/storage/cards/official/NREA03-UR-014L3-thumb.png?v=5",
+      "isPromo": false
+    },
+    {
+      "id": "kayou-naruto:NREA03:UR015",
+      "setId": "set:kayou-naruto-nrea03",
+      "provisionalNumber": "UR015",
+      "number": "NREA03-UR-015L3",
+      "name": "Boruto Uzumaki",
+      "rarity": "UR",
+      "imageUrl": "https://cdn.narutodb.com/storage/cards/official/NREA03-UR-015L3-thumb.png?v=5",
+      "isPromo": false
+    },
+    {
+      "id": "kayou-naruto:NREA03:SSR001",
+      "setId": "set:kayou-naruto-nrea03",
+      "provisionalNumber": "SSR001",
+      "number": "NREA03-SSR-001L3",
+      "name": "Naruto Uzumaki",
+      "rarity": "SSR",
+      "imageUrl": "https://cdn.narutodb.com/storage/cards/official/NREA03-SSR-001L3-thumb.png?v=5",
+      "isPromo": false
+    },
+    {
+      "id": "kayou-naruto:NREA03:SSR002",
+      "setId": "set:kayou-naruto-nrea03",
+      "provisionalNumber": "SSR002",
+      "number": "NREA03-SSR-002L3",
+      "name": "Kakashi Hatake",
+      "rarity": "SSR",
+      "imageUrl": "https://cdn.narutodb.com/storage/cards/official/NREA03-SSR-002L3-thumb.png?v=5",
+      "isPromo": false
+    },
+    {
+      "id": "kayou-naruto:NREA03:SSR003",
+      "setId": "set:kayou-naruto-nrea03",
+      "provisionalNumber": "SSR003",
+      "number": "NREA03-SSR-003L3",
+      "name": "Mizuki",
+      "rarity": "SSR",
+      "imageUrl": "https://cdn.narutodb.com/storage/cards/official/NREA03-SSR-003L3-thumb.png?v=5",
+      "isPromo": false
+    },
+    {
+      "id": "kayou-naruto:NREA03:SSR004",
+      "setId": "set:kayou-naruto-nrea03",
+      "provisionalNumber": "SSR004",
+      "number": "NREA03-SSR-004L3",
+      "name": "Naruto Uzumaki",
+      "rarity": "SSR",
+      "imageUrl": "https://cdn.narutodb.com/storage/cards/official/NREA03-SSR-004L3-thumb.png?v=5",
+      "isPromo": false
+    },
+    {
+      "id": "kayou-naruto:NREA03:SSR005",
+      "setId": "set:kayou-naruto-nrea03",
+      "provisionalNumber": "SSR005",
+      "number": "NREA03-SSR-005L3",
+      "name": "Naruto Uzumaki",
+      "rarity": "SSR",
+      "imageUrl": "https://cdn.narutodb.com/storage/cards/official/NREA03-SSR-005L3-thumb.png?v=5",
+      "isPromo": false
+    },
+    {
+      "id": "kayou-naruto:NREA03:SSR006",
+      "setId": "set:kayou-naruto-nrea03",
+      "provisionalNumber": "SSR006",
+      "number": "NREA03-SSR-006L3",
+      "name": "Sasuke Uchiha",
+      "rarity": "SSR",
+      "imageUrl": "https://cdn.narutodb.com/storage/cards/official/NREA03-SSR-006L3-thumb.png?v=5",
+      "isPromo": false
+    },
+    {
+      "id": "kayou-naruto:NREA03:SSR007",
+      "setId": "set:kayou-naruto-nrea03",
+      "provisionalNumber": "SSR007",
+      "number": "NREA03-SSR-007L3",
+      "name": "Naruto Uzumaki",
+      "rarity": "SSR",
+      "imageUrl": "https://cdn.narutodb.com/storage/cards/official/NREA03-SSR-007L3-thumb.png?v=5",
+      "isPromo": false
+    },
+    {
+      "id": "kayou-naruto:NREA03:SSR008",
+      "setId": "set:kayou-naruto-nrea03",
+      "provisionalNumber": "SSR008",
+      "number": "NREA03-SSR-008L3",
+      "name": "Ebisu",
+      "rarity": "SSR",
+      "imageUrl": "https://cdn.narutodb.com/storage/cards/official/NREA03-SSR-008L3-thumb.png?v=5",
+      "isPromo": false
+    },
+    {
+      "id": "kayou-naruto:NREA03:SSR009",
+      "setId": "set:kayou-naruto-nrea03",
+      "provisionalNumber": "SSR009",
+      "number": "NREA03-SSR-009L3",
+      "name": "Naruto Uzumaki",
+      "rarity": "SSR",
+      "imageUrl": "https://cdn.narutodb.com/storage/cards/official/NREA03-SSR-009L3-thumb.png?v=5",
+      "isPromo": false
+    },
+    {
+      "id": "kayou-naruto:NREA03:SSR010",
+      "setId": "set:kayou-naruto-nrea03",
+      "provisionalNumber": "SSR010",
+      "number": "NREA03-SSR-010L3",
+      "name": "Sasuke Uchiha",
+      "rarity": "SSR",
+      "imageUrl": "https://cdn.narutodb.com/storage/cards/official/NREA03-SSR-010L3-thumb.png?v=5",
+      "isPromo": false
+    },
+    {
+      "id": "kayou-naruto:NREA03:SSR011",
+      "setId": "set:kayou-naruto-nrea03",
+      "provisionalNumber": "SSR011",
+      "number": "NREA03-SSR-011L3",
+      "name": "Naruto Uzumaki",
+      "rarity": "SSR",
+      "imageUrl": "https://cdn.narutodb.com/storage/cards/official/NREA03-SSR-011L3-thumb.png?v=5",
+      "isPromo": false
+    },
+    {
+      "id": "kayou-naruto:NREA03:SSR012",
+      "setId": "set:kayou-naruto-nrea03",
+      "provisionalNumber": "SSR012",
+      "number": "NREA03-SSR-012L3",
+      "name": "Sakura Haruno",
+      "rarity": "SSR",
+      "imageUrl": "https://cdn.narutodb.com/storage/cards/official/NREA03-SSR-012L3-thumb.png?v=5",
+      "isPromo": false
+    },
+    {
+      "id": "kayou-naruto:NREA03:SSR013",
+      "setId": "set:kayou-naruto-nrea03",
+      "provisionalNumber": "SSR013",
+      "number": "NREA03-SSR-013L3",
+      "name": "Naruto Uzumaki",
+      "rarity": "SSR",
+      "imageUrl": "https://cdn.narutodb.com/storage/cards/official/NREA03-SSR-013L3-thumb.png?v=5",
+      "isPromo": false
+    },
+    {
+      "id": "kayou-naruto:NREA03:SSR014",
+      "setId": "set:kayou-naruto-nrea03",
+      "provisionalNumber": "SSR014",
+      "number": "NREA03-SSR-014L3",
+      "name": "Naruto Uzumaki",
+      "rarity": "SSR",
+      "imageUrl": "https://cdn.narutodb.com/storage/cards/official/NREA03-SSR-014L3-thumb.png?v=5",
+      "isPromo": false
+    },
+    {
+      "id": "kayou-naruto:NREA03:SSR015",
+      "setId": "set:kayou-naruto-nrea03",
+      "provisionalNumber": "SSR015",
+      "number": "NREA03-SSR-015L3",
+      "name": "Haku",
+      "rarity": "SSR",
+      "imageUrl": "https://cdn.narutodb.com/storage/cards/official/NREA03-SSR-015L3-thumb.png?v=5",
+      "isPromo": false
+    },
+    {
+      "id": "kayou-naruto:NREA03:SSR016",
+      "setId": "set:kayou-naruto-nrea03",
+      "provisionalNumber": "SSR016",
+      "number": "NREA03-SSR-016L3",
+      "name": "Iruka Umino",
+      "rarity": "SSR",
+      "imageUrl": "https://cdn.narutodb.com/storage/cards/official/NREA03-SSR-016L3-thumb.png?v=5",
+      "isPromo": false
+    },
+    {
+      "id": "kayou-naruto:NREA03:SSR017",
+      "setId": "set:kayou-naruto-nrea03",
+      "provisionalNumber": "SSR017",
+      "number": "NREA03-SSR-017L3",
+      "name": "Sasuke Uchiha",
+      "rarity": "SSR",
+      "imageUrl": "https://cdn.narutodb.com/storage/cards/official/NREA03-SSR-017L3-thumb.png?v=5",
+      "isPromo": false
+    },
+    {
+      "id": "kayou-naruto:NREA03:SSR018",
+      "setId": "set:kayou-naruto-nrea03",
+      "provisionalNumber": "SSR018",
+      "number": "NREA03-SSR-018L3",
+      "name": "Sasuke Uchiha",
+      "rarity": "SSR",
+      "imageUrl": "https://cdn.narutodb.com/storage/cards/official/NREA03-SSR-018L3-thumb.png?v=5",
+      "isPromo": false
+    },
+    {
+      "id": "kayou-naruto:NREA03:SSR019",
+      "setId": "set:kayou-naruto-nrea03",
+      "provisionalNumber": "SSR019",
+      "number": "NREA03-SSR-019L3",
+      "name": "Sasuke Uchiha",
+      "rarity": "SSR",
+      "imageUrl": "https://cdn.narutodb.com/storage/cards/official/NREA03-SSR-019L3-thumb.png?v=5",
+      "isPromo": false
+    },
+    {
+      "id": "kayou-naruto:NREA03:SSR020",
+      "setId": "set:kayou-naruto-nrea03",
+      "provisionalNumber": "SSR020",
+      "number": "NREA03-SSR-020L3",
+      "name": "Hanabi Hyuga",
+      "rarity": "SSR",
+      "imageUrl": "https://cdn.narutodb.com/storage/cards/official/NREA03-SSR-020L3-thumb.png?v=5",
+      "isPromo": false
+    },
+    {
+      "id": "kayou-naruto:NREA03:SSR021",
+      "setId": "set:kayou-naruto-nrea03",
+      "provisionalNumber": "SSR021",
+      "number": "NREA03-SSR-021L3",
+      "name": "Shino Aburame",
+      "rarity": "SSR",
+      "imageUrl": "https://cdn.narutodb.com/storage/cards/official/NREA03-SSR-021L3-thumb.png?v=5",
+      "isPromo": false
+    },
+    {
+      "id": "kayou-naruto:NREA03:SSR022",
+      "setId": "set:kayou-naruto-nrea03",
+      "provisionalNumber": "SSR022",
+      "number": "NREA03-SSR-022L3",
+      "name": "Chocho Akimichi",
+      "rarity": "SSR",
+      "imageUrl": "https://cdn.narutodb.com/storage/cards/official/NREA03-SSR-022L3-thumb.png?v=5",
+      "isPromo": false
+    },
+    {
+      "id": "kayou-naruto:NREA03:SSR023",
+      "setId": "set:kayou-naruto-nrea03",
+      "provisionalNumber": "SSR023",
+      "number": "NREA03-SSR-023L3",
+      "name": "Sumire Kakei",
+      "rarity": "SSR",
+      "imageUrl": "https://cdn.narutodb.com/storage/cards/official/NREA03-SSR-023L3-thumb.png?v=5",
+      "isPromo": false
+    },
+    {
+      "id": "kayou-naruto:NREA03:SSR024",
+      "setId": "set:kayou-naruto-nrea03",
+      "provisionalNumber": "SSR024",
+      "number": "NREA03-SSR-024L3",
+      "name": "Boruto Uzumaki",
+      "rarity": "SSR",
+      "imageUrl": "https://cdn.narutodb.com/storage/cards/official/NREA03-SSR-024L3-thumb.png?v=5",
+      "isPromo": false
+    },
+    {
+      "id": "kayou-naruto:NREA03:SSR025",
+      "setId": "set:kayou-naruto-nrea03",
+      "provisionalNumber": "SSR025",
+      "number": "NREA03-SSR-025L3",
+      "name": "Sarada Uchiha",
+      "rarity": "SSR",
+      "imageUrl": "https://cdn.narutodb.com/storage/cards/official/NREA03-SSR-025L3-thumb.png?v=5",
+      "isPromo": false
+    },
+    {
+      "id": "kayou-naruto:NREA03:SR001",
+      "setId": "set:kayou-naruto-nrea03",
+      "provisionalNumber": "SR001",
+      "number": "NREA03-SR-001L2",
+      "name": "Naruto Uzumaki",
+      "rarity": "SR",
+      "imageUrl": "https://cdn.narutodb.com/storage/cards/official/NREA03-SR-001L2-thumb.png?v=5",
+      "isPromo": false
+    },
+    {
+      "id": "kayou-naruto:NREA03:SR002",
+      "setId": "set:kayou-naruto-nrea03",
+      "provisionalNumber": "SR002",
+      "number": "NREA03-SR-002L2",
+      "name": "Sasuke Uchiha",
+      "rarity": "SR",
+      "imageUrl": "https://cdn.narutodb.com/storage/cards/official/NREA03-SR-002L2-thumb.png?v=5",
+      "isPromo": false
+    },
+    {
+      "id": "kayou-naruto:NREA03:SR003",
+      "setId": "set:kayou-naruto-nrea03",
+      "provisionalNumber": "SR003",
+      "number": "NREA03-SR-003L2",
+      "name": "Kakashi Hatake",
+      "rarity": "SR",
+      "imageUrl": "https://cdn.narutodb.com/storage/cards/official/NREA03-SR-003L2-thumb.png?v=5",
+      "isPromo": false
+    },
+    {
+      "id": "kayou-naruto:NREA03:SR004",
+      "setId": "set:kayou-naruto-nrea03",
+      "provisionalNumber": "SR004",
+      "number": "NREA03-SR-004L2",
+      "name": "Sakura Haruno",
+      "rarity": "SR",
+      "imageUrl": "https://cdn.narutodb.com/storage/cards/official/NREA03-SR-004L2-thumb.png?v=5",
+      "isPromo": false
+    },
+    {
+      "id": "kayou-naruto:NREA03:SR005",
+      "setId": "set:kayou-naruto-nrea03",
+      "provisionalNumber": "SR005",
+      "number": "NREA03-SR-005L2",
+      "name": "Konohamaru Sarutobi",
+      "rarity": "SR",
+      "imageUrl": "https://cdn.narutodb.com/storage/cards/official/NREA03-SR-005L2-thumb.png?v=5",
+      "isPromo": false
+    },
+    {
+      "id": "kayou-naruto:NREA03:SR006",
+      "setId": "set:kayou-naruto-nrea03",
+      "provisionalNumber": "SR006",
+      "number": "NREA03-SR-006L2",
+      "name": "Moegi Kazamatsuri",
+      "rarity": "SR",
+      "imageUrl": "https://cdn.narutodb.com/storage/cards/official/NREA03-SR-006L2-thumb.png?v=5",
+      "isPromo": false
+    },
+    {
+      "id": "kayou-naruto:NREA03:SR007",
+      "setId": "set:kayou-naruto-nrea03",
+      "provisionalNumber": "SR007",
+      "number": "NREA03-SR-007L2",
+      "name": "Gatō",
+      "rarity": "SR",
+      "imageUrl": "https://cdn.narutodb.com/storage/cards/official/NREA03-SR-007L2-thumb.png?v=5",
+      "isPromo": false
+    },
+    {
+      "id": "kayou-naruto:NREA03:SR008",
+      "setId": "set:kayou-naruto-nrea03",
+      "provisionalNumber": "SR008",
+      "number": "NREA03-SR-008L2",
+      "name": "Inari",
+      "rarity": "SR",
+      "imageUrl": "https://cdn.narutodb.com/storage/cards/official/NREA03-SR-008L2-thumb.png?v=5",
+      "isPromo": false
+    },
+    {
+      "id": "kayou-naruto:NREA03:SR009",
+      "setId": "set:kayou-naruto-nrea03",
+      "provisionalNumber": "SR009",
+      "number": "NREA03-SR-009L2",
+      "name": "Zabuza Momochi",
+      "rarity": "SR",
+      "imageUrl": "https://cdn.narutodb.com/storage/cards/official/NREA03-SR-009L2-thumb.png?v=5",
+      "isPromo": false
+    },
+    {
+      "id": "kayou-naruto:NREA03:SR010",
+      "setId": "set:kayou-naruto-nrea03",
+      "provisionalNumber": "SR010",
+      "number": "NREA03-SR-010L2",
+      "name": "Kakashi Hatake",
+      "rarity": "SR",
+      "imageUrl": "https://cdn.narutodb.com/storage/cards/official/NREA03-SR-010L2-thumb.png?v=5",
+      "isPromo": false
+    },
+    {
+      "id": "kayou-naruto:NREA03:SR011",
+      "setId": "set:kayou-naruto-nrea03",
+      "provisionalNumber": "SR011",
+      "number": "NREA03-SR-011L2",
+      "name": "Tsunami",
+      "rarity": "SR",
+      "imageUrl": "https://cdn.narutodb.com/storage/cards/official/NREA03-SR-011L2-thumb.png?v=5",
+      "isPromo": false
+    },
+    {
+      "id": "kayou-naruto:NREA03:SR012",
+      "setId": "set:kayou-naruto-nrea03",
+      "provisionalNumber": "SR012",
+      "number": "NREA03-SR-012L2",
+      "name": "Naruto Uzumaki",
+      "rarity": "SR",
+      "imageUrl": "https://cdn.narutodb.com/storage/cards/official/NREA03-SR-012L2-thumb.png?v=5",
+      "isPromo": false
+    },
+    {
+      "id": "kayou-naruto:NREA03:SR013",
+      "setId": "set:kayou-naruto-nrea03",
+      "provisionalNumber": "SR013",
+      "number": "NREA03-SR-013L2",
+      "name": "Might Guy",
+      "rarity": "SR",
+      "imageUrl": "https://cdn.narutodb.com/storage/cards/official/NREA03-SR-013L2-thumb.png?v=5",
+      "isPromo": false
+    },
+    {
+      "id": "kayou-naruto:NREA03:SR014",
+      "setId": "set:kayou-naruto-nrea03",
+      "provisionalNumber": "SR014",
+      "number": "NREA03-SR-014L2",
+      "name": "Udon Ise",
+      "rarity": "SR",
+      "imageUrl": "https://cdn.narutodb.com/storage/cards/official/NREA03-SR-014L2-thumb.png?v=5",
+      "isPromo": false
+    },
+    {
+      "id": "kayou-naruto:NREA03:SR015",
+      "setId": "set:kayou-naruto-nrea03",
+      "provisionalNumber": "SR015",
+      "number": "NREA03-SR-015L2",
+      "name": "Sasuke Uchiha",
+      "rarity": "SR",
+      "imageUrl": "https://cdn.narutodb.com/storage/cards/official/NREA03-SR-015L2-thumb.png?v=5",
+      "isPromo": false
+    },
+    {
+      "id": "kayou-naruto:NREA03:SR016",
+      "setId": "set:kayou-naruto-nrea03",
+      "provisionalNumber": "SR016",
+      "number": "NREA03-SR-016L2",
+      "name": "Boruto Uzumaki",
+      "rarity": "SR",
+      "imageUrl": "https://cdn.narutodb.com/storage/cards/official/NREA03-SR-016L2-thumb.png?v=5",
+      "isPromo": false
+    },
+    {
+      "id": "kayou-naruto:NREA03:SR017",
+      "setId": "set:kayou-naruto-nrea03",
+      "provisionalNumber": "SR017",
+      "number": "NREA03-SR-017L2",
+      "name": "Boruto Uzumaki",
+      "rarity": "SR",
+      "imageUrl": "https://cdn.narutodb.com/storage/cards/official/NREA03-SR-017L2-thumb.png?v=5",
+      "isPromo": false
+    },
+    {
+      "id": "kayou-naruto:NREA03:SR018",
+      "setId": "set:kayou-naruto-nrea03",
+      "provisionalNumber": "SR018",
+      "number": "NREA03-SR-018L2",
+      "name": "Sarada Uchiha",
+      "rarity": "SR",
+      "imageUrl": "https://cdn.narutodb.com/storage/cards/official/NREA03-SR-018L2-thumb.png?v=5",
+      "isPromo": false
+    },
+    {
+      "id": "kayou-naruto:NREA03:SR019",
+      "setId": "set:kayou-naruto-nrea03",
+      "provisionalNumber": "SR019",
+      "number": "NREA03-SR-019L2",
+      "name": "Mitsuki",
+      "rarity": "SR",
+      "imageUrl": "https://cdn.narutodb.com/storage/cards/official/NREA03-SR-019L2-thumb.png?v=5",
+      "isPromo": false
+    },
+    {
+      "id": "kayou-naruto:NREA03:SR020",
+      "setId": "set:kayou-naruto-nrea03",
+      "provisionalNumber": "SR020",
+      "number": "NREA03-SR-020L2",
+      "name": "Boruto Uzumaki",
+      "rarity": "SR",
+      "imageUrl": "https://cdn.narutodb.com/storage/cards/official/NREA03-SR-020L2-thumb.png?v=5",
+      "isPromo": false
+    },
+    {
+      "id": "kayou-naruto:NREA03:R001",
+      "setId": "set:kayou-naruto-nrea03",
+      "provisionalNumber": "R001",
+      "number": "NREA03-R-001L1",
+      "name": "My Name Is Konohamaru!",
+      "rarity": "R",
+      "imageUrl": "https://cdn.narutodb.com/storage/cards/official/NREA03-R-001L1-thumb.png?v=5",
+      "isPromo": false
+    },
+    {
+      "id": "kayou-naruto:NREA03:R002",
+      "setId": "set:kayou-naruto-nrea03",
+      "provisionalNumber": "R002",
+      "number": "NREA03-R-002L1",
+      "name": "My Name Is Konohamaru!",
+      "rarity": "R",
+      "imageUrl": "https://cdn.narutodb.com/storage/cards/official/NREA03-R-002L1-thumb.png?v=5",
+      "isPromo": false
+    },
+    {
+      "id": "kayou-naruto:NREA03:R003",
+      "setId": "set:kayou-naruto-nrea03",
+      "provisionalNumber": "R003",
+      "number": "NREA03-R-003L1",
+      "name": "My Name Is Konohamaru!",
+      "rarity": "R",
+      "imageUrl": "https://cdn.narutodb.com/storage/cards/official/NREA03-R-003L1-thumb.png?v=5",
+      "isPromo": false
+    },
+    {
+      "id": "kayou-naruto:NREA03:R004",
+      "setId": "set:kayou-naruto-nrea03",
+      "provisionalNumber": "R004",
+      "number": "NREA03-R-004L1",
+      "name": "My Name Is Konohamaru!",
+      "rarity": "R",
+      "imageUrl": "https://cdn.narutodb.com/storage/cards/official/NREA03-R-004L1-thumb.png?v=5",
+      "isPromo": false
+    },
+    {
+      "id": "kayou-naruto:NREA03:R005",
+      "setId": "set:kayou-naruto-nrea03",
+      "provisionalNumber": "R005",
+      "number": "NREA03-R-005L1",
+      "name": "My Name Is Konohamaru!",
+      "rarity": "R",
+      "imageUrl": "https://cdn.narutodb.com/storage/cards/official/NREA03-R-005L1-thumb.png?v=5",
+      "isPromo": false
+    },
+    {
+      "id": "kayou-naruto:NREA03:R006",
+      "setId": "set:kayou-naruto-nrea03",
+      "provisionalNumber": "R006",
+      "number": "NREA03-R-006L1",
+      "name": "Sasuke and Sakura: Friends or Foes?",
+      "rarity": "R",
+      "imageUrl": "https://cdn.narutodb.com/storage/cards/official/NREA03-R-006L1-thumb.png?v=5",
+      "isPromo": false
+    },
+    {
+      "id": "kayou-naruto:NREA03:R007",
+      "setId": "set:kayou-naruto-nrea03",
+      "provisionalNumber": "R007",
+      "number": "NREA03-R-007L1",
+      "name": "Sasuke and Sakura: Friends or Foes?",
+      "rarity": "R",
+      "imageUrl": "https://cdn.narutodb.com/storage/cards/official/NREA03-R-007L1-thumb.png?v=5",
+      "isPromo": false
+    },
+    {
+      "id": "kayou-naruto:NREA03:R008",
+      "setId": "set:kayou-naruto-nrea03",
+      "provisionalNumber": "R008",
+      "number": "NREA03-R-008L1",
+      "name": "Sasuke and Sakura: Friends or Foes?",
+      "rarity": "R",
+      "imageUrl": "https://cdn.narutodb.com/storage/cards/official/NREA03-R-008L1-thumb.png?v=5",
+      "isPromo": false
+    },
+    {
+      "id": "kayou-naruto:NREA03:R009",
+      "setId": "set:kayou-naruto-nrea03",
+      "provisionalNumber": "R009",
+      "number": "NREA03-R-009L1",
+      "name": "Sasuke and Sakura: Friends or Foes?",
+      "rarity": "R",
+      "imageUrl": "https://cdn.narutodb.com/storage/cards/official/NREA03-R-009L1-thumb.png?v=5",
+      "isPromo": false
+    },
+    {
+      "id": "kayou-naruto:NREA03:R010",
+      "setId": "set:kayou-naruto-nrea03",
+      "provisionalNumber": "R010",
+      "number": "NREA03-R-010L1",
+      "name": "Sasuke and Sakura: Friends or Foes?",
+      "rarity": "R",
+      "imageUrl": "https://cdn.narutodb.com/storage/cards/official/NREA03-R-010L1-thumb.png?v=5",
+      "isPromo": false
+    },
+    {
+      "id": "kayou-naruto:NREA03:R011",
+      "setId": "set:kayou-naruto-nrea03",
+      "provisionalNumber": "R011",
+      "number": "NREA03-R-011L1",
+      "name": "Pass or Fail: Survival Test",
+      "rarity": "R",
+      "imageUrl": "https://cdn.narutodb.com/storage/cards/official/NREA03-R-011L1-thumb.png?v=5",
+      "isPromo": false
+    },
+    {
+      "id": "kayou-naruto:NREA03:R012",
+      "setId": "set:kayou-naruto-nrea03",
+      "provisionalNumber": "R012",
+      "number": "NREA03-R-012L1",
+      "name": "Pass or Fail: Survival Test",
+      "rarity": "R",
+      "imageUrl": "https://cdn.narutodb.com/storage/cards/official/NREA03-R-012L1-thumb.png?v=5",
+      "isPromo": false
+    },
+    {
+      "id": "kayou-naruto:NREA03:R013",
+      "setId": "set:kayou-naruto-nrea03",
+      "provisionalNumber": "R013",
+      "number": "NREA03-R-013L1",
+      "name": "Pass or Fail: Survival Test",
+      "rarity": "R",
+      "imageUrl": "https://cdn.narutodb.com/storage/cards/official/NREA03-R-013L1-thumb.png?v=5",
+      "isPromo": false
+    },
+    {
+      "id": "kayou-naruto:NREA03:R014",
+      "setId": "set:kayou-naruto-nrea03",
+      "provisionalNumber": "R014",
+      "number": "NREA03-R-014L1",
+      "name": "Pass or Fail: Survival Test",
+      "rarity": "R",
+      "imageUrl": "https://cdn.narutodb.com/storage/cards/official/NREA03-R-014L1-thumb.png?v=5",
+      "isPromo": false
+    },
+    {
+      "id": "kayou-naruto:NREA03:R015",
+      "setId": "set:kayou-naruto-nrea03",
+      "provisionalNumber": "R015",
+      "number": "NREA03-R-015L1",
+      "name": "Pass or Fail: Survival Test",
+      "rarity": "R",
+      "imageUrl": "https://cdn.narutodb.com/storage/cards/official/NREA03-R-015L1-thumb.png?v=5",
+      "isPromo": false
+    },
+    {
+      "id": "kayou-naruto:NREA03:R016",
+      "setId": "set:kayou-naruto-nrea03",
+      "provisionalNumber": "R016",
+      "number": "NREA03-R-016L1",
+      "name": "You Failed! Kakashi's Final Decision",
+      "rarity": "R",
+      "imageUrl": "https://cdn.narutodb.com/storage/cards/official/NREA03-R-016L1-thumb.png?v=5",
+      "isPromo": false
+    },
+    {
+      "id": "kayou-naruto:NREA03:R017",
+      "setId": "set:kayou-naruto-nrea03",
+      "provisionalNumber": "R017",
+      "number": "NREA03-R-017L1",
+      "name": "You Failed! Kakashi's Final Decision",
+      "rarity": "R",
+      "imageUrl": "https://cdn.narutodb.com/storage/cards/official/NREA03-R-017L1-thumb.png?v=5",
+      "isPromo": false
+    },
+    {
+      "id": "kayou-naruto:NREA03:R018",
+      "setId": "set:kayou-naruto-nrea03",
+      "provisionalNumber": "R018",
+      "number": "NREA03-R-018L1",
+      "name": "You Failed! Kakashi's Final Decision",
+      "rarity": "R",
+      "imageUrl": "https://cdn.narutodb.com/storage/cards/official/NREA03-R-018L1-thumb.png?v=5",
+      "isPromo": false
+    },
+    {
+      "id": "kayou-naruto:NREA03:R019",
+      "setId": "set:kayou-naruto-nrea03",
+      "provisionalNumber": "R019",
+      "number": "NREA03-R-019L1",
+      "name": "You Failed! Kakashi's Final Decision",
+      "rarity": "R",
+      "imageUrl": "https://cdn.narutodb.com/storage/cards/official/NREA03-R-019L1-thumb.png?v=5",
+      "isPromo": false
+    },
+    {
+      "id": "kayou-naruto:NREA03:R020",
+      "setId": "set:kayou-naruto-nrea03",
+      "provisionalNumber": "R020",
+      "number": "NREA03-R-020L1",
+      "name": "You Failed! Kakashi's Final Decision",
+      "rarity": "R",
+      "imageUrl": "https://cdn.narutodb.com/storage/cards/official/NREA03-R-020L1-thumb.png?v=5",
+      "isPromo": false
+    },
+    {
+      "id": "kayou-naruto:NREA03:R021",
+      "setId": "set:kayou-naruto-nrea03",
+      "provisionalNumber": "R021",
+      "number": "NREA03-R-021L1",
+      "name": "The Forest of Chakra",
+      "rarity": "R",
+      "imageUrl": "https://cdn.narutodb.com/storage/cards/official/NREA03-R-021L1-thumb.png?v=5",
+      "isPromo": false
+    },
+    {
+      "id": "kayou-naruto:NREA03:R022",
+      "setId": "set:kayou-naruto-nrea03",
+      "provisionalNumber": "R022",
+      "number": "NREA03-R-022L1",
+      "name": "The Forest of Chakra",
+      "rarity": "R",
+      "imageUrl": "https://cdn.narutodb.com/storage/cards/official/NREA03-R-022L1-thumb.png?v=5",
+      "isPromo": false
+    },
+    {
+      "id": "kayou-naruto:NREA03:R023",
+      "setId": "set:kayou-naruto-nrea03",
+      "provisionalNumber": "R023",
+      "number": "NREA03-R-023L1",
+      "name": "The Forest of Chakra",
+      "rarity": "R",
+      "imageUrl": "https://cdn.narutodb.com/storage/cards/official/NREA03-R-023L1-thumb.png?v=5",
+      "isPromo": false
+    },
+    {
+      "id": "kayou-naruto:NREA03:R024",
+      "setId": "set:kayou-naruto-nrea03",
+      "provisionalNumber": "R024",
+      "number": "NREA03-R-024L1",
+      "name": "The Forest of Chakra",
+      "rarity": "R",
+      "imageUrl": "https://cdn.narutodb.com/storage/cards/official/NREA03-R-024L1-thumb.png?v=5",
+      "isPromo": false
+    },
+    {
+      "id": "kayou-naruto:NREA03:R025",
+      "setId": "set:kayou-naruto-nrea03",
+      "provisionalNumber": "R025",
+      "number": "NREA03-R-025L1",
+      "name": "The Forest of Chakra",
+      "rarity": "R",
+      "imageUrl": "https://cdn.narutodb.com/storage/cards/official/NREA03-R-025L1-thumb.png?v=5",
+      "isPromo": false
+    },
+    {
+      "id": "kayou-naruto:NREA03:R026",
+      "setId": "set:kayou-naruto-nrea03",
+      "provisionalNumber": "R026",
+      "number": "NREA03-R-026L1",
+      "name": "Haku's Secret Jutsu: Crystal Ice Mirrors",
+      "rarity": "R",
+      "imageUrl": "https://cdn.narutodb.com/storage/cards/official/NREA03-R-026L1-thumb.png?v=5",
+      "isPromo": false
+    },
+    {
+      "id": "kayou-naruto:NREA03:R027",
+      "setId": "set:kayou-naruto-nrea03",
+      "provisionalNumber": "R027",
+      "number": "NREA03-R-027L1",
+      "name": "Haku's Secret Jutsu: Crystal Ice Mirrors",
+      "rarity": "R",
+      "imageUrl": "https://cdn.narutodb.com/storage/cards/official/NREA03-R-027L1-thumb.png?v=5",
+      "isPromo": false
+    },
+    {
+      "id": "kayou-naruto:NREA03:R028",
+      "setId": "set:kayou-naruto-nrea03",
+      "provisionalNumber": "R028",
+      "number": "NREA03-R-028L1",
+      "name": "Haku's Secret Jutsu: Crystal Ice Mirrors",
+      "rarity": "R",
+      "imageUrl": "https://cdn.narutodb.com/storage/cards/official/NREA03-R-028L1-thumb.png?v=5",
+      "isPromo": false
+    },
+    {
+      "id": "kayou-naruto:NREA03:R029",
+      "setId": "set:kayou-naruto-nrea03",
+      "provisionalNumber": "R029",
+      "number": "NREA03-R-029L1",
+      "name": "Haku's Secret Jutsu: Crystal Ice Mirrors",
+      "rarity": "R",
+      "imageUrl": "https://cdn.narutodb.com/storage/cards/official/NREA03-R-029L1-thumb.png?v=5",
+      "isPromo": false
+    },
+    {
+      "id": "kayou-naruto:NREA03:R030",
+      "setId": "set:kayou-naruto-nrea03",
+      "provisionalNumber": "R030",
+      "number": "NREA03-R-030L1",
+      "name": "Haku's Secret Jutsu: Crystal Ice Mirrors",
+      "rarity": "R",
+      "imageUrl": "https://cdn.narutodb.com/storage/cards/official/NREA03-R-030L1-thumb.png?v=5",
+      "isPromo": false
+    },
+    {
+      "id": "kayou-naruto:NREA03:R031",
+      "setId": "set:kayou-naruto-nrea03",
+      "provisionalNumber": "R031",
+      "number": "NREA03-R-031L1",
+      "name": "The Number One Hyperactive, Knucklehead Ninja Joins the Fight!!",
+      "rarity": "R",
+      "imageUrl": "https://cdn.narutodb.com/storage/cards/official/NREA03-R-031L1-thumb.png?v=5",
+      "isPromo": false
+    },
+    {
+      "id": "kayou-naruto:NREA03:R032",
+      "setId": "set:kayou-naruto-nrea03",
+      "provisionalNumber": "R032",
+      "number": "NREA03-R-032L1",
+      "name": "The Number One Hyperactive, Knucklehead Ninja Joins the Fight!!",
+      "rarity": "R",
+      "imageUrl": "https://cdn.narutodb.com/storage/cards/official/NREA03-R-032L1-thumb.png?v=5",
+      "isPromo": false
+    },
+    {
+      "id": "kayou-naruto:NREA03:R033",
+      "setId": "set:kayou-naruto-nrea03",
+      "provisionalNumber": "R033",
+      "number": "NREA03-R-033L1",
+      "name": "The Number One Hyperactive, Knucklehead Ninja Joins the Fight!!",
+      "rarity": "R",
+      "imageUrl": "https://cdn.narutodb.com/storage/cards/official/NREA03-R-033L1-thumb.png?v=5",
+      "isPromo": false
+    },
+    {
+      "id": "kayou-naruto:NREA03:R034",
+      "setId": "set:kayou-naruto-nrea03",
+      "provisionalNumber": "R034",
+      "number": "NREA03-R-034L1",
+      "name": "The Number One Hyperactive, Knucklehead Ninja Joins the Fight!!",
+      "rarity": "R",
+      "imageUrl": "https://cdn.narutodb.com/storage/cards/official/NREA03-R-034L1-thumb.png?v=5",
+      "isPromo": false
+    },
+    {
+      "id": "kayou-naruto:NREA03:R035",
+      "setId": "set:kayou-naruto-nrea03",
+      "provisionalNumber": "R035",
+      "number": "NREA03-R-035L1",
+      "name": "The Number One Hyperactive, Knucklehead Ninja Joins the Fight!!",
+      "rarity": "R",
+      "imageUrl": "https://cdn.narutodb.com/storage/cards/official/NREA03-R-035L1-thumb.png?v=5",
+      "isPromo": false
+    },
+    {
+      "id": "kayou-naruto:NREA03:R036",
+      "setId": "set:kayou-naruto-nrea03",
+      "provisionalNumber": "R036",
+      "number": "NREA03-R-036L1",
+      "name": "The Number One Hyperactive, Knucklehead Ninja Joins the Fight!!",
+      "rarity": "R",
+      "imageUrl": "https://cdn.narutodb.com/storage/cards/official/NREA03-R-036L1-thumb.png?v=5",
+      "isPromo": false
+    },
+    {
+      "id": "kayou-naruto:NREA03:R037",
+      "setId": "set:kayou-naruto-nrea03",
+      "provisionalNumber": "R037",
+      "number": "NREA03-R-037L1",
+      "name": "The Broken Seal",
+      "rarity": "R",
+      "imageUrl": "https://cdn.narutodb.com/storage/cards/official/NREA03-R-037L1-thumb.png?v=5",
+      "isPromo": false
+    },
+    {
+      "id": "kayou-naruto:NREA03:R038",
+      "setId": "set:kayou-naruto-nrea03",
+      "provisionalNumber": "R038",
+      "number": "NREA03-R-038L1",
+      "name": "The Broken Seal",
+      "rarity": "R",
+      "imageUrl": "https://cdn.narutodb.com/storage/cards/official/NREA03-R-038L1-thumb.png?v=5",
+      "isPromo": false
+    },
+    {
+      "id": "kayou-naruto:NREA03:R039",
+      "setId": "set:kayou-naruto-nrea03",
+      "provisionalNumber": "R039",
+      "number": "NREA03-R-039L1",
+      "name": "The Broken Seal",
+      "rarity": "R",
+      "imageUrl": "https://cdn.narutodb.com/storage/cards/official/NREA03-R-039L1-thumb.png?v=5",
+      "isPromo": false
+    },
+    {
+      "id": "kayou-naruto:NREA03:R040",
+      "setId": "set:kayou-naruto-nrea03",
+      "provisionalNumber": "R040",
+      "number": "NREA03-R-040L1",
+      "name": "The Broken Seal",
+      "rarity": "R",
+      "imageUrl": "https://cdn.narutodb.com/storage/cards/official/NREA03-R-040L1-thumb.png?v=5",
+      "isPromo": false
+    },
+    {
+      "id": "kayou-naruto:NREA03:R041",
+      "setId": "set:kayou-naruto-nrea03",
+      "provisionalNumber": "R041",
+      "number": "NREA03-R-041L1",
+      "name": "The Demon in the Snow",
+      "rarity": "R",
+      "imageUrl": "https://cdn.narutodb.com/storage/cards/official/NREA03-R-041L1-thumb.png?v=5",
+      "isPromo": false
+    },
+    {
+      "id": "kayou-naruto:NREA03:R042",
+      "setId": "set:kayou-naruto-nrea03",
+      "provisionalNumber": "R042",
+      "number": "NREA03-R-042L1",
+      "name": "The Demon in the Snow",
+      "rarity": "R",
+      "imageUrl": "https://cdn.narutodb.com/storage/cards/official/NREA03-R-042L1-thumb.png?v=5",
+      "isPromo": false
+    },
+    {
+      "id": "kayou-naruto:NREA03:R043",
+      "setId": "set:kayou-naruto-nrea03",
+      "provisionalNumber": "R043",
+      "number": "NREA03-R-043L1",
+      "name": "The Demon in the Snow",
+      "rarity": "R",
+      "imageUrl": "https://cdn.narutodb.com/storage/cards/official/NREA03-R-043L1-thumb.png?v=5",
+      "isPromo": false
+    },
+    {
+      "id": "kayou-naruto:NREA03:R044",
+      "setId": "set:kayou-naruto-nrea03",
+      "provisionalNumber": "R044",
+      "number": "NREA03-R-044L1",
+      "name": "The Demon in the Snow",
+      "rarity": "R",
+      "imageUrl": "https://cdn.narutodb.com/storage/cards/official/NREA03-R-044L1-thumb.png?v=5",
+      "isPromo": false
+    },
+    {
+      "id": "kayou-naruto:NREA03:R045",
+      "setId": "set:kayou-naruto-nrea03",
+      "provisionalNumber": "R045",
+      "number": "NREA03-R-045L1",
+      "name": "The Demon in the Snow",
+      "rarity": "R",
+      "imageUrl": "https://cdn.narutodb.com/storage/cards/official/NREA03-R-045L1-thumb.png?v=5",
+      "isPromo": false
+    },
+    {
+      "id": "kayou-naruto:NREA03:R046",
+      "setId": "set:kayou-naruto-nrea03",
+      "provisionalNumber": "R046",
+      "number": "NREA03-R-046L1",
+      "name": "A New Chapter Begins: The Chunin Exam!",
+      "rarity": "R",
+      "imageUrl": "https://cdn.narutodb.com/storage/cards/official/NREA03-R-046L1-thumb.png?v=5",
+      "isPromo": false
+    },
+    {
+      "id": "kayou-naruto:NREA03:R047",
+      "setId": "set:kayou-naruto-nrea03",
+      "provisionalNumber": "R047",
+      "number": "NREA03-R-047L1",
+      "name": "A New Chapter Begins: The Chunin Exam!",
+      "rarity": "R",
+      "imageUrl": "https://cdn.narutodb.com/storage/cards/official/NREA03-R-047L1-thumb.png?v=5",
+      "isPromo": false
+    },
+    {
+      "id": "kayou-naruto:NREA03:R048",
+      "setId": "set:kayou-naruto-nrea03",
+      "provisionalNumber": "R048",
+      "number": "NREA03-R-048L1",
+      "name": "A New Chapter Begins: The Chunin Exam!",
+      "rarity": "R",
+      "imageUrl": "https://cdn.narutodb.com/storage/cards/official/NREA03-R-048L1-thumb.png?v=5",
+      "isPromo": false
+    },
+    {
+      "id": "kayou-naruto:NREA03:R049",
+      "setId": "set:kayou-naruto-nrea03",
+      "provisionalNumber": "R049",
+      "number": "NREA03-R-049L1",
+      "name": "A New Chapter Begins: The Chunin Exam!",
+      "rarity": "R",
+      "imageUrl": "https://cdn.narutodb.com/storage/cards/official/NREA03-R-049L1-thumb.png?v=5",
+      "isPromo": false
+    },
+    {
+      "id": "kayou-naruto:NREA03:R050",
+      "setId": "set:kayou-naruto-nrea03",
+      "provisionalNumber": "R050",
+      "number": "NREA03-R-050L1",
+      "name": "A New Chapter Begins: The Chunin Exam!",
+      "rarity": "R",
+      "imageUrl": "https://cdn.narutodb.com/storage/cards/official/NREA03-R-050L1-thumb.png?v=5",
+      "isPromo": false
+    },
+    {
+      "id": "kayou-naruto:NREA03:PR015",
+      "setId": "set:kayou-naruto-nrea03",
+      "provisionalNumber": "PR015",
+      "number": "NRSA-PR-015",
+      "name": "Kiba Inuzuka",
+      "rarity": "PR",
+      "imageUrl": "https://cdn.narutodb.com/storage/cards/NRSA/NRSA-PR-015_thumb.png?v=1794382917",
+      "isPromo": true
+    }
+  ]
+}

@@ -49,9 +49,19 @@ describe('collection domain', () => {
     expect(validateInventoryRows(parsed.rows, cards).errors).toEqual([]);
     expect(validateInventoryRows([{ card_id: 'unknown', personal: '-1', duplicates: '0', incoming: '0' }], cards).errors).toHaveLength(2);
   });
+  it('preserves an unknown duplicate quantity instead of treating it as zero', () => {
+    const parsed = parseCsv('card_id,personal,duplicates,duplicates_known,incoming\n"set:one:01",1,0,false,0');
+    const checked = validateInventoryRows(parsed.rows, cards);
+    expect(checked.errors).toEqual([]);
+    expect(checked.updates[0].duplicatesKnown).toBe(false);
+    expect(validateInventoryRows([{ card_id: 'set:one:01', personal: '1', duplicates: '0', duplicates_known: 'maybe', incoming: '0' }], cards).errors).toContain('Row 2 has invalid duplicates_known; use true or false.');
+  });
   it('round trips backups and migrates the version zero envelope', () => {
     const current = emptyVault();
     expect(migrateVault(JSON.parse(JSON.stringify(current)))).toEqual(current);
+    current.catalog.cards.push({ id: 'set:kayou-naruto-nrea02:R001', setId: 'set:kayou-naruto-nrea02', number: 'R001', name: '' });
+    current.catalog.ownership.push({ cardId: 'set:kayou-naruto-nrea02:R001', personal: 1, duplicates: 0, duplicatesKnown: false, incoming: 0, updatedAt: '2026-01-01' });
+    expect(migrateVault(JSON.parse(JSON.stringify(current))).catalog.ownership[0].duplicatesKnown).toBe(false);
     const legacyCard = { ...cards[0], setId: 'set:legacy' };
     const legacyCatalog = { ...current.catalog, sets: [...current.catalog.sets, { id: 'set:legacy', seriesId: 'series:kayou-naruto', name: 'legacy' }], cards: [legacyCard], ownership: [{ cardId: legacyCard.id, owned: 2, incoming: 0, updatedAt: '2026-01-01' }] };
     const old = { ...current, schemaVersion: 1, catalog: legacyCatalog };

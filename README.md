@@ -16,20 +16,21 @@ The app persists its vault in IndexedDB in the current browser. No account is re
 - Open a collection and set, add canonical cards, and track physically owned and incoming quantities separately.
 - The Gallery, List, and Checklist controls change presentation only. Search and status filters remain active across view changes.
 - Completion counts unique card definitions that have at least one physically owned copy. Extra copies affect duplicate status and quantity, not completion.
-- Card details accept user-provided image URLs. A URL marked “Verified” is stored with a timestamp; verify that it is the exact card before selecting that option. The app does not scrape card images.
+- Naruto cards can be enriched with verified names, catalog card codes, and remote thumbnails from NarutoDB. Review and apply the update inside the app; it preserves your inventory quantities and user-added images. Thumbnails stay hosted remotely and are cached after viewing.
+- Card details also accept user-provided image URLs. A URL marked “Verified” is stored with a timestamp; verify that it is the exact card before selecting that option.
 - A Super Rare Games release set requires a release number and creates the six specified slots (Title, 1–5). This slot structure has not yet been reconciled with the source workbook because it was not supplied.
 
 ## Data model
 
-Data is stored as a versioned JSON envelope (`schemaVersion`, `updatedAt`, `catalog`). Catalog entity IDs are stable namespaced strings, such as `publisher:kayou`, `set:kayou-naruto-nrea02`, and `set:kayou-naruto-nrea02:01`. The schema keeps publishers, franchises, series, sets, canonical card definitions, variants and image sources, ownership, and acquisition records distinct. Ownership stores Personal, Dupes, and incoming counts separately. Completion counts a card definition when Personal + Dupes is greater than zero. Sets can omit rarity schemes; cards can omit rarity. Card identity is the full namespaced ID, never the printed number alone.
+Data is stored as a versioned JSON envelope (`schemaVersion`, `updatedAt`, `catalog`). Catalog entity IDs are stable namespaced strings, such as `publisher:kayou`, `set:kayou-naruto-nrea02`, and `set:kayou-naruto-nrea02:01`. The schema keeps publishers, franchises, series, sets, canonical card definitions, variants and image sources, ownership, and acquisition records distinct. Ownership stores Personal, Dupes, and incoming counts separately. An optional `duplicatesKnown: false` marks an unreported duplicate quantity; it is shown as unknown instead of zero. Completion counts a card definition when Personal + Dupes is greater than zero. Sets can omit rarity schemes; cards can omit rarity. Card identity is the full namespaced ID, never the printed number alone.
 
 `src/domain.ts` documents the TypeScript schema and validation rules. Schema migrations are centralized in `migrateVault`; increment `CURRENT_SCHEMA_VERSION` and add a migration before changing persisted structures.
 
 ## Backup and import
 
 - **JSON backup** includes the whole versioned catalog. Restore validates the schema, warns on conflicting overlapping records, and merges only non-conflicting IDs after confirmation. It never deletes records.
-- **CSV export** contains `card_id,set_id,card_number,name,personal,duplicates,incoming`.
-- **CSV import** requires `card_id,personal,incoming` and accepts an optional `duplicates` column. It accepts only known card IDs and non-negative whole quantities, and rejects malformed rows and duplicate IDs. It does not create card definitions.
+- **CSV export** contains `card_id,set_id,card_number,name,personal,duplicates,duplicates_known,incoming`.
+- **CSV import** requires `card_id,personal,incoming` and accepts optional `duplicates` and `duplicates_known` columns. It accepts only known card IDs and non-negative whole quantities, and rejects malformed rows and duplicate IDs. It does not create card definitions.
 - Keep a backup before moving browser profiles or devices. Clearing browser storage can remove the only local copy.
 
 ## GitHub Pages
@@ -54,7 +55,19 @@ python scripts/import_srg_workbook.py "/path/to/Super Rare Card Intentory.xlsx" 
 
 The generated backup contains personal inventory data. `private-data/` is ignored by Git and is not part of the production build. In Collect Everything, use **Import** and select that JSON to merge the catalog into this browser’s IndexedDB. Conflicting local records stop the restore for review; unmatched records are retained. The converter reports marker mismatches and unmarked release titles, and the app preserves these source states for review. Card notes in the workbook are preserved verbatim as source notes.
 
-The three Kayou source inventory notes were not part of the provided files, so the NREA02/NREA03 sets remain empty. No canonical Naruto cards or quantities have been added.
+## Naruto catalog and provisional inventory
+
+The Naruto catalog update is built from the user-provided [NREA02](https://narutodb.com/kayou/sets/NREA02) and [NREA03](https://narutodb.com/kayou/sets/NREA03) catalog pages. `python scripts/build_naruto_catalog.py` validates full set counts, rarity totals, unique IDs, names, image hosts, and optional alignment with a local provisional inventory JSON before writing `public/naruto-catalog.json`. The public file contains catalog metadata and remote image URLs only; it never contains personal quantities.
+
+NarutoDB lists 133 NREA02 cards and 123 NREA03 cards, including one Promo card per set. The original inventory package has 132 and 122 positions, so the in-app review shows the two Promo additions explicitly. Applying the update fills blank names and provisional card numbers, links exact non-stand-in thumbnails, and leaves all existing card IDs, Personal, Dupes, incoming quantities, custom names, and user image variants unchanged. Promo cards begin with no ownership recorded.
+
+The inventory converter reads the JSON and CSV members of the user-supplied ZIP, checks every card ID, status, quantity, rarity position, set total, and CSV/JSON match, then writes a schema-v2 backup under `private-data/` for the app's **Import** control:
+
+```sh
+python scripts/import_naruto_package.py "/path/to/card-vault-naruto-import-package.zip" private-data/card-vault-naruto-import.json
+```
+
+The generated inventory backup stays local and contains personal data. `private-data/` is ignored by Git and excluded from the production build. The app keeps imported ownership quantities separate from the public catalog definitions and image links.
 
 ## Validate
 

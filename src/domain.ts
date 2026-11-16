@@ -15,7 +15,7 @@ export type CardSet = { id: string; seriesId: string; name: string; releaseNumbe
 export type CardDefinition = { id: string; setId: string; number: string; name: string; category?: string; rarity?: string; slot?: 'title' | 'numbered'; sourceNote?: string };
 export type CardVariant = { id: string; cardId: string; name: string; imageUrls: ImageSource[] };
 export type ImageSource = { url: string; source: 'verified-remote' | 'user-provided'; verifiedAt?: string };
-export type Ownership = { cardId: string; variantId?: string; personal: number; duplicates: number; incoming: number; updatedAt: string };
+export type Ownership = { cardId: string; variantId?: string; personal: number; duplicates: number; duplicatesKnown?: boolean; incoming: number; updatedAt: string };
 export type Acquisition = { id: string; cardId: string; quantity: number; status: 'incoming' | 'received'; acquiredAt?: string; note?: string };
 export type VaultData = { schemaVersion: number; updatedAt: string; catalog: Catalog };
 
@@ -56,6 +56,7 @@ export function validateCatalog(catalog: Catalog): string[] {
   for (const item of catalog.ownership) {
     if (!has('cards', item.cardId)) errors.push(`Ownership references missing card ${item.cardId}.`);
     if (!Number.isInteger(item.personal) || item.personal < 0 || !Number.isInteger(item.duplicates) || item.duplicates < 0 || !Number.isInteger(item.incoming) || item.incoming < 0) errors.push(`Ownership for ${item.cardId} must use non-negative whole quantities.`);
+    if (item.duplicatesKnown !== undefined && typeof item.duplicatesKnown !== 'boolean') errors.push(`Ownership for ${item.cardId} must mark duplicate quantity knowledge as true or false.`);
   }
   if (new Set(catalog.ownership.map((item) => item.cardId)).size !== catalog.ownership.length) errors.push('A card may have only one ownership record.');
   for (const item of catalog.acquisitions) {
@@ -81,7 +82,8 @@ export function migrateVault(value: unknown): VaultData {
     const previous = source.catalog as Omit<Catalog, 'ownership'> & { ownership: (Partial<Ownership> & { cardId: string; owned?: number })[] };
     const catalog = { ...previous, ownership: previous.ownership.map((item) => ({
       cardId: item.cardId, variantId: item.variantId, personal: item.personal ?? item.owned ?? 0,
-      duplicates: item.duplicates ?? 0, incoming: item.incoming ?? 0, updatedAt: item.updatedAt ?? new Date().toISOString(),
+      duplicates: item.duplicates ?? 0, ...(item.duplicatesKnown === undefined ? {} : { duplicatesKnown: item.duplicatesKnown }),
+      incoming: item.incoming ?? 0, updatedAt: item.updatedAt ?? new Date().toISOString(),
     })) } as Catalog;
     const migrated = { ...source, catalog, schemaVersion: CURRENT_SCHEMA_VERSION, updatedAt: source.updatedAt ?? new Date().toISOString() } as VaultData;
     const errors = validateCatalog(migrated.catalog);
@@ -128,7 +130,11 @@ export function validateInventoryRows(rows: Record<string, string>[], cards: Car
     if (!known.has(row.card_id)) errors.push(`Row ${line} references unknown card ID ${row.card_id}.`);
     const personal = Number(row.personal ?? row.owned); const duplicates = Number(row.duplicates ?? row.dupes ?? 0); const incoming = Number(row.incoming);
     if (![personal, duplicates, incoming].every((x) => Number.isInteger(x) && x >= 0)) errors.push(`Row ${line} has invalid Personal, Dupes, or incoming quantities.`);
-    else updates.push({ cardId: row.card_id, personal, duplicates, incoming, updatedAt: new Date().toISOString() });
+    else {
+      const duplicateFlag = row.duplicates_known?.trim().toLowerCase();
+      if (duplicateFlag && duplicateFlag !== 'true' && duplicateFlag !== 'false') errors.push(`Row ${line} has invalid duplicates_known; use true or false.`);
+      else updates.push({ cardId: row.card_id, personal, duplicates, incoming, ...(duplicateFlag ? { duplicatesKnown: duplicateFlag === 'true' } : {}), updatedAt: new Date().toISOString() });
+    }
   });
   if (new Set(updates.map((x) => x.cardId)).size !== updates.length) errors.push('CSV contains duplicate card_id rows.');
   return { updates, errors };

@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState, type ChangeEvent } from 'react';
 import { Archive, ArrowDownToLine, ArrowUpFromLine, BookOpen, Check, CircleHelp, Download, Grid2X2, ImagePlus, List, Plus, Search, Settings2, ShieldCheck, SlidersHorizontal, Sparkles, Upload, X } from 'lucide-react';
 import { cardStatus, completion, emptyVault, filterCards, findConflicts, migrateVault, parseCsv, validateInventoryRows, type CardDefinition, type CardSet, type CardVariant, type Ownership, type VaultData } from '../domain';
 import { loadVault, saveVault } from '../storage';
+import { applyNarutoCatalogUpdate, parseNarutoCatalogUpdate, planNarutoCatalogUpdate, type NarutoCatalogUpdate } from '../narutoCatalog';
 
 type View = 'gallery' | 'list' | 'checklist';
 type Filter = 'all' | 'owned' | 'missing' | 'incoming' | 'duplicate';
@@ -20,9 +21,20 @@ export default function App() {
   const [error, setError] = useState('');
   const [showFilters, setShowFilters] = useState(false);
   const [statusFilter, setStatusFilter] = useState(false);
+  const [narutoCatalogUpdate, setNarutoCatalogUpdate] = useState<NarutoCatalogUpdate | null>(null);
+  const [showNarutoUpdateReview, setShowNarutoUpdateReview] = useState(false);
 
   useEffect(() => { loadVault().then((data) => { setVault(data); setReady(true); }).catch((e: Error) => { setError(`Could not open local vault: ${e.message}`); setReady(true); }); }, []);
   useEffect(() => { if (ready) saveVault(vault).catch((e: Error) => setError(`Save failed: ${e.message}`)); }, [vault, ready]);
+  useEffect(() => {
+    if (!ready) return;
+    let active = true;
+    fetch(import.meta.env.BASE_URL + 'naruto-catalog.json')
+      .then((response) => { if (!response.ok) throw new Error('Catalog update is unavailable.'); return response.json(); })
+      .then((value: unknown) => { if (active) setNarutoCatalogUpdate(parseNarutoCatalogUpdate(value)); })
+      .catch(() => { /* Local collection use continues if the update file is unavailable. */ });
+    return () => { active = false; };
+  }, [ready]);
   useEffect(() => { if (!notice) return; const timer = window.setTimeout(() => setNotice(''), 3600); return () => window.clearTimeout(timer); }, [notice]);
 
   const seriesMap = new Map(vault.catalog.series.map((x) => [x.id, x]));
@@ -34,13 +46,14 @@ export default function App() {
   const progress = completion(cards, vault.catalog.ownership);
   const allProgress = completion(vault.catalog.cards, vault.catalog.ownership);
   const [reviewImport, setReviewImport] = useState(false);
+  const narutoUpdatePlan = useMemo(() => narutoCatalogUpdate ? planNarutoCatalogUpdate(vault, narutoCatalogUpdate) : null, [vault, narutoCatalogUpdate]);
   const srgSets = vault.catalog.sets.filter((set) => set.sourceCompletionIndicator !== undefined);
   const markerDiscrepancies = srgSets.filter((set) => set.sourceCompletionIndicator !== 'unmarked' && ((set.sourceCompletionIndicator === 'complete') !== (completion(vault.catalog.cards.filter((card) => card.setId === set.id), vault.catalog.ownership).percent === 100)));
   const unmarkedSets = srgSets.filter((set) => set.sourceCompletionIndicator === 'unmarked');
 
   function updateOwnership(card: CardDefinition, field: 'personal' | 'duplicates' | 'incoming', quantity: number) {
     const found = byId.get(card.id);
-    const record: Ownership = { cardId: card.id, personal: found?.personal ?? 0, duplicates: found?.duplicates ?? 0, incoming: found?.incoming ?? 0, updatedAt: new Date().toISOString(), [field]: Math.max(0, Math.floor(quantity)) };
+    const record: Ownership = { cardId: card.id, personal: found?.personal ?? 0, duplicates: found?.duplicates ?? 0, duplicatesKnown: field === 'duplicates' ? true : found?.duplicatesKnown ?? true, incoming: found?.incoming ?? 0, updatedAt: new Date().toISOString(), [field]: Math.max(0, Math.floor(quantity)) };
     setVault((prev) => ({ ...prev, updatedAt: new Date().toISOString(), catalog: { ...prev.catalog, ownership: [...prev.catalog.ownership.filter((x) => x.cardId !== card.id), record] } }));
   }
   function addCard(event: ChangeEvent<HTMLFormElement>) {
@@ -71,7 +84,7 @@ export default function App() {
   }
   function exportJson() { download('collect-everything-backup.json', JSON.stringify(vault, null, 2), 'application/json'); }
   function exportCsv() {
-    const rows = [['card_id', 'set_id', 'card_number', 'name', 'personal', 'duplicates', 'incoming'], ...vault.catalog.cards.map((c) => [c.id, c.setId, c.number, c.name, byId.get(c.id)?.personal ?? 0, byId.get(c.id)?.duplicates ?? 0, byId.get(c.id)?.incoming ?? 0])];
+    const rows = [['card_id', 'set_id', 'card_number', 'name', 'personal', 'duplicates', 'duplicates_known', 'incoming'], ...vault.catalog.cards.map((c) => [c.id, c.setId, c.number, c.name, byId.get(c.id)?.personal ?? 0, byId.get(c.id)?.duplicates ?? 0, byId.get(c.id)?.duplicatesKnown !== false, byId.get(c.id)?.incoming ?? 0])];
     download('collect-everything-inventory.csv', rows.map((row) => row.map(csvCell).join(',')).join('\n'), 'text/csv');
   }
   async function importFile(file?: File) {
@@ -80,9 +93,13 @@ export default function App() {
       if (file.name.toLowerCase().endsWith('.csv')) {
         const parsed = parseCsv(await file.text()); if (parsed.errors.length) throw new Error(parsed.errors.join(' '));
         const checked = validateInventoryRows(parsed.rows, vault.catalog.cards); if (checked.errors.length) throw new Error(checked.errors.join(' '));
-        const changed = checked.updates.filter((next) => { const current = vault.catalog.ownership.find((item) => item.cardId === next.cardId); return !current || current.personal !== next.personal || current.duplicates !== next.duplicates || current.incoming !== next.incoming; });
+        const effectiveUpdates = checked.updates.map((next) => {
+          const current = vault.catalog.ownership.find((item) => item.cardId === next.cardId);
+          return next.duplicatesKnown === undefined && current?.duplicatesKnown !== undefined ? { ...next, duplicatesKnown: current.duplicatesKnown } : next;
+        });
+        const changed = effectiveUpdates.filter((next) => { const current = vault.catalog.ownership.find((item) => item.cardId === next.cardId); return !current || current.personal !== next.personal || current.duplicates !== next.duplicates || current.incoming !== next.incoming || (current.duplicatesKnown ?? true) !== (next.duplicatesKnown ?? true); });
         if (changed.length && !window.confirm(`This CSV changes quantities for ${changed.length} card${changed.length === 1 ? '' : 's'}. Apply those inventory updates? Other card records will be kept.`)) return;
-        const proposed = new Map(vault.catalog.ownership.map((x) => [x.cardId, x])); checked.updates.forEach((x) => proposed.set(x.cardId, x));
+        const proposed = new Map(vault.catalog.ownership.map((x) => [x.cardId, x])); effectiveUpdates.forEach((x) => proposed.set(x.cardId, x));
         setVault((prev) => ({ ...prev, catalog: { ...prev.catalog, ownership: [...proposed.values()] } })); setNotice(`Imported ${parsed.rows.length} inventory rows.`);
       } else {
         const incoming = migrateVault(JSON.parse(await file.text()));
@@ -91,12 +108,24 @@ export default function App() {
         const merge = window.confirm(`Restore ${incoming.catalog.cards.length} cards and merge non-conflicting records with your current vault? No records will be deleted.`);
         if (!merge) return;
         setVault(mergeVault(vault, incoming));
-        const srgStart = incoming.catalog.sets.find((item) => item.seriesId === 'series:srg-switch' && item.sourceCompletionIndicator);
-        if (srgStart) setSetId(srgStart.id);
-        setNotice(`Backup restored with ${incoming.catalog.sets.filter((item) => item.seriesId === 'series:srg-switch').length} Super Rare releases.`);
+        const preferredSet = incoming.catalog.sets.find((item) => item.seriesId === 'series:srg-switch' && item.sourceCompletionIndicator) ?? incoming.catalog.sets[0];
+        if (preferredSet) setSetId(preferredSet.id);
+        setNotice(`Backup restored with ${incoming.catalog.cards.length} card definitions across ${incoming.catalog.sets.length} sets.`);
       }
       setError('');
     } catch (e) { setError(e instanceof Error ? e.message : 'Import failed.'); }
+  }
+
+  function applyNarutoUpdate() {
+    if (!narutoCatalogUpdate || !narutoUpdatePlan?.hasChanges) return;
+    try {
+      setVault(applyNarutoCatalogUpdate(vault, narutoCatalogUpdate));
+      setShowNarutoUpdateReview(false);
+      setNotice('Naruto names and images added. Your quantities were kept.');
+      setError('');
+    } catch (e) {
+      setError(e instanceof Error ? e.message : 'Naruto catalog update failed.');
+    }
   }
 
   const activeName = selectedSet ? `${selectedSeries?.name ?? 'Collection'} ${selectedSet.name}` : 'All cards';
@@ -113,6 +142,7 @@ export default function App() {
     <main className="main-content">
       <header className="topbar"><div className="crumb">COLLECTIONS <span>/</span> <b>{activeName.toUpperCase()}</b></div><div className="mobile-brand"><img src={`${import.meta.env.BASE_URL}collect-wordmark.svg`} alt="Collect!"/></div><div className="top-actions"><span className="sync-label"><ShieldCheck size={15} /> Saved on this device</span><button className="avatar" aria-label="Local profile">V</button></div></header>
       <div className="content-wrap">
+        {ready && narutoUpdatePlan?.hasChanges && <section className="catalog-update-banner" aria-label="Naruto catalog update available"><div><strong>Naruto card names and images are ready</strong><p>{narutoUpdatePlan.namesToFill} names · {narutoUpdatePlan.imagesToAdd} image links · {narutoUpdatePlan.cardsToAdd} new catalog cards</p></div><button className="button primary" onClick={() => setShowNarutoUpdateReview(true)}>Review update</button></section>}
         <section className="welcome-row"><div><div className="eyebrow"><Sparkles size={14} /> YOUR COLLECTION, IN FOCUS</div><h1>Good to see you.<br/><span>Let’s make some room.</span></h1><p className="lede">A considered home for every card you’re chasing.</p></div><div className="progress-orbit" aria-label={`${allProgress.owned} of ${allProgress.total} cards owned`}><div><strong>{allProgress.percent}<small>%</small></strong><span>COMPLETE</span></div><svg viewBox="0 0 120 120"><circle cx="60" cy="60" r="51"/><circle className="orbit-progress" cx="60" cy="60" r="51" style={{ strokeDashoffset: 320 - 320 * allProgress.percent / 100 }}/></svg></div></section>
 
         <section className="summary-grid" aria-label="Collection summary"><Metric label="UNIQUE CARDS" value={allProgress.total.toString().padStart(2, '0')} detail="across all collections" icon={<BookOpen size={17}/>} /><Metric label="IN YOUR VAULT" value={allProgress.owned.toString().padStart(2, '0')} detail="unique definitions owned" icon={<Check size={17}/>} /><Metric label="STILL CHASING" value={vault.catalog.cards.filter((c) => cardStatus(c.id, vault.catalog.ownership) === 'missing').length.toString().padStart(2, '0')} detail="not yet in your collection" icon={<ImagePlus size={17}/>} /><Metric label="ON THE WAY" value={vault.catalog.ownership.reduce((sum, x) => sum + x.incoming, 0).toString().padStart(2, '0')} detail="incoming copies" icon={<ArrowDownToLine size={17}/>} /></section>
@@ -140,7 +170,8 @@ export default function App() {
     </main>
     {notice && <div className="toast success"><Check size={16}/>{notice}</div>}
     {error && <div className="toast error"><X size={16}/><span>{error}</span><button aria-label="Dismiss error" onClick={() => setError('')}><X size={14}/></button></div>}
-    {modal && <Modal title={modal === 'add-card' ? 'Add a card' : modal === 'add-set' ? 'Add a set' : 'A little about your vault'} onClose={() => setModal(null)}>{modal === 'add-card' ? <form onSubmit={addCard} className="form-stack"><p>Card IDs are namespaced to this set, so the same number can exist in another collection.</p><label>Set<select value={setId} onChange={(e) => setSetId(e.target.value)}>{vault.catalog.sets.map((s) => <option value={s.id} key={s.id}>{seriesMap.get(s.seriesId)?.name} · {s.name}</option>)}</select></label><div className="form-row"><label>Card number<input name="number" placeholder="e.g. 01" required/></label><label>Rarity <span className="optional">OPTIONAL</span><input name="rarity" placeholder="Leave blank if none"/></label></div><label>Card name<input name="name" placeholder="Name on the card" required/></label><button className="button primary full"><Plus size={16}/> Add card</button></form> : modal === 'add-set' ? <form onSubmit={addSet} className="form-stack"><p>Sets can be numbered releases or any named checklist, with or without rarity tiers.</p><label>Collection<select name="seriesId" required>{vault.catalog.series.map((s) => <option value={s.id} key={s.id}>{s.name}</option>)}</select></label><label>Set or release name<input name="name" placeholder="e.g. NREA01 or Release 042" required/></label><label>Release number <span className="optional">OPTIONAL</span><input name="releaseNumber" placeholder="For numbered releases"/></label><button className="button primary full"><Plus size={16}/> Create set</button></form> : <div className="help-copy"><p><b>Local-first.</b> Your catalog and quantities are stored in this browser’s IndexedDB. They work offline after the first load.</p><p><b>Move your data.</b> JSON includes the versioned catalog. CSV imports require <code>card_id, personal, incoming</code> with optional <code>duplicates</code> and can only update known card IDs.</p><p><b>Safe sync.</b> Private GitHub sync is not connected in this foundation. No access token is stored here; use backups until a token-safe sync service is added.</p><p><b>Images.</b> Open a card to add a user image URL. Mark a remote image as verified only after checking it is the exact card.</p></div>}</Modal>}
+    {modal && <Modal title={modal === 'add-card' ? 'Add a card' : modal === 'add-set' ? 'Add a set' : 'A little about your vault'} onClose={() => setModal(null)}>{modal === 'add-card' ? <form onSubmit={addCard} className="form-stack"><p>Card IDs are namespaced to this set, so the same number can exist in another collection.</p><label>Set<select value={setId} onChange={(e) => setSetId(e.target.value)}>{vault.catalog.sets.map((s) => <option value={s.id} key={s.id}>{seriesMap.get(s.seriesId)?.name} · {s.name}</option>)}</select></label><div className="form-row"><label>Card number<input name="number" placeholder="e.g. 01" required/></label><label>Rarity <span className="optional">OPTIONAL</span><input name="rarity" placeholder="Leave blank if none"/></label></div><label>Card name<input name="name" placeholder="Name on the card" required/></label><button className="button primary full"><Plus size={16}/> Add card</button></form> : modal === 'add-set' ? <form onSubmit={addSet} className="form-stack"><p>Sets can be numbered releases or any named checklist, with or without rarity tiers.</p><label>Collection<select name="seriesId" required>{vault.catalog.series.map((s) => <option value={s.id} key={s.id}>{s.name}</option>)}</select></label><label>Set or release name<input name="name" placeholder="e.g. NREA01 or Release 042" required/></label><label>Release number <span className="optional">OPTIONAL</span><input name="releaseNumber" placeholder="For numbered releases"/></label><button className="button primary full"><Plus size={16}/> Create set</button></form> : <div className="help-copy"><p><b>Local-first.</b> Your catalog and quantities are stored in this browser’s IndexedDB. They work offline after the first load.</p><p><b>Move your data.</b> JSON includes the versioned catalog. CSV imports require <code>card_id, personal, incoming</code> with optional <code>duplicates</code> and can only update known card IDs.</p><p><b>Safe sync.</b> Private GitHub sync is not connected in this foundation. No access token is stored here; use backups until a token-safe sync service is added.</p><p><b>Images.</b> Review the NarutoDB catalog update to add source-checked card thumbnails. You can also add your own image URL to a card. Remote images are cached after viewing.</p></div>}</Modal>}
+    {showNarutoUpdateReview && narutoCatalogUpdate && narutoUpdatePlan && <Modal title="Naruto card details" onClose={() => setShowNarutoUpdateReview(false)}><div className="report-copy"><p>NarutoDB lists {narutoCatalogUpdate.sets.map((set) => set.name + ' ' + set.cardCount).join(' · ')} cards. Each list includes one Promo card that was not in the provisional import.</p><ul><li>{narutoUpdatePlan.namesToFill} blank card names will be filled.</li><li>{narutoUpdatePlan.numbersToUpdate} provisional numbers will be replaced with catalog card codes.</li><li>{narutoUpdatePlan.imagesToAdd} remote card thumbnails will be linked from NarutoDB.</li><li>{narutoUpdatePlan.cardsToAdd} catalog entries will be added, including the Promo entries.</li></ul><p>Applying this update preserves card IDs, all Personal, Dupes and incoming quantities, custom names, and your existing image variants. New Promo cards start with no ownership recorded. The card images remain hosted by NarutoDB and are cached by this app after viewing.</p><div className="catalog-update-actions"><button className="button subtle" onClick={() => setShowNarutoUpdateReview(false)}>Not now</button><button className="button primary" onClick={applyNarutoUpdate}>Apply update</button></div></div></Modal>}
     {reviewImport && <Modal title="Workbook comparison" onClose={() => setReviewImport(false)}><div className="report-copy"><p>Workbook markers are preserved as source metadata. Completion is calculated from Personal plus Dupes quantities.</p><h3>Color markers that differ from the quantities</h3>{markerDiscrepancies.length ? <ul>{markerDiscrepancies.map((set) => { const missing = vault.catalog.cards.filter((card) => card.setId === set.id && (byId.get(card.id)?.personal ?? 0) + (byId.get(card.id)?.duplicates ?? 0) === 0); return <li key={set.id}><b>{set.name}</b> · {set.sourceCompletionIndicator === 'complete' ? 'green' : 'yellow'} · row {set.sourceRow} · {missing.length ? `no physical copy for ${missing.map((card) => card.number).join(', ')}` : 'every slot has a physical copy'}</li>; })}</ul> : <p>None.</p>}<h3>Titles without a color marker</h3>{unmarkedSets.length ? <ul>{unmarkedSets.map((set) => <li key={set.id}><b>{set.name}</b> · row {set.sourceRow}</li>)}</ul> : <p>None.</p>}<p className="report-foot">Imported from Switch Games. Card notes in the final column are preserved verbatim.</p></div></Modal>}
     {selected && <CardDetail card={selected} inventory={byId.get(selected.id)} variants={vault.catalog.variants.filter((v) => v.cardId === selected.id)} onClose={() => setSelected(null)} onQuantity={updateOwnership} onImage={addImage}/>}
   </div>;
@@ -148,21 +179,22 @@ export default function App() {
 
 function Metric({ label, value, detail, icon }: { label: string; value: string; detail: string; icon: React.ReactNode }) { return <div className="metric"><div className="metric-top"><span>{label}</span><i>{icon}</i></div><strong>{value}</strong><small>{detail}</small></div>; }
 function CardTile({ card, inventory, variants, view, showStatus, onOpen, onQuantity }: { card: CardDefinition; inventory?: Ownership; variants: CardVariant[]; view: View; showStatus: boolean; onOpen: () => void; onQuantity: (c: CardDefinition, f: 'personal' | 'duplicates' | 'incoming', q: number) => void }) {
-  const status = cardStatus(card.id, inventory ? [inventory] : []); const image = variants[0]?.imageUrls[0]?.url; const physicallyOwned = (inventory?.personal ?? 0) + (inventory?.duplicates ?? 0) > 0;
+  const status = cardStatus(card.id, inventory ? [inventory] : []); const image = variants.flatMap((variant) => variant.imageUrls).find((source) => !!source.url)?.url; const physicallyOwned = (inventory?.personal ?? 0) + (inventory?.duplicates ?? 0) > 0; const displayName = card.name || card.number;
   return <article className={`card-tile ${view === 'list' ? 'tile-list' : ''} ${view === 'checklist' ? 'tile-check' : ''} ${physicallyOwned ? 'has-owned' : ''}`}>
-    <button className="card-image" onClick={onOpen} aria-label={`Open ${card.name}`}><span className="card-index">{card.number}</span>{image ? <img src={image} alt={card.name} loading="lazy"/> : <span className="placeholder"><span className="placeholder-mark">✳</span><small>IMAGE NOT ADDED</small></span>}{showStatus && <span className={`status-tag ${status}`}>{status}</span>}</button>
-    <div className="tile-info"><button className="tile-title" onClick={onOpen}>{card.name}</button><span>{card.rarity || card.category || 'No rarity'}{card.sourceNote ? ` · ${card.sourceNote}` : ''}</span></div>
-    <div className="tile-qty"><Quantity label="PERSONAL" value={inventory?.personal ?? 0} onChange={(n) => onQuantity(card, 'personal', n)}/><Quantity label="DUPES" value={inventory?.duplicates ?? 0} onChange={(n) => onQuantity(card, 'duplicates', n)}/><button className="incoming-action" onClick={() => onQuantity(card, 'incoming', (inventory?.incoming ?? 0) + 1)}>+ incoming {inventory?.incoming ? `(${inventory.incoming})` : ''}</button></div>
+    <button className="card-image" onClick={onOpen} aria-label={`Open ${displayName}`}><span className="card-index">{card.number}</span>{image ? <img src={image} alt={displayName} loading="lazy"/> : <span className="placeholder"><span className="placeholder-mark">✳</span><small>IMAGE NOT ADDED</small></span>}{showStatus && <span className={`status-tag ${status}`}>{status}</span>}</button>
+    <div className="tile-info"><button className="tile-title" onClick={onOpen}>{displayName}</button><span>{card.rarity || card.category || 'No rarity'}</span></div>
+    <div className="tile-qty"><Quantity label="PERSONAL" value={inventory?.personal ?? 0} onChange={(n) => onQuantity(card, 'personal', n)}/><Quantity label="DUPES" value={inventory?.duplicates ?? 0} unknown={inventory?.duplicatesKnown === false} onChange={(n) => onQuantity(card, 'duplicates', n)}/><button className="incoming-action" onClick={() => onQuantity(card, 'incoming', (inventory?.incoming ?? 0) + 1)}>+ incoming {inventory?.incoming ? `(${inventory.incoming})` : ''}</button></div>
   </article>;
 }
 function CardDetail({ card, inventory, variants, onClose, onQuantity, onImage }: { card: CardDefinition; inventory?: Ownership; variants: CardVariant[]; onClose: () => void; onQuantity: (c: CardDefinition, f: 'personal' | 'duplicates' | 'incoming', q: number) => void; onImage: (c: CardDefinition, url: string, kind: 'verified-remote' | 'user-provided') => void }) {
-  const [url, setUrl] = useState(''); const [kind, setKind] = useState<'verified-remote' | 'user-provided'>('user-provided'); const image = variants[0]?.imageUrls[0]?.url;
-  return <div className="overlay" onMouseDown={(e) => { if (e.target === e.currentTarget) onClose(); }}><section className="detail-modal" role="dialog" aria-modal="true" aria-labelledby="detail-title"><button className="modal-close" aria-label="Close card detail" onClick={onClose}><X size={18}/></button><div className="detail-image">{image ? <img src={image} alt={card.name}/> : <div className="placeholder"><span className="placeholder-mark">✳</span><small>NO IMAGE YET</small></div>}</div><div className="detail-content"><div className="eyebrow">CARD DETAIL · {card.number}</div><h2 id="detail-title">{card.name}</h2><p className="detail-rarity">{card.rarity || 'No rarity assigned'} <span>·</span> {card.id}</p><div className="detail-counts"><Quantity label="PERSONAL" value={inventory?.personal ?? 0} onChange={(n) => onQuantity(card, 'personal', n)}/><Quantity label="DUPES" value={inventory?.duplicates ?? 0} onChange={(n) => onQuantity(card, 'duplicates', n)}/><Quantity label="INCOMING" value={inventory?.incoming ?? 0} onChange={(n) => onQuantity(card, 'incoming', n)}/></div>{card.sourceNote && <p className="detail-rarity">Workbook note: {card.sourceNote}</p>}<div className="image-editor"><strong>Card image</strong><p>Only add a verified URL when you’ve confirmed it shows this exact card.</p><div className="image-add-row"><input aria-label="Image URL" type="url" placeholder="https://…" value={url} onChange={(e) => setUrl(e.target.value)}/><select aria-label="Image source" value={kind} onChange={(e) => setKind(e.target.value as typeof kind)}><option value="user-provided">My image</option><option value="verified-remote">Verified URL</option></select><button className="button primary" disabled={!url} onClick={() => { onImage(card, url, kind); setUrl(''); }}>Save</button></div></div></div></section></div>;
+  const [url, setUrl] = useState(''); const [kind, setKind] = useState<'verified-remote' | 'user-provided'>('user-provided'); const image = variants.flatMap((variant) => variant.imageUrls).find((source) => !!source.url)?.url;
+  const displayName = card.name || card.number;
+  return <div className="overlay" onMouseDown={(e) => { if (e.target === e.currentTarget) onClose(); }}><section className="detail-modal" role="dialog" aria-modal="true" aria-labelledby="detail-title"><button className="modal-close" aria-label="Close card detail" onClick={onClose}><X size={18}/></button><div className="detail-image">{image ? <img src={image} alt={displayName}/> : <div className="placeholder"><span className="placeholder-mark">✳</span><small>NO IMAGE YET</small></div>}</div><div className="detail-content"><div className="eyebrow">CARD DETAIL · {card.number}</div><h2 id="detail-title">{displayName}</h2><p className="detail-rarity">{card.rarity || 'No rarity assigned'} <span>·</span> {card.id}</p><div className="detail-counts"><Quantity label="PERSONAL" value={inventory?.personal ?? 0} onChange={(n) => onQuantity(card, 'personal', n)}/><Quantity label="DUPES" value={inventory?.duplicates ?? 0} unknown={inventory?.duplicatesKnown === false} onChange={(n) => onQuantity(card, 'duplicates', n)}/><Quantity label="INCOMING" value={inventory?.incoming ?? 0} onChange={(n) => onQuantity(card, 'incoming', n)}/></div>{card.sourceNote && <p className="detail-rarity">Source note: {card.sourceNote}</p>}<div className="image-editor"><strong>Card image</strong><p>Only add a verified URL when you’ve confirmed it shows this exact card.</p><div className="image-add-row"><input aria-label="Image URL" type="url" placeholder="https://…" value={url} onChange={(e) => setUrl(e.target.value)}/><select aria-label="Image source" value={kind} onChange={(e) => setKind(e.target.value as typeof kind)}><option value="user-provided">My image</option><option value="verified-remote">Verified URL</option></select><button className="button primary" disabled={!url} onClick={() => { onImage(card, url, kind); setUrl(''); }}>Save</button></div></div></div></section></div>;
 }
-function Quantity({ label, value, onChange }: { label: string; value: number; onChange: (n: number) => void }) { return <div><small>{label}</small><span><button aria-label={`Decrease ${label.toLowerCase()}`} onClick={() => onChange(value - 1)}>−</button><b>{value}</b><button aria-label={`Increase ${label.toLowerCase()}`} onClick={() => onChange(value + 1)}>+</button></span></div>; }
+function Quantity({ label, value, onChange, unknown = false }: { label: string; value: number; onChange: (n: number) => void; unknown?: boolean }) { return <div><small>{unknown ? `${label} · UNKNOWN` : label}</small><span><button aria-label={unknown ? `Mark ${label.toLowerCase()} as zero` : `Decrease ${label.toLowerCase()}`} onClick={() => onChange(unknown ? 0 : value - 1)}>−</button><b>{unknown ? '?' : value}</b><button aria-label={unknown ? `Set ${label.toLowerCase()} to one` : `Increase ${label.toLowerCase()}`} onClick={() => onChange(unknown ? 1 : value + 1)}>+</button></span></div>; }
 function Modal({ title, onClose, children }: { title: string; onClose: () => void; children: React.ReactNode }) { return <div className="overlay" onMouseDown={(e) => { if (e.target === e.currentTarget) onClose(); }}><section className="form-modal" role="dialog" aria-modal="true" aria-labelledby="modal-title"><div className="modal-heading"><h2 id="modal-title">{title}</h2><button className="modal-close" aria-label="Close dialog" onClick={onClose}><X size={18}/></button></div>{children}</section></div>; }
 function download(name: string, value: string, mime: string) { const url = URL.createObjectURL(new Blob([value], { type: mime })); const a = document.createElement('a'); a.href = url; a.download = name; a.click(); URL.revokeObjectURL(url); }
-function csvCell(value: string | number) { const text = String(value); return /[",\n]/.test(text) ? `"${text.replaceAll('"', '""')}"` : text; }
+function csvCell(value: string | number | boolean) { const text = String(value); return /[",\n]/.test(text) ? `"${text.replaceAll('"', '""')}"` : text; }
 function mergeVault(local: VaultData, remote: VaultData): VaultData {
   const mergeById = <T extends { id: string }>(a: T[], b: T[]) => [...a, ...b.filter((y) => !a.some((x) => x.id === y.id))];
   const ownership = [...local.catalog.ownership]; for (const incoming of remote.catalog.ownership) if (!ownership.some((x) => x.cardId === incoming.cardId)) ownership.push(incoming);
