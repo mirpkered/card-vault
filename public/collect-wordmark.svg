@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 360 104" role="img" aria-labelledby="title desc">
+  <title id="title">Collect!</title>
+  <desc id="desc">A bright, bouncy rainbow wordmark with a cream sticker outline.</desc>
+  <defs>
+    <linearGradient id="letters" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#c6ef68"/>
+      <stop offset=".18" stop-color="#ffd66b"/>
+      <stop offset=".34" stop-color="#ff9474"/>
+      <stop offset=".5" stop-color="#96caff"/>
+      <stop offset=".67" stop-color="#c2a0ff"/>
+      <stop offset=".83" stop-color="#fb9fce"/>
+      <stop offset="1" stop-color="#ffad70"/>
+    </linearGradient>
+  </defs>
+  <path d="m19 17 3 7 7 2-7 3-2 7-3-7-7-2 7-3z" fill="#ffd66b"/>
+  <path d="m344 18 2.5 5.5L352 26l-5.5 2.5L344 34l-2.5-5.5L336 26l5.5-2.5z" fill="#96caff"/>
+  <g transform="rotate(-2 180 52)">
+    <text x="15" y="77" textLength="327" lengthAdjust="spacingAndGlyphs" font-family="ui-rounded, &quot;Arial Rounded MT Bold&quot;, &quot;Trebuchet MS&quot;, system-ui, sans-serif" font-size="62" font-weight="1000" letter-spacing="-2" fill="#483852" stroke="#483852" stroke-width="13" stroke-linejoin="round" paint-order="stroke fill" transform="translate(0 5)">Collect!</text>
+    <text x="15" y="77" textLength="327" lengthAdjust="spacingAndGlyphs" font-family="ui-rounded, &quot;Arial Rounded MT Bold&quot;, &quot;Trebuchet MS&quot;, system-ui, sans-serif" font-size="62" font-weight="1000" letter-spacing="-2" fill="url(#letters)" stroke="#fff3dc" stroke-width="7" stroke-linejoin="round" paint-order="stroke fill">Collect!</text>
+  </g>
+</svg>

@@ -103,7 +103,7 @@ export default function App() {
 
   return <div className="app-shell">
     <aside className="sidebar">
-      <div className="brand"><span className="brand-mark"><Archive size={18} /></span><span>Collect<span className="brand-light"> Everything</span><small>COLLECTION STUDIO</small></span></div>
+      <div className="brand"><img className="brand-wordmark" src={`${import.meta.env.BASE_URL}collect-wordmark.svg`} alt="Collect!"/><small>EVERYTHING, COLLECTED.</small></div>
       <button className="nav-item active"><Grid2X2 size={18} /> Overview</button>
       <div className="sidebar-label">YOUR COLLECTIONS <button aria-label="Add a set" className="icon-button small" onClick={() => setModal('add-set')}><Plus size={15} /></button></div>
       {vault.catalog.series.map((series, index) => { const sets = vault.catalog.sets.filter((set) => set.seriesId === series.id); const ids = new Set(sets.map((set) => set.id)); const owned = completion(vault.catalog.cards.filter((card) => ids.has(card.setId)), vault.catalog.ownership).owned; const total = vault.catalog.cards.filter((card) => ids.has(card.setId)).length; return <button className={`collection-nav ${series.id === selectedSeries?.id ? 'chosen' : ''}`} key={series.id} onClick={() => { if (sets[0]) setSetId(sets[0].id); else setModal('add-set'); }}><span className={`collection-dot ${index === 0 ? 'lime' : 'purple'}`}></span><span>{series.name}<small>{series.id === 'series:kayou-naruto' ? 'NREA02 · NREA03' : 'Nintendo Switch releases'}</small></span><span className="nav-count">{owned}/{total}</span></button>; })}
@@ -111,7 +111,7 @@ export default function App() {
     </aside>
 
     <main className="main-content">
-      <header className="topbar"><div className="crumb">COLLECTIONS <span>/</span> <b>{activeName.toUpperCase()}</b></div><div className="top-actions"><span className="sync-label"><ShieldCheck size={15} /> Saved on this device</span><button className="avatar" aria-label="Local profile">V</button></div></header>
+      <header className="topbar"><div className="crumb">COLLECTIONS <span>/</span> <b>{activeName.toUpperCase()}</b></div><div className="mobile-brand"><img src={`${import.meta.env.BASE_URL}collect-wordmark.svg`} alt="Collect!"/></div><div className="top-actions"><span className="sync-label"><ShieldCheck size={15} /> Saved on this device</span><button className="avatar" aria-label="Local profile">V</button></div></header>
       <div className="content-wrap">
         <section className="welcome-row"><div><div className="eyebrow"><Sparkles size={14} /> YOUR COLLECTION, IN FOCUS</div><h1>Good to see you.<br/><span>Let’s make some room.</span></h1><p className="lede">A considered home for every card you’re chasing.</p></div><div className="progress-orbit" aria-label={`${allProgress.owned} of ${allProgress.total} cards owned`}><div><strong>{allProgress.percent}<small>%</small></strong><span>COMPLETE</span></div><svg viewBox="0 0 120 120"><circle cx="60" cy="60" r="51"/><circle className="orbit-progress" cx="60" cy="60" r="51" style={{ strokeDashoffset: 320 - 320 * allProgress.percent / 100 }}/></svg></div></section>
 

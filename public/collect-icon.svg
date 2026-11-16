@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-labelledby="title">
+  <title id="title">Collect!</title>
+  <rect width="64" height="64" rx="19" fill="#28233c"/>
+  <path d="m32 7 5 7 9-2-1 9 8 5-7 6 2 9-9-1-5 8-6-7-9 2 1-9-8-5 7-6-2-9 9 1z" fill="#c6ef68" stroke="#fff3dc" stroke-width="2.5" stroke-linejoin="round"/>
+  <text x="32" y="41" text-anchor="middle" font-family="ui-rounded, &quot;Arial Rounded MT Bold&quot;, &quot;Trebuchet MS&quot;, system-ui, sans-serif" font-size="25" font-weight="1000" letter-spacing="-2" fill="#28233c" stroke="#fff3dc" stroke-width="1.2" stroke-linejoin="round" paint-order="stroke fill" transform="rotate(-5 32 34)">C!</text>
+  <path d="m13 13 1.5 3.5L18 18l-3.5 1.5L13 23l-1.5-3.5L8 18l3.5-1.5z" fill="#ff9474"/>
+  <circle cx="51" cy="49" r="2.5" fill="#96caff"/>
+</svg>

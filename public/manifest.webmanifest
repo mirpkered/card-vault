@@ -7,5 +7,5 @@
   "display": "standalone",
   "background_color": "#111313",
   "theme_color": "#111313",
-  "icons": [{ "src": "./vault.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any maskable" }]
+  "icons": [{ "src": "./collect-icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any maskable" }]
 }
