@@ -18,7 +18,7 @@ The app persists its vault in IndexedDB in the current browser. No account is re
 - Add cards, DVD titles, or other collectible items and track physically owned, duplicate, and incoming quantities separately.
 - The Gallery, List, and Checklist controls change presentation only. Search and status filters remain active across view changes.
 - Completion counts unique item definitions that have at least one physically owned copy. Extra copies affect duplicate status and quantity, not completion.
-- Naruto cards can be enriched with verified names, catalog card codes, and remote thumbnails from NarutoDB. Review and apply the update inside the app; it preserves your inventory quantities and user-added images. Thumbnails stay hosted remotely and are cached after viewing.
+- The Naruto Kayou catalog includes all eight North American sets listed by NarutoDB, with verified card names, catalog codes, and remote thumbnails. Review and apply the catalog update inside the app; your quantities and user-added images are preserved.
 - Card details also accept user-provided image URLs. A URL marked “Verified” is stored with a timestamp; verify that it is the exact card before selecting that option.
 - Super Rare Games imports preserve Personal and Dupes quantities separately, keep the workbook’s colored completion markers for review, and use six release slots (Title, 1–5). New release sets start with those six slots.
 
@@ -71,9 +71,9 @@ The generated backup contains personal inventory data. `private-data/` is ignore
 
 ## Naruto catalog and provisional inventory
 
-The Naruto catalog update is built from the user-provided [NREA02](https://narutodb.com/kayou/sets/NREA02) and [NREA03](https://narutodb.com/kayou/sets/NREA03) catalog pages. `python scripts/build_naruto_catalog.py` validates full set counts, rarity totals, unique IDs, names, image hosts, and optional alignment with a local provisional inventory JSON before writing `public/naruto-catalog.json`. The public file contains catalog metadata and remote image URLs only; it never contains personal quantities.
+The Naruto catalog is built from NarutoDB's [North American Kayou set list](https://narutodb.com/kayou/sets) and its eight full set pages: NRSA01 Heaven Scroll (159), NRSA02 Chapter Jin (172), NRSA03 Chapter Jin 3 (187), NREA01 Earth Scroll (132), NREA02 Earth Scroll 2 (133), NRCCNA Ninja Age (110), NRSA04 Chapter Jin 4 (186), and NREA03 Earth Scroll 3 (123). `python scripts/build_naruto_catalog.py` validates all set counts, rarity totals, unique namespaced IDs and card codes, promo labels, names, image hosts, and optional alignment with the local provisional inventory JSON before writing `public/naruto-catalog.json`. The checked-in public file contains catalog metadata and remote image URLs only; it never contains personal quantities.
 
-NarutoDB lists 133 NREA02 cards and 123 NREA03 cards, including one Promo card per set. The original inventory package has 132 and 122 positions, so the in-app review shows the two Promo additions explicitly. Applying the update fills blank names and provisional card numbers, links exact non-stand-in thumbnails, and leaves all existing card IDs, Personal, Dupes, incoming quantities, custom names, and user image variants unchanged. Promo cards begin with no ownership recorded.
+The in-app Naruto review adds 1,202 unique card definitions and verified remote image links. NREA02 and NREA03 keep their current visibility choices; the other six sets start hidden and can be enabled individually under **Manage sets**. New catalog entries start without ownership. Applying the update fills verified names and printed codes where the imported checklist has provisional values, while preserving all existing card IDs, Personal, Dupes, incoming quantities, custom names, and user image variants. NarutoDB continues to host the thumbnails, which the app caches after viewing.
 
 The inventory converter reads the JSON and CSV members of the user-supplied ZIP, checks every card ID, status, quantity, rarity position, set total, and CSV/JSON match, then writes a schema-v2 backup under `private-data/` for the app's **Import** control:
 

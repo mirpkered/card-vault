@@ -5,123 +5,112 @@ import {
   applyNarutoCatalogUpdate,
   parseNarutoCatalogUpdate,
   planNarutoCatalogUpdate,
-  type NarutoCatalogCard,
-  type NarutoCatalogUpdate,
 } from './narutoCatalog';
 
-function completeUpdate(): NarutoCatalogUpdate {
-  const sets = [
-    { id: 'set:kayou-naruto-nrea02', name: 'NREA02', cardCount: 133, sourceUrl: 'https://narutodb.com/kayou/sets/NREA02' },
-    { id: 'set:kayou-naruto-nrea03', name: 'NREA03', cardCount: 123, sourceUrl: 'https://narutodb.com/kayou/sets/NREA03' },
-  ];
-  const cards: NarutoCatalogCard[] = [];
-  const rarities = {
-    NREA02: { CR: 4, '◇UR': 4, AR: 10, MR: 4, UR: 15, SSR: 25, SR: 20, R: 50, PR: 1 },
-    NREA03: { CR: 4, SP: 4, MR: 4, UR: 15, SSR: 25, SR: 20, R: 50, PR: 1 },
-  };
-  for (const set of sets) {
-    const code = set.name;
-    for (const [rarity, count] of Object.entries(rarities[code as keyof typeof rarities])) {
-      for (let index = 1; index <= count; index++) {
-        const isPromo = rarity === 'PR';
-        const idPrefix = rarity === '◇UR' ? 'PARALLEL_UR' : rarity;
-        const slot = idPrefix + String(index).padStart(3, '0');
-        cards.push({
-          id: 'kayou-naruto:' + code + ':' + slot,
-          setId: set.id,
-          provisionalNumber: slot,
-          number: code + '-' + rarity + '-' + String(index).padStart(3, '0'),
-          name: 'Card ' + code + ' ' + rarity + ' ' + index,
-          rarity,
-          imageUrl: null,
-          isPromo,
-        });
-      }
-    }
-  }
-  return {
-    schemaVersion: 1,
-    source: 'NarutoDB',
-    cataloguedAt: '2026-11-16T00:00:00Z',
-    sourcePages: { NREA02: sets[0].sourceUrl, NREA03: sets[1].sourceUrl },
-    sets,
-    cards,
-  };
-}
+const PROVISIONAL_NOTE = 'Provisional rarity index; exact card name and printed number are unverified.';
 
-describe('Naruto catalog enrichment', () => {
-  it('accepts the generated public NarutoDB catalog', () => {
+describe('Kayou Naruto catalog import', () => {
+  it('accepts all eight verified North American lists and their image links', () => {
     const update = parseNarutoCatalogUpdate(narutoCatalogData);
-    expect(update.cards).toHaveLength(256);
-    expect(update.cards.filter((card) => card.imageUrl)).toHaveLength(256);
-    expect(update.cards.filter((card) => card.isPromo)).toHaveLength(2);
+    expect(update.sets).toHaveLength(8);
+    expect(update.cards).toHaveLength(1202);
+    expect(update.cards.filter((card) => card.imageUrl)).toHaveLength(1202);
+    expect(update.cards.filter((card) => card.isPromo)).toHaveLength(14);
+    expect(update.sets.find((set) => set.code === 'NREA02')).toMatchObject({ cardCount: 133, trackedByDefault: true });
+    expect(update.sets.find((set) => set.code === 'NREA03')).toMatchObject({ cardCount: 123, trackedByDefault: true });
+    expect(update.sets.filter((set) => !set.trackedByDefault)).toHaveLength(6);
   });
 
-  it('accepts only complete, uniquely identified set catalogs', () => {
-    const update = completeUpdate();
-    expect(parseNarutoCatalogUpdate(update).cards).toHaveLength(256);
-    expect(() => parseNarutoCatalogUpdate({ ...update, cards: update.cards.slice(0, -1) })).toThrow('incomplete');
+  it('uses set-namespaced IDs for equal rarity slots across different sets', () => {
+    const update = parseNarutoCatalogUpdate(narutoCatalogData);
+    const sameSlot = update.cards.filter((card) => card.provisionalNumber === 'R001');
+    expect(sameSlot.length).toBeGreaterThan(1);
+    expect(new Set(sameSlot.map((card) => card.id)).size).toBe(sameSlot.length);
+    expect(new Set(sameSlot.map((card) => card.setId)).size).toBe(sameSlot.length);
+  });
+
+  it('rejects an incomplete set, repeated card identity, or unapproved image URL', () => {
+    const update = parseNarutoCatalogUpdate(narutoCatalogData);
+    expect(() => parseNarutoCatalogUpdate({ ...update, sets: update.sets.slice(1) })).toThrow('incomplete');
+    expect(() => parseNarutoCatalogUpdate({ ...update, cards: update.cards.slice(1) })).toThrow('incomplete');
     expect(() => parseNarutoCatalogUpdate({
       ...update,
       cards: update.cards.map((card, index) => index === 0 ? { ...card, id: update.cards[1].id } : card),
     })).toThrow();
+    expect(() => parseNarutoCatalogUpdate({
+      ...update,
+      cards: update.cards.map((card, index) => index === 0 ? { ...card, imageUrl: 'https://example.com/wrong-card.png' } : card),
+    })).toThrow('unapproved image URL');
+    expect(() => parseNarutoCatalogUpdate({
+      ...update,
+      cards: update.cards.map((card, index) => index === 0 ? { ...card, isPromo: !card.isPromo } : card),
+    })).toThrow('invalid card details');
   });
 
-  it('fills verified catalog details and preserves quantities and user images', () => {
+  it('adds all sets, names, card numbers, and images while preserving inventory and personal images', () => {
+    const update = parseNarutoCatalogUpdate(narutoCatalogData);
     const vault = emptyVault();
-    const cardId = 'kayou-naruto:NREA02:R001';
-    const card = {
-      id: cardId,
-      setId: 'set:kayou-naruto-nrea02',
-      number: 'R001',
-      name: '',
-      rarity: 'R',
-      sourceNote: 'Provisional rarity index; exact card name and printed number are unverified. Duplicate quantity was not supplied.',
-    };
-    vault.catalog.cards.push(card);
-    const ownership = {
-      cardId, personal: 2, duplicates: 1, duplicatesKnown: false, incoming: 3, updatedAt: '2026-11-15',
-    };
-    vault.catalog.ownership.push(ownership);
+    const earlierCards = update.cards.filter((card) => ['NREA02', 'NREA03'].some((code) => card.id.startsWith('kayou-naruto:' + code + ':') && !card.isPromo));
+    expect(earlierCards).toHaveLength(254);
+    for (const entry of earlierCards) {
+      vault.catalog.cards.push({
+        id: entry.id, setId: entry.setId, number: entry.provisionalNumber, name: '', rarity: entry.rarity,
+        sourceNote: PROVISIONAL_NOTE + ' Duplicate quantity was not supplied.',
+      });
+    }
+    const ownedCardId = 'kayou-naruto:NREA02:R001';
+    const ownership = { cardId: ownedCardId, personal: 2, duplicates: 3, duplicatesKnown: false, incoming: 1, updatedAt: '2026-11-15T00:00:00Z' };
     const userImage = {
-      id: cardId + ':personal-photo',
-      cardId,
-      name: 'My photo',
+      id: ownedCardId + ':personal-photo', cardId: ownedCardId, name: 'My photo',
       imageUrls: [{ url: 'https://example.com/my-card.jpg', source: 'user-provided' as const }],
     };
+    vault.catalog.ownership.push(ownership);
     vault.catalog.variants.push(userImage);
-
-    const promoId = 'kayou-naruto:NREA02:PR003';
-    const update: NarutoCatalogUpdate = {
-      ...completeUpdate(),
-      cards: [
-        {
-          id: cardId, setId: card.setId, provisionalNumber: 'R001', number: 'NREA02-R-001L1',
-          name: 'Eye to Eye: Sharingan vs Sharingan', rarity: 'R',
-          imageUrl: 'https://cdn.narutodb.com/storage/cards/official/NREA02-R-001L1-thumb.png', isPromo: false,
-        },
-        {
-          id: promoId, setId: card.setId, provisionalNumber: 'PR003', number: 'NREA-PR-003',
-          name: 'Naruto Uzumaki', rarity: 'PR',
-          imageUrl: 'https://cdn.narutodb.com/storage/cards/NREA/NREA-PR-003_thumb.png', isPromo: true,
-        },
-      ],
-    };
+    const customCardId = 'kayou-naruto:NREA02:R002';
+    vault.catalog.cards.find((card) => card.id === customCardId)!.name = 'My custom card name';
 
     const plan = planNarutoCatalogUpdate(vault, update);
-    expect(plan).toMatchObject({ cardsToAdd: 1, namesToFill: 2, numbersToUpdate: 1, imagesToAdd: 2, sourceNotesToRefresh: 1 });
+    expect(plan).toMatchObject({
+      setsToAdd: 6,
+      cardsToAdd: 948,
+      namesToFill: 253,
+      numbersToUpdate: 254,
+      imagesToAdd: 1202,
+      customNamesToPreserve: 1,
+      conflicts: [],
+      hasChanges: true,
+    });
 
-    const updated = applyNarutoCatalogUpdate(vault, update);
-    expect(updated.catalog.cards.find((item) => item.id === cardId)).toMatchObject({
-      name: 'Eye to Eye: Sharingan vs Sharingan',
-      number: 'NREA02-R-001L1',
-      sourceNote: 'Catalog code verified by NarutoDB: NREA02-R-001L1. Duplicate quantity was not supplied.',
+    const imported = applyNarutoCatalogUpdate(vault, update);
+    expect(imported.catalog.sets.filter((set) => set.seriesId === 'series:kayou-naruto')).toHaveLength(8);
+    expect(imported.catalog.cards.filter((card) => update.sets.some((set) => set.id === card.setId))).toHaveLength(1202);
+    expect(imported.catalog.sets.find((set) => set.id === 'set:kayou-naruto-nrea02')).toMatchObject({
+      name: 'NREA02 · Earth Scroll 2', expectedCardCount: 133, tracked: true,
     });
-    expect(updated.catalog.cards.find((item) => item.id === promoId)).toMatchObject({
-      name: 'Naruto Uzumaki', number: 'NREA-PR-003', rarity: 'PR', category: 'Promo',
+    expect(imported.catalog.sets.find((set) => set.id === 'set:kayou-naruto-nrsa01')).toMatchObject({
+      name: 'NRSA01 · Heaven Scroll', expectedCardCount: 159, tracked: false,
     });
-    expect(updated.catalog.ownership).toEqual([ownership]);
-    expect(updated.catalog.variants).toContainEqual(userImage);
-    expect(updated.catalog.variants.filter((item) => item.id.endsWith(':narutodb'))).toHaveLength(2);
+    expect(imported.catalog.sets.find((set) => set.id === 'set:kayou-naruto-nrea03')?.tracked).toBe(true);
+    expect(imported.catalog.cards.find((card) => card.id === customCardId)?.name).toBe('My custom card name');
+    expect(imported.catalog.ownership).toEqual([ownership]);
+    expect(imported.catalog.variants).toContainEqual(userImage);
+    expect(imported.catalog.variants.filter((variant) => variant.id.endsWith(':narutodb'))).toHaveLength(1202);
+    expect(imported.catalog.cards.find((card) => card.id === 'kayou-naruto:NREA02:PR003')).toMatchObject({ category: 'Promo' });
+  });
+
+  it('preserves an explicit set visibility choice and pauses on local catalog conflicts', () => {
+    const update = parseNarutoCatalogUpdate(narutoCatalogData);
+    const vault = emptyVault();
+    vault.catalog.sets.find((set) => set.id === 'set:kayou-naruto-nrea02')!.tracked = false;
+    const imported = applyNarutoCatalogUpdate(vault, update);
+    expect(imported.catalog.sets.find((set) => set.id === 'set:kayou-naruto-nrea02')?.tracked).toBe(false);
+    expect(imported.catalog.sets.find((set) => set.id === 'set:kayou-naruto-nrea03')?.tracked).toBe(true);
+
+    const conflicted = emptyVault();
+    conflicted.catalog.cards.push({ id: 'local:extra-nrea02', setId: 'set:kayou-naruto-nrea02', number: 'CUSTOM', name: 'My extra card' });
+    const before = JSON.stringify(conflicted);
+    expect(planNarutoCatalogUpdate(conflicted, update).conflicts.join(' ')).toContain('absent from the verified catalog');
+    expect(() => applyNarutoCatalogUpdate(conflicted, update)).toThrow('paused for review');
+    expect(JSON.stringify(conflicted)).toBe(before);
   });
 });
