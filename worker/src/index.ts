@@ -33,7 +33,7 @@ export default {
     if (!url.pathname.startsWith('/api/')) return env.ASSETS.fetch(request);
     try {
       if (url.pathname === '/api/health' && request.method === 'GET') return json({ ok: true, configured: isConfigured(env) });
-      const protectedRoutes = ['/api/auth/device/start', '/api/auth/device/poll', '/api/auth/sign-out', '/api/session', '/api/data'];
+      const protectedRoutes = ['/api/auth/device/start', '/api/auth/device/poll', '/api/auth/sign-out', '/api/session', '/api/data', '/api/revision'];
       if (protectedRoutes.includes(url.pathname) && !isConfigured(env)) return json({ error: 'sync_not_configured', message: 'Private sync needs its GitHub App and encrypted session secrets configured on the Worker.' }, 503);
       if (url.pathname === '/api/auth/device/start' && request.method === 'POST') return await startDeviceFlow(request, env);
       if (url.pathname === '/api/auth/device/poll' && request.method === 'POST') return await pollDeviceFlow(request, env);
@@ -49,6 +49,11 @@ export default {
           return json({ exists: false, data: null, revision: null, commitSha: canonical.commitSha, updatedAt: null }, 200, cookie);
         }
         return jsonVault(canonical.rawData, canonical.revision, canonical.commitSha, canonical.updatedAt, cookie);
+      }
+      if (url.pathname === '/api/revision' && request.method === 'GET') {
+        const { session, cookie } = await getSession(request, env);
+        const current = await getRepositoryHead(env, session.accessToken);
+        return json({ exists: current.exists, revision: current.revision }, 200, cookie);
       }
       if (url.pathname === '/api/data' && request.method === 'PUT') {
         assertSameOrigin(request);
@@ -168,7 +173,7 @@ export function assertExpectedRevision(expected: string | null, current: string 
 async function commitSnapshot(env: Env, session: AuthSession, expectedRevision: string | null, data: VaultData) {
   const current = await getRepositoryHead(env, session.accessToken);
   assertExpectedRevision(expectedRevision, current.revision);
-  const content = `${JSON.stringify(data, null, 2)}\n`;
+  const content = serializeCanonicalSnapshot(data);
   if (new TextEncoder().encode(content).length > MAX_SNAPSHOT_BYTES) throw new ServiceError('The proposed vault exceeds the supported snapshot size.', 400, 'snapshot_too_large');
   const { owner, repository, branch } = repositoryConfig(env);
   const root = `/repos/${owner}/${repository}`;
@@ -185,6 +190,12 @@ async function commitSnapshot(env: Env, session: AuthSession, expectedRevision: 
     throw cause;
   }
   return { exists: true, data: null, revision: blob.sha, commitSha: commit.sha, updatedAt: data.updatedAt };
+}
+
+export function serializeCanonicalSnapshot(data: VaultData): string {
+  // Keep the canonical snapshot compact: pretty-printing pushes otherwise
+  // valid catalogs over the service limit without adding any user value.
+  return JSON.stringify(data);
 }
 
 async function githubApi<T>(path: string, token: string, init: RequestInit = {}): Promise<T> {

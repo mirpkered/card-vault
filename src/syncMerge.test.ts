@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { emptyVault, type VaultData } from './domain';
-import { applyVaultMerge, isPristineVault, prepareVaultMerge } from './syncMerge';
+import { applyVaultMerge, isPristineVault, prepareVaultMerge, shouldSaveRecoveryBeforeRemoteRefresh } from './syncMerge';
 
 function vault(): VaultData {
   const result = emptyVault();
@@ -69,5 +69,21 @@ describe('private sync merge review', () => {
     expect(plan.conflicts[0].collection).toBe('ownership');
     const merged = applyVaultMerge(plan, { [plan.conflicts[0].key]: 'device' });
     expect(merged.catalog.ownership[0].personal).toBe(1);
+  });
+});
+
+describe('GitHub master refresh policy', () => {
+  it('keeps a local recovery copy when a non-empty device catalog differs from GitHub', () => {
+    const device = vault();
+    const privateCopy = vault();
+    privateCopy.catalog.cards[0] = { ...privateCopy.catalog.cards[0], name: 'GitHub name' };
+    expect(shouldSaveRecoveryBeforeRemoteRefresh(device, privateCopy)).toBe(true);
+  });
+
+  it('does not create recovery copies for a new device or timestamp-only changes', () => {
+    const privateCopy = vault();
+    const timestampOnly = { ...privateCopy, updatedAt: '2030-01-01T00:00:00.000Z' };
+    expect(shouldSaveRecoveryBeforeRemoteRefresh(emptyVault(), privateCopy)).toBe(false);
+    expect(shouldSaveRecoveryBeforeRemoteRefresh(privateCopy, timestampOnly)).toBe(false);
   });
 });

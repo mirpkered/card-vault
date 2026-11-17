@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { emptyVault } from '../../src/domain';
-import { assertExpectedRevision, migrateRemoteSnapshot } from './index';
+import { assertExpectedRevision, migrateRemoteSnapshot, serializeCanonicalSnapshot } from './index';
 
 describe('canonical private snapshots', () => {
   it('serves schema 2 snapshots as migrated data without changing their source', () => {
@@ -41,5 +41,17 @@ describe('private snapshot revisions', () => {
     expect(() => assertExpectedRevision(null, null)).not.toThrow();
     expect(() => assertExpectedRevision('unexpected', null)).toThrow('Revision conflict');
     expect(() => assertExpectedRevision(null, 'already-created')).toThrow('Revision conflict');
+  });
+});
+
+describe('private snapshot storage', () => {
+  it('writes a compact but complete snapshot to leave room under the size limit', () => {
+    const vault = emptyVault();
+    vault.catalog.cards.push({ id: 'set:kayou-naruto-nrea02:01', setId: 'set:kayou-naruto-nrea02', number: '01', name: 'Card one' });
+    const compact = serializeCanonicalSnapshot(vault);
+    expect(compact).toBe(JSON.stringify(vault));
+    expect(compact).not.toContain('\n  ');
+    expect(JSON.parse(compact)).toEqual(vault);
+    expect(compact.length).toBeLessThan(JSON.stringify(vault, null, 2).length);
   });
 });

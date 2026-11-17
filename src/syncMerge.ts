@@ -34,6 +34,10 @@ export function isPristineVault(value: VaultData): boolean {
   return same(value.catalog, emptyVault().catalog);
 }
 
+export function shouldSaveRecoveryBeforeRemoteRefresh(device: VaultData, privateCopy: VaultData): boolean {
+  return !isPristineVault(device) && !same(device.catalog, privateCopy.catalog);
+}
+
 /**
  * Builds a non-destructive union. Records present on only one side are kept;
  * changed records with the same stable identity need an explicit choice.

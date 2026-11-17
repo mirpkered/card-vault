@@ -3,6 +3,7 @@ import { migrateVault, type VaultData } from './domain';
 export type CloudHealth = { configured: boolean };
 export type CloudSession = { authenticated: true; login: string; expiresAt: number };
 export type RemoteVault = { exists: boolean; data: VaultData | null; revision: string | null; commitSha: string | null; updatedAt: string | null };
+export type RemoteRevision = Pick<RemoteVault, 'exists' | 'revision'>;
 
 export class CloudRequestError extends Error {
   constructor(message: string, readonly status: number, readonly code?: string) {
@@ -60,6 +61,10 @@ export async function getRemoteVault(): Promise<RemoteVault> {
   } catch {
     throw new CloudRequestError('The private snapshot has an unsupported schema or invalid catalog records. No change was applied.', 502, 'invalid_remote_snapshot');
   }
+}
+
+export function getRemoteRevision() {
+  return request<RemoteRevision>('/api/revision');
 }
 
 export function putRemoteVault(expectedRevision: string | null, data: VaultData) {
