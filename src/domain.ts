@@ -158,16 +158,21 @@ function isCollectionCategory(value: unknown): value is CollectionCategory {
 export function validateCatalog(catalog: Catalog): string[] {
   const errors: string[] = [];
   const collections: [string, { id: string }[]][] = Object.entries(catalog).filter(([name]) => name !== 'ownership') as [string, { id: string }[]][];
+  const idsByCollection = new Map<string, Set<string>>();
   for (const [name, records] of collections) {
     if (!Array.isArray(records)) { errors.push(`${name} must be an array.`); continue; }
     const ids = new Set<string>();
+    idsByCollection.set(name, ids);
     for (const record of records) {
       if (!record.id) errors.push(`${name} contains a record without an ID.`);
       else if (ids.has(record.id)) errors.push(`${name} contains duplicate ID “${record.id}”.`);
       else ids.add(record.id);
     }
   }
-  const has = (key: keyof Catalog, id: string) => (catalog[key] as { id: string }[]).some((item) => item.id === id);
+  const has = (key: keyof Catalog, id: string) => idsByCollection.get(key)?.has(id) ?? false;
+  const cardsById = new Map(catalog.cards.map((card) => [card.id, card]));
+  const requiredCardsBySet = new Map<string, number>();
+  for (const card of catalog.cards) if (card.countsTowardSetCompletion !== false) requiredCardsBySet.set(card.setId, (requiredCardsBySet.get(card.setId) ?? 0) + 1);
   for (const item of catalog.franchises) if (!has('publishers', item.publisherId)) errors.push(`Franchise ${item.id} references missing publisher ${item.publisherId}.`);
   for (const item of catalog.series) {
     if (item.franchiseId && !has('franchises', item.franchiseId)) errors.push(`Series ${item.id} references missing franchise ${item.franchiseId}.`);
@@ -176,7 +181,7 @@ export function validateCatalog(catalog: Catalog): string[] {
   for (const item of catalog.sets) if (!has('series', item.seriesId)) errors.push(`Set ${item.id} references missing series ${item.seriesId}.`);
   for (const item of catalog.sets) if (typeof item.tracked !== 'boolean') errors.push(`Set ${item.id} must record whether it is tracked.`);
   for (const item of catalog.sets) if (item.archived !== undefined && typeof item.archived !== 'boolean') errors.push(`Set ${item.id} has an invalid archive state.`);
-  for (const item of catalog.sets) if (item.expectedCardCount !== undefined && catalog.cards.filter((card) => card.setId === item.id && card.countsTowardSetCompletion !== false).length !== item.expectedCardCount) errors.push(`Set ${item.id} must define exactly ${item.expectedCardCount} required cards.`);
+  for (const item of catalog.sets) if (item.expectedCardCount !== undefined && (requiredCardsBySet.get(item.id) ?? 0) !== item.expectedCardCount) errors.push(`Set ${item.id} must define exactly ${item.expectedCardCount} required cards.`);
   for (const item of catalog.cards) if (!has('sets', item.setId)) errors.push(`Card ${item.id} references missing set ${item.setId}.`);
   for (const item of catalog.cards) {
     if (item.releaseName !== undefined && typeof item.releaseName !== 'string') errors.push(`Card ${item.id} has an invalid release name.`);
@@ -184,7 +189,7 @@ export function validateCatalog(catalog: Catalog): string[] {
     if (item.releaseSourceRow !== undefined && (!Number.isInteger(item.releaseSourceRow) || item.releaseSourceRow < 1)) errors.push(`Card ${item.id} has an invalid release source row.`);
     if (item.countsTowardSetCompletion !== undefined && typeof item.countsTowardSetCompletion !== 'boolean') errors.push(`Card ${item.id} has an invalid completion setting.`);
     if (item.relatedCardId !== undefined && !has('cards', item.relatedCardId)) errors.push(`Card ${item.id} references missing related card ${item.relatedCardId}.`);
-    if (item.relatedCardId && catalog.cards.find((card) => card.id === item.relatedCardId)?.setId !== item.setId) errors.push(`Card ${item.id} and its related card must be in the same set.`);
+    if (item.relatedCardId && cardsById.get(item.relatedCardId)?.setId !== item.setId) errors.push(`Card ${item.id} and its related card must be in the same set.`);
     if (item.countsTowardSetCompletion === false && !item.bonusLabel?.trim()) errors.push(`Bonus card ${item.id} must have a label.`);
     if (item.bonusLabel !== undefined && (typeof item.bonusLabel !== 'string' || !item.bonusLabel.trim())) errors.push(`Card ${item.id} has an invalid bonus label.`);
   }
@@ -207,7 +212,7 @@ export function validateCatalog(catalog: Catalog): string[] {
     if (!has('cards', item.cardId)) errors.push(`Acquisition ${item.id} references missing card ${item.cardId}.`);
     if (!Number.isInteger(item.quantity) || item.quantity < 1) errors.push(`Acquisition ${item.id} must have a positive whole quantity.`);
   }
-  const ids = new Set(catalog.cards.map((card) => card.id));
+  const ids = idsByCollection.get('cards') ?? new Set<string>();
   if (ids.size !== catalog.cards.length) errors.push('Card definition IDs must be unique across all sets.');
   return errors;
 }

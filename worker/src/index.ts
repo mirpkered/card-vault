@@ -13,7 +13,9 @@ export interface Env {
 
 const COOKIE = 'collect_everything_session';
 const SNAPSHOT_PATH = 'current/collect-everything.v2.json';
-const MAX_SNAPSHOT_BYTES = 3_000_000;
+// The vault may include thousands of catalog entries with image source URLs.
+// Keep a hard bound while leaving room for the English Union Arena catalog.
+const MAX_SNAPSHOT_BYTES = 16_000_000;
 const API_VERSION = '2022-11-28';
 
 type AuthSession = { login: string; accessToken: string; refreshToken: string; accessExpiresAt: number; refreshExpiresAt: number };
