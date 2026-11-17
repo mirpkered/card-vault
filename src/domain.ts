@@ -159,18 +159,25 @@ export function validateCatalog(catalog: Catalog): string[] {
   const errors: string[] = [];
   const collections: [string, { id: string }[]][] = Object.entries(catalog).filter(([name]) => name !== 'ownership') as [string, { id: string }[]][];
   const idsByCollection = new Map<string, Set<string>>();
+  const cardsById = new Map<string, CardDefinition>();
+  const variantById = new Map<string, CardVariant>();
   for (const [name, records] of collections) {
     if (!Array.isArray(records)) { errors.push(`${name} must be an array.`); continue; }
-    const ids = new Set<string>();
-    idsByCollection.set(name, ids);
+    const ids = name === 'cards' || name === 'variants' ? undefined : new Set<string>();
+    if (ids) idsByCollection.set(name, ids);
     for (const record of records) {
       if (!record.id) errors.push(`${name} contains a record without an ID.`);
-      else if (ids.has(record.id)) errors.push(`${name} contains duplicate ID “${record.id}”.`);
-      else ids.add(record.id);
+      else if (name === 'cards') {
+        if (cardsById.has(record.id)) errors.push(`${name} contains duplicate ID “${record.id}”.`);
+        else cardsById.set(record.id, record as CardDefinition);
+      } else if (name === 'variants') {
+        if (variantById.has(record.id)) errors.push(`${name} contains duplicate ID “${record.id}”.`);
+        else variantById.set(record.id, record as CardVariant);
+      } else if (ids?.has(record.id)) errors.push(`${name} contains duplicate ID “${record.id}”.`);
+      else ids?.add(record.id);
     }
   }
-  const has = (key: keyof Catalog, id: string) => idsByCollection.get(key)?.has(id) ?? false;
-  const cardsById = new Map(catalog.cards.map((card) => [card.id, card]));
+  const has = (key: keyof Catalog, id: string) => key === 'cards' ? cardsById.has(id) : key === 'variants' ? variantById.has(id) : idsByCollection.get(key)?.has(id) ?? false;
   const requiredCardsBySet = new Map<string, number>();
   for (const card of catalog.cards) if (card.countsTowardSetCompletion !== false) requiredCardsBySet.set(card.setId, (requiredCardsBySet.get(card.setId) ?? 0) + 1);
   for (const item of catalog.franchises) if (!has('publishers', item.publisherId)) errors.push(`Franchise ${item.id} references missing publisher ${item.publisherId}.`);
@@ -193,7 +200,6 @@ export function validateCatalog(catalog: Catalog): string[] {
     if (item.countsTowardSetCompletion === false && !item.bonusLabel?.trim()) errors.push(`Bonus card ${item.id} must have a label.`);
     if (item.bonusLabel !== undefined && (typeof item.bonusLabel !== 'string' || !item.bonusLabel.trim())) errors.push(`Card ${item.id} has an invalid bonus label.`);
   }
-  const variantById = new Map(catalog.variants.map((variant) => [variant.id, variant]));
   for (const item of catalog.variants) {
     if (!has('cards', item.cardId)) errors.push(`Variant ${item.id} references missing card ${item.cardId}.`);
     if (item.treatment !== undefined && !['normal', 'foil', 'full-art', 'special'].includes(item.treatment)) errors.push(`Variant ${item.id} has an unsupported treatment.`);
@@ -212,8 +218,7 @@ export function validateCatalog(catalog: Catalog): string[] {
     if (!has('cards', item.cardId)) errors.push(`Acquisition ${item.id} references missing card ${item.cardId}.`);
     if (!Number.isInteger(item.quantity) || item.quantity < 1) errors.push(`Acquisition ${item.id} must have a positive whole quantity.`);
   }
-  const ids = idsByCollection.get('cards') ?? new Set<string>();
-  if (ids.size !== catalog.cards.length) errors.push('Card definition IDs must be unique across all sets.');
+  if (cardsById.size !== catalog.cards.length) errors.push('Card definition IDs must be unique across all sets.');
   return errors;
 }
 

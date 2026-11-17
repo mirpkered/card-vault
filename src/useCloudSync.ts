@@ -146,8 +146,9 @@ export function useCloudSync(vault: VaultData, setVault: Dispatch<SetStateAction
   const writeVault = useCallback(async (source: VaultData, expectedRevision: string | null, applyReviewedMerge = false) => {
     const snapshot = { ...source, updatedAt: new Date().toISOString() };
     const saved = await putRemoteVault(expectedRevision, snapshot);
-    setRemote(saved);
-    if (applyReviewedMerge || vaultsEqual(vaultRef.current, source)) setVault(saved.data ?? snapshot);
+    const confirmed = { ...saved, data: saved.data ?? snapshot };
+    setRemote(confirmed);
+    if (applyReviewedMerge || vaultsEqual(vaultRef.current, source)) setVault(confirmed.data ?? snapshot);
     setLastSavedAt(saved.updatedAt ?? snapshot.updatedAt);
     setMergePlan(null);
     setChoices({});

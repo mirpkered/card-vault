@@ -1,4 +1,4 @@
-import { migrateVault, validateVault, type VaultData } from '../../src/domain';
+import { migrateVault, type VaultData } from '../../src/domain';
 
 export interface Env {
   ASSETS: { fetch(request: Request): Promise<Response> };
@@ -19,7 +19,8 @@ const MAX_SNAPSHOT_BYTES = 16_000_000;
 const API_VERSION = '2022-11-28';
 
 type AuthSession = { login: string; accessToken: string; refreshToken: string; accessExpiresAt: number; refreshExpiresAt: number };
-type Canonical = { exists: boolean; data: VaultData | null; revision: string | null; commitSha: string; treeSha: string; updatedAt: string | null };
+type RepositoryHead = { exists: boolean; revision: string | null; commitSha: string; treeSha: string };
+type Canonical = RepositoryHead & { rawData: string | null; updatedAt: string | null };
 type TokenResponse = { access_token: string; refresh_token: string; expires_in?: number; refresh_token_expires_in?: number };
 
 class ServiceError extends Error {
@@ -44,7 +45,10 @@ export default {
       if (url.pathname === '/api/data' && request.method === 'GET') {
         const { session, cookie } = await getSession(request, env);
         const canonical = await getCanonical(env, session.accessToken);
-        return json({ exists: canonical.exists, data: canonical.data, revision: canonical.revision, commitSha: canonical.commitSha, updatedAt: canonical.updatedAt }, 200, cookie);
+        if (!canonical.exists || !canonical.rawData || !canonical.revision || !canonical.updatedAt) {
+          return json({ exists: false, data: null, revision: null, commitSha: canonical.commitSha, updatedAt: null }, 200, cookie);
+        }
+        return jsonVault(canonical.rawData, canonical.revision, canonical.commitSha, canonical.updatedAt, cookie);
       }
       if (url.pathname === '/api/data' && request.method === 'PUT') {
         assertSameOrigin(request);
@@ -54,7 +58,6 @@ export default {
         let data: VaultData;
         try { data = migrateVault(input.data); }
         catch { throw new ServiceError('Invalid vault snapshot. Check the schema version and catalog relationships before syncing.', 400, 'invalid_snapshot'); }
-        if (!validateVault(data)) throw new ServiceError('Invalid vault snapshot. Check the schema version and catalog relationships before syncing.', 400, 'invalid_snapshot');
         return json(await commitSnapshot(env, session, input.expectedRevision as string | null, data), 200, cookie);
       }
       return json({ error: 'not_found', message: 'This private sync route was not found.' }, 404);
@@ -124,6 +127,25 @@ async function getSession(request: Request, env: Env): Promise<{ session: AuthSe
 }
 
 async function getCanonical(env: Env, token: string): Promise<Canonical> {
+  const head = await getRepositoryHead(env, token);
+  if (!head.exists || !head.revision) return { ...head, rawData: null, updatedAt: null };
+  const { owner, repository } = repositoryConfig(env);
+  const blob = await githubApi<{ content: string; size: number }>(`/repos/${owner}/${repository}/git/blobs/${head.revision}`, token);
+  if (blob.size > MAX_SNAPSHOT_BYTES) throw new ServiceError('The private snapshot exceeds the supported size.', 502, 'snapshot_too_large');
+  let snapshot: unknown;
+  let rawData: string;
+  try {
+    rawData = decodeBase64(blob.content);
+    snapshot = JSON.parse(rawData);
+  } catch { throw new ServiceError('The canonical private snapshot is not valid JSON. Restore a previous repository revision before syncing.', 502, 'invalid_remote_json'); }
+  const data = migrateRemoteSnapshot(snapshot);
+  // Current snapshots can be streamed back exactly as stored. Older schemas are
+  // migrated in memory and serialized only when a migration actually changed them.
+  const responseData = data === snapshot ? rawData : JSON.stringify(data);
+  return { ...head, rawData: responseData, updatedAt: data.updatedAt };
+}
+
+async function getRepositoryHead(env: Env, token: string): Promise<RepositoryHead> {
   const { owner, repository, branch } = repositoryConfig(env);
   const root = `/repos/${owner}/${repository}`;
   let ref: { object: { sha: string } };
@@ -133,21 +155,14 @@ async function getCanonical(env: Env, token: string): Promise<Canonical> {
   const tree = await githubApi<{ truncated?: boolean; tree: Array<{ path: string; sha: string; type: string }> }>(`${root}/git/trees/${commit.tree.sha}?recursive=1`, token);
   if (tree.truncated) throw new ServiceError('The private repository tree is too large to inspect safely.', 502, 'repository_too_large');
   const file = tree.tree.find((entry) => entry.path === SNAPSHOT_PATH && entry.type === 'blob');
-  if (!file) return { exists: false, data: null, revision: null, commitSha: ref.object.sha, treeSha: commit.tree.sha, updatedAt: null };
-  const blob = await githubApi<{ content: string; size: number }>(`${root}/git/blobs/${file.sha}`, token);
-  if (blob.size > MAX_SNAPSHOT_BYTES) throw new ServiceError('The private snapshot exceeds the supported size.', 502, 'snapshot_too_large');
-  let snapshot: unknown;
-  try { snapshot = JSON.parse(decodeBase64(blob.content)); }
-  catch { throw new ServiceError('The canonical private snapshot is not valid JSON. Restore a previous repository revision before syncing.', 502, 'invalid_remote_json'); }
-  const data = migrateRemoteSnapshot(snapshot);
-  return { exists: true, data, revision: file.sha, commitSha: ref.object.sha, treeSha: commit.tree.sha, updatedAt: data.updatedAt };
+  if (!file) return { exists: false, revision: null, commitSha: ref.object.sha, treeSha: commit.tree.sha };
+  return { exists: true, revision: file.sha, commitSha: ref.object.sha, treeSha: commit.tree.sha };
 }
 
 /** Migrate older canonical snapshots in memory; reading never writes to the private repository. */
 export function migrateRemoteSnapshot(value: unknown): VaultData {
   try {
-    const migrated = migrateVault(value);
-    if (validateVault(migrated)) return migrated;
+    return migrateVault(value);
   } catch {
     // Return one consistent sync error without exposing private snapshot contents.
   }
@@ -159,7 +174,7 @@ export function assertExpectedRevision(expected: string | null, current: string 
 }
 
 async function commitSnapshot(env: Env, session: AuthSession, expectedRevision: string | null, data: VaultData) {
-  const current = await getCanonical(env, session.accessToken);
+  const current = await getRepositoryHead(env, session.accessToken);
   assertExpectedRevision(expectedRevision, current.revision);
   const content = `${JSON.stringify(data, null, 2)}\n`;
   if (new TextEncoder().encode(content).length > MAX_SNAPSHOT_BYTES) throw new ServiceError('The proposed vault exceeds the supported snapshot size.', 400, 'snapshot_too_large');
@@ -177,7 +192,7 @@ async function commitSnapshot(env: Env, session: AuthSession, expectedRevision: 
     if (cause instanceof ServiceError && cause.status === 409) throw new ServiceError('Revision conflict: another device saved first. Your local changes remain here; review both copies.', 409, 'revision_conflict');
     throw cause;
   }
-  return { exists: true, data, revision: blob.sha, commitSha: commit.sha, updatedAt: data.updatedAt };
+  return { exists: true, data: null, revision: blob.sha, commitSha: commit.sha, updatedAt: data.updatedAt };
 }
 
 async function githubApi<T>(path: string, token: string, init: RequestInit = {}): Promise<T> {
@@ -237,9 +252,34 @@ function assertSameOrigin(request: Request) {
 
 function readCookie(request: Request, name: string) { return request.headers.get('cookie')?.split(';').map((part) => part.trim()).find((part) => part.startsWith(`${name}=`))?.slice(name.length + 1); }
 function json(value: unknown, status = 200, cookie?: string) {
+  return new Response(JSON.stringify(value), { status, headers: jsonHeaders(cookie) });
+}
+function jsonVault(rawData: string, revision: string, commitSha: string, updatedAt: string, cookie?: string) {
+  const encoder = new TextEncoder();
+  const prefix = encoder.encode('{"exists":true,"data":');
+  const suffix = encoder.encode(`,"revision":${JSON.stringify(revision)},"commitSha":${JSON.stringify(commitSha)},"updatedAt":${JSON.stringify(updatedAt)}` + '}');
+  let offset = 0;
+  const body = new ReadableStream<Uint8Array>({
+    start(controller) { controller.enqueue(prefix); },
+    pull(controller) {
+      if (offset < rawData.length) {
+        let end = Math.min(offset + 32_768, rawData.length);
+        const last = rawData.charCodeAt(end - 1);
+        if (end < rawData.length && last >= 0xd800 && last <= 0xdbff) end--;
+        controller.enqueue(encoder.encode(rawData.slice(offset, end)));
+        offset = end;
+        return;
+      }
+      controller.enqueue(suffix);
+      controller.close();
+    },
+  });
+  return new Response(body, { status: 200, headers: jsonHeaders(cookie) });
+}
+function jsonHeaders(cookie?: string) {
   const headers = new Headers({ 'Content-Type': 'application/json; charset=utf-8', 'Cache-Control': 'no-store', 'X-Content-Type-Options': 'nosniff', 'Referrer-Policy': 'no-referrer', 'Content-Security-Policy': "default-src 'none'; frame-ancestors 'none'" });
   if (cookie) headers.append('Set-Cookie', cookie);
-  return new Response(JSON.stringify(value), { status, headers });
+  return headers;
 }
 function clearSession() { return new Response(JSON.stringify({ signedOut: true }), { status: 200, headers: { 'Content-Type': 'application/json', 'Cache-Control': 'no-store', 'Set-Cookie': `${COOKIE}=; Path=/; Max-Age=0; HttpOnly; Secure; SameSite=Lax` } }); }
 function base64Url(bytes: Uint8Array) { return btoa(String.fromCharCode(...bytes)).replaceAll('+', '-').replaceAll('/', '_').replaceAll('=', ''); }
