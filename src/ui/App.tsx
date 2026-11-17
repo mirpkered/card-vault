@@ -291,19 +291,26 @@ function syncButtonLabel(status: ReturnType<typeof useCloudSync>['status']) {
 function Metric({ label, value, detail, icon }: { label: string; value: string; detail: string; icon: React.ReactNode }) { return <div className="metric"><div className="metric-top"><span>{label}</span><i>{icon}</i></div><strong>{value}</strong><small>{detail}</small></div>; }
 type QuantityField = 'personal' | 'duplicates' | 'incoming';
 type OwnershipChange = (card: CardDefinition, field: QuantityField, quantity: number, variantId?: string) => void;
-function CardTile({ card, inventory, variants, view, showStatus, itemLabel, onOpen, onQuantity }: { card: CardDefinition; inventory: Ownership[]; variants: CardVariant[]; view: View; showStatus: boolean; itemLabel: string; onOpen: () => void; onQuantity: OwnershipChange }) {
-  const normalVariant = variants.find((variant) => variant.treatment === 'normal');
-  const standardInventory = inventory.find((item) => item.variantId === normalVariant?.id) ?? inventory.find((item) => !item.variantId);
+export function CardTile({ card, inventory, variants, view, showStatus, itemLabel, onOpen, onQuantity }: { card: CardDefinition; inventory: Ownership[]; variants: CardVariant[]; view: View; showStatus: boolean; itemLabel: string; onOpen: () => void; onQuantity: OwnershipChange }) {
+  const treatmentVariants = variants.filter((variant) => variant.treatment);
+  const normalVariant = treatmentVariants.find((variant) => variant.treatment === 'normal');
+  const [selectedVariantId, setSelectedVariantId] = useState(normalVariant?.id ?? treatmentVariants[0]?.id ?? '');
+  useEffect(() => { setSelectedVariantId(normalVariant?.id ?? treatmentVariants[0]?.id ?? ''); }, [card.id]);
+  const selectedVariant = treatmentVariants.find((variant) => variant.id === selectedVariantId) ?? normalVariant ?? treatmentVariants[0];
+  const versionInventory = inventory.find((item) => item.variantId === selectedVariant?.id) ?? (!selectedVariant ? inventory.find((item) => !item.variantId) : undefined);
   const status = cardStatus(card.id, inventory);
-  const imageVariants = [...(normalVariant ? [normalVariant] : []), ...variants.filter((variant) => variant !== normalVariant)];
-  const sources = imageVariants.flatMap((variant) => variant.imageUrls);
-  const image = (sources.find((source) => source.source === 'user-provided') ?? sources[0])?.url;
+  const treatmentSources = selectedVariant?.imageUrls ?? [];
+  const sources = selectedVariant ? [...treatmentSources, ...variants.filter((variant) => !variant.treatment).flatMap((variant) => variant.imageUrls)] : variants.flatMap((variant) => variant.imageUrls);
+  const imageSource = treatmentSources.find((source) => source.source === 'user-provided') ?? treatmentSources[0]
+    ?? (selectedVariant?.treatment === 'normal' ? sources.find((source) => source.source === 'user-provided') : undefined)
+    ?? sources[0];
+  const image = imageSource?.url;
   const physicallyOwned = inventory.some((item) => item.personal + item.duplicates > 0);
   const displayName = card.name || card.number;
   return <article className={`card-tile ${view === 'list' ? 'tile-list' : ''} ${view === 'checklist' ? 'tile-check' : ''} ${physicallyOwned ? 'has-owned' : ''}`}>
-    <button className="card-image" onClick={onOpen} aria-label={`Open ${itemLabel}: ${displayName}`}>{image ? <img src={image} alt={displayName} loading="lazy"/> : <span className="placeholder"><span className="placeholder-mark">✳</span><small>IMAGE NOT ADDED</small></span>}{showStatus && <span className={`status-tag ${status}`}>{status}</span>}</button>
-    <div className="tile-info"><div className="tile-title-line"><button className="tile-title" onClick={onOpen}>{displayName}</button><span className="tile-number" title={`Number ${card.number}`} aria-label={`Number ${card.number}`}>{card.number}</span></div><span>{card.rarity || card.category || 'No rarity'}</span></div>
-    <div className="tile-qty"><Quantity label={normalVariant ? 'NORMAL · PERSONAL' : 'PERSONAL'} value={standardInventory?.personal ?? 0} onChange={(n) => onQuantity(card, 'personal', n, normalVariant?.id)}/><Quantity label={normalVariant ? 'NORMAL · DUPES' : 'DUPES'} value={standardInventory?.duplicates ?? 0} unknown={standardInventory?.duplicatesKnown === false} onChange={(n) => onQuantity(card, 'duplicates', n, normalVariant?.id)}/><button className="incoming-action" onClick={() => onQuantity(card, 'incoming', (standardInventory?.incoming ?? 0) + 1, normalVariant?.id)}>+ incoming {standardInventory?.incoming ? `(${standardInventory.incoming})` : ''}</button></div>
+    <button className="card-image" onClick={onOpen} aria-label={`Open ${itemLabel}: ${displayName}${selectedVariant ? `, showing ${selectedVariant.name}` : ''}`}>{image ? <img src={image} alt={`${displayName}${selectedVariant ? ` · ${selectedVariant.name}` : ''}`} loading="lazy"/> : <span className="placeholder"><span className="placeholder-mark">✳</span><small>IMAGE NOT ADDED</small></span>}{showStatus && <span className={`status-tag ${status}`}>{status}</span>}</button>
+    <div className="tile-info"><div className="tile-title-line"><button className="tile-title" onClick={onOpen}>{displayName}</button><span className="tile-number" title={`Number ${card.number}`} aria-label={`Number ${card.number}`}>{card.number}</span></div><span>{card.rarity || card.category || 'No rarity'}</span>{view !== 'checklist' && treatmentVariants.length > 1 && <div className="tile-versions" role="group" aria-label={`${displayName} version`}>{treatmentVariants.map((variant) => <button key={variant.id} className={variant.id === selectedVariant?.id ? 'active' : ''} aria-pressed={variant.id === selectedVariant?.id} aria-label={`Show ${variant.name} version`} onClick={() => setSelectedVariantId(variant.id)}>{variant.name}</button>)}</div>}{selectedVariant?.imageNote && view !== 'checklist' && <small className="tile-variant-note" title={selectedVariant.imageNote}>Foil finish not pictured</small>}</div>
+    <div className="tile-qty"><Quantity label={selectedVariant ? `${selectedVariant.name.toUpperCase()} · PERSONAL` : 'PERSONAL'} value={versionInventory?.personal ?? 0} onChange={(n) => onQuantity(card, 'personal', n, selectedVariant?.id)}/><Quantity label={selectedVariant ? `${selectedVariant.name.toUpperCase()} · DUPES` : 'DUPES'} value={versionInventory?.duplicates ?? 0} unknown={versionInventory?.duplicatesKnown === false} onChange={(n) => onQuantity(card, 'duplicates', n, selectedVariant?.id)}/><button className="incoming-action" onClick={() => onQuantity(card, 'incoming', (versionInventory?.incoming ?? 0) + 1, selectedVariant?.id)}>+ {selectedVariant?.name ?? ''} incoming {versionInventory?.incoming ? `(${versionInventory.incoming})` : ''}</button></div>
   </article>;
 }
 function CardDetail({ card, inventory, variants, itemLabel, onClose, onQuantity, onImage }: { card: CardDefinition; inventory: Ownership[]; variants: CardVariant[]; itemLabel: string; onClose: () => void; onQuantity: OwnershipChange; onImage: (c: CardDefinition, url: string, kind: 'verified-remote' | 'user-provided', variantId?: string) => void }) {
