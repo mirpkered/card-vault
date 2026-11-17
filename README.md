@@ -1,6 +1,6 @@
 # Collect Everything
 
-Collect Everything is a local-first, image-focused collection manager for Cards, Media, and Misc collections. It runs as a standalone React + TypeScript + Vite PWA, is designed for iPhone portrait use, and remains usable on desktop. Kayou Naruto and Super Rare Games card collections are included, with a Square Enix sourced catalog for Final Fantasy TCG releases. An empty **SNL DVDs** media collection is created without inventing titles, images, or quantities; add DVD titles as you reconcile your collection.
+Collect Everything is a local-first, image-focused collection manager for Cards, Media, and Misc collections. It runs as a standalone React + TypeScript + Vite PWA, is designed for iPhone portrait use, and remains usable on desktop. Kayou Naruto, Super Rare Games, Final Fantasy TCG, and Union Arena card catalogs are included. An empty **SNL DVDs** media collection is created without inventing titles, images, or quantities; add DVD titles as you reconcile your collection.
 
 ## Run locally
 
@@ -98,6 +98,22 @@ npm run catalog:fftcg
 ```
 
 The importer reads the official filter list and complete card-browser response, verifies the expected release names, validates per-set totals and image hosts, then writes `public/fftcg-catalog.json`. It stops without writing if the official set list or response structure changes. Source reference: [Square Enix card browser](https://fftcg.square-enix-games.com/na/card-browser).
+
+## Union Arena English catalog
+
+The catalog uses the English (U.S./Canada) product filters in Bandai's [official Card Browser](https://www.unionarena-tcg.com/na/cardlist/?search=true), not the English Asia or Japanese listings. As of the catalog snapshot, it includes all 52 product filters that have card lists: 5,804 required card-number definitions and 1,151 additional parallel-art entries. This includes starter and advanced decks, booster releases, promotion cards, and release-event cards. Unreleased products without a card list are not guessed or added.
+
+Each required card has separate **Normal** and **Foil** quantities. The official list does not provide foil-specific images, so the Foil control uses the exact listed card image and says the finish is not shown. Bandai's parallel-print rows are represented as optional **Full Art · P1/P2…** entries with separate ownership and incoming counts, excluded from set completion. When a product lists only a parallel print for a card number, that print stays the required entry; extra parallel prints remain optional. All product sets start turned off, and the update adds no ownership quantities.
+
+Open the **Union Arena English catalog is ready** banner and choose **Add all sets** to add the catalog, then turn on only the products you want in **Manage sets**. The catalog stores card names and exact remote image URLs from Bandai; image files are not downloaded or committed. Card images load from Bandai's host and use the app's normal bounded offline image cache.
+
+To re-check the official product filters and generate the static catalog file, run:
+
+```sh
+npm run catalog:union-arena
+```
+
+The importer validates the full current product-filter list and every returned card row, stops if Bandai changes the product list or response shape, and writes `public/union-arena-catalog.json`. The set catalog currently has 52 product filters and must be reviewed when Bandai adds or removes a product. Bandai's website carries a notice that its images, text, and data may not be reproduced without permission; this project keeps image files off-repository and references the official hosted URLs.
 
 ## Validate
 

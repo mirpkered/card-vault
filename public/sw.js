@@ -1,6 +1,6 @@
-const CACHE = 'collect-everything-v8';
+const CACHE = 'collect-everything-v9';
 self.addEventListener('install', (event) => {
-  event.waitUntil(caches.open(CACHE).then((cache) => cache.addAll(['./', './index.html', './manifest.webmanifest', './favicon.png', './apple-touch-icon.png', './collect-icon-192.png', './collect-icon-512.png', './collect-wordmark.svg', './collect-wordmark.png', './naruto-catalog.json', './fftcg-catalog.json'])));
+  event.waitUntil(caches.open(CACHE).then((cache) => cache.addAll(['./', './index.html', './manifest.webmanifest', './favicon.png', './apple-touch-icon.png', './collect-icon-192.png', './collect-icon-512.png', './collect-wordmark.svg', './collect-wordmark.png', './naruto-catalog.json', './fftcg-catalog.json', './union-arena-catalog.json'])));
   self.skipWaiting();
 });
 self.addEventListener('activate', (event) => {

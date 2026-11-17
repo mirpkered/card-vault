@@ -11,6 +11,7 @@
     "typecheck:worker": "tsc -p worker/tsconfig.json --pretty",
     "test": "vitest run && python -m unittest discover -s scripts -p test_import_srg_workbook.py",
     "catalog:fftcg": "node scripts/import-fftcg-catalog.mjs",
+    "catalog:union-arena": "node scripts/import-union-arena-catalog.mjs",
     "deploy:worker": "npm run build && wrangler deploy --config worker/wrangler.jsonc"
   },
   "dependencies": {
