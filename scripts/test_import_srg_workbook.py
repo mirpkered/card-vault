@@ -86,7 +86,7 @@ class SuperRareWorkbookImportTest(unittest.TestCase):
             self.assertEqual(title['sourceNote'], 'Workbook note')
             title_inventory = next(item for item in backup['catalog']['ownership'] if item['cardId'] == title['id'])
             self.assertEqual((title_inventory['personal'], title_inventory['duplicates'], title_inventory['incoming']), (1, 2, 0))
-            self.assertEqual(backup['schemaVersion'], 5)
+            self.assertEqual(backup['schemaVersion'], 6)
             self.assertEqual(len(report['markerMismatches']), 1)
             self.assertEqual(report['markerMismatches'][0]['title'], 'Game Two')
             self.assertEqual(source.read_bytes(), original_bytes)

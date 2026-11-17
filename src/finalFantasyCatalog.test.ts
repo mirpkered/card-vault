@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { completion, emptyVault } from './domain';
+import { completion, emptyVault, fullArtBonusCardId } from './domain';
 import catalogData from '../public/fftcg-catalog.json';
 import previousMemoriesData from './fixtures/fftcg-memories-of-life-v1.json';
 import {
@@ -70,14 +70,16 @@ describe('Final Fantasy TCG catalog import', () => {
     vault.catalog.ownership.push(ownership);
     vault.catalog.variants.push(userImage);
 
-    expect(planFinalFantasyCatalogUpdate(vault, update)).toMatchObject({ setsToAdd: 33, cardsToAdd: 4404 - 118, conflicts: [], hasChanges: true });
+    const fullArtCount = update.cards.filter((entry) => entry.variants.some((variant) => variant.treatment === 'full-art')).length;
+    expect(planFinalFantasyCatalogUpdate(vault, update)).toMatchObject({ setsToAdd: 33, cardsToAdd: 4404 - 118 + fullArtCount, conflicts: [], hasChanges: true });
     const imported = applyFinalFantasyCatalogUpdate(vault, update);
     const memories = update.sets.find((set) => set.name === 'Memories of Life')!;
 
     expect(imported.catalog.sets.filter((set) => set.seriesId === 'series:final-fantasy-tcg')).toHaveLength(34);
     expect(imported.catalog.sets.find((set) => set.id === memories.id)).toMatchObject({ expectedCardCount: 134, tracked: true });
     expect(imported.catalog.sets.filter((set) => set.seriesId === 'series:final-fantasy-tcg' && set.tracked).map((set) => set.name)).toEqual(['Memories of Life']);
-    expect(imported.catalog.cards.filter((card) => card.setId === memories.id)).toHaveLength(134);
+    expect(imported.catalog.cards.filter((card) => card.setId === memories.id && card.countsTowardSetCompletion !== false)).toHaveLength(134);
+    expect(imported.catalog.cards.filter((card) => card.setId === memories.id && card.countsTowardSetCompletion === false)).toHaveLength(35);
     expect(imported.catalog.ownership).toEqual([{ ...ownership, variantId: `${ownedCardId}:fftcg:normal` }]);
     expect(imported.catalog.variants).toContainEqual(userImage);
     const officialVariant = imported.catalog.variants.find((variant) => variant.id === `${ownedCardId}:square-enix-official`)!;
@@ -89,21 +91,28 @@ describe('Final Fantasy TCG catalog import', () => {
     expect(planFinalFantasyCatalogUpdate(vault, update).ownershipToNormalize).toBe(1);
   });
 
-  it('creates independently trackable versions while progress stays on unique card definitions', () => {
+    it('creates Normal/Foil variants and a separate optional Full Art entry', () => {
     const update = parseFinalFantasyCatalogUpdate(catalogData);
     const imported = applyFinalFantasyCatalogUpdate(emptyVault(), update);
     const caius = update.cards.find((card) => card.setId.endsWith(':hidden-trials') && card.number === '23-002L')!;
     const cardId = `${caius.setId}:${caius.number}`;
     const normalId = `${cardId}:fftcg:normal`;
     const foilId = `${cardId}:fftcg:foil`;
+    const fullArtCardId = fullArtBonusCardId(cardId);
+    const fullArtVariantId = `${cardId}:fftcg:full-art`;
     imported.catalog.ownership.push(
       { cardId, variantId: normalId, personal: 1, duplicates: 0, incoming: 0, updatedAt: '2026-11-16' },
       { cardId, variantId: foilId, personal: 2, duplicates: 1, incoming: 1, updatedAt: '2026-11-16' },
+      { cardId: fullArtCardId, variantId: fullArtVariantId, personal: 1, duplicates: 0, incoming: 0, updatedAt: '2026-11-16' },
     );
     expect(imported.catalog.ownership.filter((item) => item.cardId === cardId)).toHaveLength(2);
+    expect(imported.catalog.ownership.find((item) => item.cardId === fullArtCardId)).toMatchObject({ variantId: fullArtVariantId, personal: 1 });
     expect(imported.catalog.cards.filter((item) => item.id === cardId)).toHaveLength(1);
-    expect(imported.catalog.ownership.reduce((sum, item) => sum + item.personal + item.duplicates, 0)).toBe(4);
-    expect(completion(imported.catalog.cards.filter((item) => item.id === cardId), imported.catalog.ownership)).toEqual({ owned: 1, total: 1, percent: 100 });
+    expect(imported.catalog.cards.find((item) => item.id === fullArtCardId)).toMatchObject({ countsTowardSetCompletion: false, relatedCardId: cardId, bonusLabel: 'Full Art' });
+    expect(imported.catalog.variants.find((variant) => variant.id === fullArtVariantId)).toMatchObject({ cardId: fullArtCardId, treatment: 'full-art' });
+    expect(imported.catalog.ownership.reduce((sum, item) => sum + item.personal + item.duplicates, 0)).toBe(5);
+    expect(completion(imported.catalog.cards.filter((item) => item.id === cardId || item.id === fullArtCardId), imported.catalog.ownership)).toEqual({ owned: 1, total: 1, percent: 100 });
+    expect(completion([imported.catalog.cards.find((item) => item.id === fullArtCardId)!], [{ cardId: fullArtCardId, variantId: fullArtVariantId, personal: 1, duplicates: 0, incoming: 0, updatedAt: '2026-11-16' }])).toEqual({ owned: 0, total: 0, percent: 0 });
   });
 
   it('pauses if both a legacy quantity row and a Normal row exist for one card', () => {

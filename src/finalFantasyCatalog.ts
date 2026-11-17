@@ -1,4 +1,6 @@
 import {
+  fullArtBonusCard,
+  fullArtBonusCardId,
   validateCatalog,
   type CardVariant,
   type Franchise,
@@ -107,10 +109,10 @@ function deriveVariants(setName: string, cardNumber: string, imageUrls: string[]
   ];
 }
 
-function imageVariantRecord(cardId: string, variant: FinalFantasyCatalogVariant, cataloguedAt: string): CardVariant {
+function imageVariantRecord(cardId: string, variant: FinalFantasyCatalogVariant, cataloguedAt: string, ownerCardId = cardId): CardVariant {
   return {
     id: finalFantasyVariantId(cardId, variant.treatment, variant.name),
-    cardId,
+    cardId: ownerCardId,
     name: variant.name,
     treatment: variant.treatment,
     imageUrls: variant.imageUrls.map((url) => imageSource(url, cataloguedAt)),
@@ -217,9 +219,12 @@ export function planFinalFantasyCatalogUpdate(vault: VaultData, update: FinalFan
 
     const entries = update.cards.filter((entry) => entry.setId === sourceSet.id);
     const incomingCardIds = new Set(entries.map((entry) => cardId(sourceSet.id, entry.number)));
+    const incomingBonusIds = new Set(entries.flatMap((entry) => entry.variants.some((variant) => variant.treatment === 'full-art') ? [fullArtBonusCardId(cardId(sourceSet.id, entry.number))] : []));
     const localCards = vault.catalog.cards.filter((card) => card.setId === sourceSet.id);
-    const removedFromSource = localCards.filter((card) => !incomingCardIds.has(card.id));
+    const removedFromSource = localCards.filter((card) => card.countsTowardSetCompletion !== false && !incomingCardIds.has(card.id));
+    const removedBonusFromSource = localCards.filter((card) => card.countsTowardSetCompletion === false && !incomingBonusIds.has(card.id));
     if (removedFromSource.length) conflicts.push(`Set ${sourceSet.name} has ${removedFromSource.length} local card record(s) missing from the official catalog; review before applying.`);
+    if (removedBonusFromSource.length) conflicts.push(`Set ${sourceSet.name} has ${removedBonusFromSource.length} local Full Art bonus record(s) missing from the official catalog; review before applying.`);
     for (const entry of entries) {
       const id = cardId(sourceSet.id, entry.number);
       const current = existingCards.get(id);
@@ -227,12 +232,18 @@ export function planFinalFantasyCatalogUpdate(vault: VaultData, update: FinalFan
       else if (current.setId !== sourceSet.id) conflicts.push(`Card ${id} belongs to a different set.`);
       else if ((!current.name.trim() && !!entry.name.trim()) || (!current.rarity && !!entry.rarity)) cardDetailsToFill++;
       for (const sourceVariant of entry.variants) {
-        const expectedVariant = imageVariantRecord(id, sourceVariant, update.cataloguedAt);
+        const ownerCardId = sourceVariant.treatment === 'full-art' ? fullArtBonusCardId(id) : id;
+        if (sourceVariant.treatment === 'full-art') {
+          const existingBonus = existingCards.get(ownerCardId);
+          if (!existingBonus) cardsToAdd++;
+          else if (existingBonus.setId !== sourceSet.id || existingBonus.relatedCardId !== id || existingBonus.countsTowardSetCompletion !== false) conflicts.push(`Full Art record ${ownerCardId} is attached to a different card identity.`);
+        }
+        const expectedVariant = imageVariantRecord(id, sourceVariant, update.cataloguedAt, ownerCardId);
         const existing = existingVariants.get(expectedVariant.id);
         if (!existing) {
           variantRecordsToAdd++;
           imagesToAdd += expectedVariant.imageUrls.length;
-        } else if (existing.cardId !== id) conflicts.push(`Official ${sourceVariant.name} version for ${entry.number} belongs to a different card.`);
+        } else if (existing.cardId !== ownerCardId) conflicts.push(`Official ${sourceVariant.name} version for ${entry.number} belongs to a different card.`);
         else {
           imagesToAdd += expectedVariant.imageUrls.filter((source) => !existing.imageUrls.some((current) => current.url === source.url)).length;
           if (existing.name !== expectedVariant.name || existing.treatment !== expectedVariant.treatment || existing.imageNote !== expectedVariant.imageNote) variantDetailsToUpdate++;
@@ -301,7 +312,22 @@ export function applyFinalFantasyCatalogUpdate(vault: VaultData, update: FinalFa
       });
     }
     for (const sourceVariant of entry.variants) {
-      const expectedVariant = imageVariantRecord(id, sourceVariant, update.cataloguedAt);
+      const ownerCardId = sourceVariant.treatment === 'full-art' ? fullArtBonusCardId(id) : id;
+      if (sourceVariant.treatment === 'full-art') {
+        const baseCard = cards.get(id)!;
+        const expectedBonus = fullArtBonusCard(baseCard, sourceVariant.name);
+        const currentBonus = cards.get(ownerCardId);
+        cards.set(ownerCardId, currentBonus ? {
+          ...expectedBonus,
+          ...currentBonus,
+          id: ownerCardId,
+          setId: baseCard.setId,
+          countsTowardSetCompletion: false,
+          relatedCardId: id,
+          bonusLabel: currentBonus.bonusLabel ?? sourceVariant.name,
+        } : expectedBonus);
+      }
+      const expectedVariant = imageVariantRecord(id, sourceVariant, update.cataloguedAt, ownerCardId);
       const currentVariant = variants.get(expectedVariant.id);
       const currentUrls = currentVariant?.imageUrls ?? [];
       const newUrls = expectedVariant.imageUrls.filter((source) => !currentUrls.some((current) => current.url === source.url));

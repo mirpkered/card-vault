@@ -236,7 +236,7 @@ def import_workbook(source: Path) -> tuple[dict, dict]:
         "ownership": ownership_records,
         "acquisitions": [],
     }
-    backup = {"schemaVersion": 5, "updatedAt": datetime.now(timezone.utc).isoformat(), "catalog": catalog}
+    backup = {"schemaVersion": 6, "updatedAt": datetime.now(timezone.utc).isoformat(), "catalog": catalog}
     source_hash = hashlib.sha256(source.read_bytes()).hexdigest()
     report = {
         "source": source.name,

@@ -16,7 +16,7 @@ describe('canonical private snapshots', () => {
 
     const migrated = migrateRemoteSnapshot(old);
 
-    expect(migrated.schemaVersion).toBe(5);
+    expect(migrated.schemaVersion).toBe(6);
     expect(migrated.catalog.cards).toContainEqual({ id: 'set:kayou-naruto-nrea02:R001', setId: 'set:kayou-naruto-nrea02', number: 'R001', name: 'Test card' });
     expect(migrated.catalog.ownership[0]).toMatchObject({ personal: 2, duplicates: 1, incoming: 1 });
     expect(migrated.catalog.series.find((series) => series.id === 'series:media:snl-dvds')).toMatchObject({ category: 'media' });

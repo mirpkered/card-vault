@@ -14,7 +14,7 @@ export type CollectionCategory = 'cards' | 'media' | 'misc';
 export type Series = { id: string; franchiseId?: string; name: string; category?: CollectionCategory };
 export type SourceCompletionIndicator = 'complete' | 'incomplete' | 'unmarked';
 export type CardSet = { id: string; seriesId: string; name: string; releaseNumber?: string; expectedCardCount?: number; rarityScheme?: string[]; tracked: boolean; archived?: boolean; sourceCompletionIndicator?: SourceCompletionIndicator; sourceRow?: number };
-export type CardDefinition = { id: string; setId: string; number: string; name: string; category?: string; rarity?: string; slot?: 'title' | 'numbered'; sourceNote?: string; releaseName?: string; releaseNumber?: string; releaseSourceCompletionIndicator?: SourceCompletionIndicator; releaseSourceRow?: number };
+export type CardDefinition = { id: string; setId: string; number: string; name: string; category?: string; rarity?: string; slot?: 'title' | 'numbered'; sourceNote?: string; releaseName?: string; releaseNumber?: string; releaseSourceCompletionIndicator?: SourceCompletionIndicator; releaseSourceRow?: number; countsTowardSetCompletion?: boolean; relatedCardId?: string; bonusLabel?: string };
 export type CardVariant = {
   id: string;
   cardId: string;
@@ -28,7 +28,7 @@ export type Ownership = { cardId: string; variantId?: string; personal: number; 
 export type Acquisition = { id: string; cardId: string; quantity: number; status: 'incoming' | 'received'; acquiredAt?: string; note?: string };
 export type VaultData = { schemaVersion: number; updatedAt: string; catalog: Catalog };
 
-export const CURRENT_SCHEMA_VERSION = 5;
+export const CURRENT_SCHEMA_VERSION = 6;
 export const SRG_SERIES_ID = 'series:srg-switch';
 export const SRG_SET_ID = 'set:srg-switch:nintendo-switch-releases';
 export const emptyCatalog = (): Catalog => ({ publishers: [], franchises: [], series: [], sets: [], cards: [], variants: [], ownership: [], acquisitions: [] });
@@ -119,6 +119,38 @@ export function reviewReleaseMarkers(cards: CardDefinition[], inventory: Ownersh
   }).sort((left, right) => (left.sourceRow ?? Number.MAX_SAFE_INTEGER) - (right.sourceRow ?? Number.MAX_SAFE_INTEGER) || left.name.localeCompare(right.name));
 }
 
+export function fullArtBonusCardId(cardId: string) { return `${cardId}:full-art`; }
+
+export function fullArtBonusCard(card: CardDefinition, label = 'Full Art'): CardDefinition {
+  return { ...card, id: fullArtBonusCardId(card.id), countsTowardSetCompletion: false, relatedCardId: card.id, bonusLabel: label };
+}
+
+function separateFinalFantasyFullArtEntries(catalog: Catalog): Catalog {
+  const finalFantasySetIds = new Set(catalog.sets.filter((set) => set.seriesId === 'series:final-fantasy-tcg').map((set) => set.id));
+  if (!finalFantasySetIds.size) return catalog;
+  const cards = [...catalog.cards];
+  const cardsById = new Map(cards.map((card) => [card.id, card]));
+  const fullArtVariantIds = new Set<string>();
+  const variants = catalog.variants.map((variant) => {
+    if (variant.treatment !== 'full-art') return variant;
+    const baseCard = cardsById.get(variant.cardId);
+    if (!baseCard || !finalFantasySetIds.has(baseCard.setId)) return variant;
+    const bonusCard = fullArtBonusCard(baseCard, variant.name || 'Full Art');
+    const existing = cardsById.get(bonusCard.id);
+    if (existing && (existing.relatedCardId !== baseCard.id || existing.countsTowardSetCompletion !== false)) {
+      throw new Error(`Full Art migration conflict: ${bonusCard.id} is already used by another card.`);
+    }
+    if (!existing) { cards.push(bonusCard); cardsById.set(bonusCard.id, bonusCard); }
+    fullArtVariantIds.add(variant.id);
+    return { ...variant, cardId: bonusCard.id };
+  });
+  if (!fullArtVariantIds.size) return catalog;
+  const ownership = catalog.ownership.map((item) => item.variantId && fullArtVariantIds.has(item.variantId)
+    ? { ...item, cardId: fullArtBonusCardId(item.cardId) }
+    : item);
+  return { ...catalog, cards, variants, ownership };
+}
+
 function isCollectionCategory(value: unknown): value is CollectionCategory {
   return value === 'cards' || value === 'media' || value === 'misc';
 }
@@ -144,12 +176,17 @@ export function validateCatalog(catalog: Catalog): string[] {
   for (const item of catalog.sets) if (!has('series', item.seriesId)) errors.push(`Set ${item.id} references missing series ${item.seriesId}.`);
   for (const item of catalog.sets) if (typeof item.tracked !== 'boolean') errors.push(`Set ${item.id} must record whether it is tracked.`);
   for (const item of catalog.sets) if (item.archived !== undefined && typeof item.archived !== 'boolean') errors.push(`Set ${item.id} has an invalid archive state.`);
-  for (const item of catalog.sets) if (item.expectedCardCount !== undefined && catalog.cards.filter((card) => card.setId === item.id).length !== item.expectedCardCount) errors.push(`Set ${item.id} must define exactly ${item.expectedCardCount} cards.`);
+  for (const item of catalog.sets) if (item.expectedCardCount !== undefined && catalog.cards.filter((card) => card.setId === item.id && card.countsTowardSetCompletion !== false).length !== item.expectedCardCount) errors.push(`Set ${item.id} must define exactly ${item.expectedCardCount} required cards.`);
   for (const item of catalog.cards) if (!has('sets', item.setId)) errors.push(`Card ${item.id} references missing set ${item.setId}.`);
   for (const item of catalog.cards) {
     if (item.releaseName !== undefined && typeof item.releaseName !== 'string') errors.push(`Card ${item.id} has an invalid release name.`);
     if (item.releaseSourceCompletionIndicator !== undefined && !['complete', 'incomplete', 'unmarked'].includes(item.releaseSourceCompletionIndicator)) errors.push(`Card ${item.id} has an invalid release completion marker.`);
     if (item.releaseSourceRow !== undefined && (!Number.isInteger(item.releaseSourceRow) || item.releaseSourceRow < 1)) errors.push(`Card ${item.id} has an invalid release source row.`);
+    if (item.countsTowardSetCompletion !== undefined && typeof item.countsTowardSetCompletion !== 'boolean') errors.push(`Card ${item.id} has an invalid completion setting.`);
+    if (item.relatedCardId !== undefined && !has('cards', item.relatedCardId)) errors.push(`Card ${item.id} references missing related card ${item.relatedCardId}.`);
+    if (item.relatedCardId && catalog.cards.find((card) => card.id === item.relatedCardId)?.setId !== item.setId) errors.push(`Card ${item.id} and its related card must be in the same set.`);
+    if (item.countsTowardSetCompletion === false && !item.bonusLabel?.trim()) errors.push(`Bonus card ${item.id} must have a label.`);
+    if (item.bonusLabel !== undefined && (typeof item.bonusLabel !== 'string' || !item.bonusLabel.trim())) errors.push(`Card ${item.id} has an invalid bonus label.`);
   }
   const variantById = new Map(catalog.variants.map((variant) => [variant.id, variant]));
   for (const item of catalog.variants) {
@@ -185,8 +222,15 @@ export function migrateVault(value: unknown): VaultData {
   if (!value || typeof value !== 'object') throw new Error('Backup must be a JSON object.');
   const source = value as Partial<VaultData>;
   if (source.schemaVersion === CURRENT_SCHEMA_VERSION && source.catalog && validateCatalog(source.catalog).length === 0) return source as VaultData;
+  if (source.schemaVersion === 5 && source.catalog) {
+    const catalog = separateFinalFantasyFullArtEntries(ensureSnlDvdCollection(source.catalog));
+    const migrated = { ...source, catalog, schemaVersion: CURRENT_SCHEMA_VERSION, updatedAt: source.updatedAt ?? new Date().toISOString() } as VaultData;
+    const errors = validateCatalog(migrated.catalog);
+    if (errors.length) throw new Error(`Migration failed: ${errors.join(' ')}`);
+    return migrated;
+  }
   if (source.schemaVersion === 4 && source.catalog) {
-    const catalog = ensureSnlDvdCollection(consolidateSrgReleases(source.catalog));
+    const catalog = separateFinalFantasyFullArtEntries(ensureSnlDvdCollection(consolidateSrgReleases(source.catalog)));
     const migrated = { ...source, catalog, schemaVersion: CURRENT_SCHEMA_VERSION, updatedAt: source.updatedAt ?? new Date().toISOString() } as VaultData;
     const errors = validateCatalog(migrated.catalog);
     if (errors.length) throw new Error(`Migration failed: ${errors.join(' ')}`);
@@ -199,7 +243,7 @@ export function migrateVault(value: unknown): VaultData {
       duplicates: item.duplicates ?? 0, ...(item.duplicatesKnown === undefined ? {} : { duplicatesKnown: item.duplicatesKnown }),
       incoming: item.incoming ?? 0, updatedAt: item.updatedAt ?? new Date().toISOString(),
     })) } as Catalog;
-    const catalog = ensureSnlDvdCollection(consolidateSrgReleases(migratedCatalog));
+    const catalog = separateFinalFantasyFullArtEntries(ensureSnlDvdCollection(consolidateSrgReleases(migratedCatalog)));
     const migrated = { ...source, catalog, schemaVersion: CURRENT_SCHEMA_VERSION, updatedAt: source.updatedAt ?? new Date().toISOString() } as VaultData;
     const errors = validateCatalog(migrated.catalog);
     if (errors.length) throw new Error(`Migration failed: ${errors.join(' ')}`);
@@ -223,7 +267,9 @@ export function cardStatus(cardId: string, inventory: Ownership[]): CardStatus {
 }
 export function completion(cards: CardDefinition[], inventory: Ownership[]) {
   const owned = new Set(inventory.filter((item) => item.personal + item.duplicates > 0).map((item) => item.cardId));
-  return { owned: cards.filter((card) => owned.has(card.id)).length, total: cards.length, percent: cards.length ? Math.round(cards.filter((card) => owned.has(card.id)).length / cards.length * 100) : 0 };
+  const requiredCards = cards.filter((card) => card.countsTowardSetCompletion !== false);
+  const ownedCount = requiredCards.filter((card) => owned.has(card.id)).length;
+  return { owned: ownedCount, total: requiredCards.length, percent: requiredCards.length ? Math.round(ownedCount / requiredCards.length * 100) : 0 };
 }
 export function getTrackedCards(catalog: Pick<Catalog, 'sets' | 'cards'>): CardDefinition[] {
   const trackedSetIds = new Set(catalog.sets.filter((set) => set.tracked && !set.archived).map((set) => set.id));
@@ -248,7 +294,7 @@ export function findConflicts(local: VaultData, remote: VaultData): string[] {
 
 export function filterCards(cards: CardDefinition[], inventory: Ownership[], filter: CardStatus | 'all', query = ''): CardDefinition[] {
   const normalized = query.trim().toLowerCase();
-  return cards.filter((card) => (filter === 'all' || cardStatus(card.id, inventory) === filter) && (!normalized || `${card.name} ${card.number} ${card.rarity ?? ''} ${card.category ?? ''} ${card.releaseName ?? ''} ${card.releaseNumber ?? ''}`.toLowerCase().includes(normalized)));
+  return cards.filter((card) => (filter === 'all' || cardStatus(card.id, inventory) === filter) && (!normalized || `${card.name} ${card.number} ${card.rarity ?? ''} ${card.category ?? ''} ${card.releaseName ?? ''} ${card.releaseNumber ?? ''} ${card.bonusLabel ?? ''}`.toLowerCase().includes(normalized)));
 }
 
 export function validateInventoryRows(rows: Record<string, string>[], cards: CardDefinition[], variants: CardVariant[] = []): { updates: Ownership[]; errors: string[] } {

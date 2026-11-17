@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { cardStatus, completion, emptyVault, filterCards, findConflicts, getTrackedCards, migrateVault, parseCsv, reviewReleaseMarkers, sortCardsByNumber, SRG_SET_ID, validateCatalog, validateInventoryRows, type CardDefinition, type CardVariant, type Ownership } from './domain';
+import { cardStatus, completion, emptyVault, filterCards, findConflicts, fullArtBonusCardId, getTrackedCards, migrateVault, parseCsv, reviewReleaseMarkers, sortCardsByNumber, SRG_SET_ID, validateCatalog, validateInventoryRows, type CardDefinition, type CardVariant, type Ownership } from './domain';
 
 const cards: CardDefinition[] = [
   { id: 'set:one:01', setId: 'set:one', number: '01', name: 'Kakashi', rarity: 'Rare' },
@@ -117,7 +117,7 @@ describe('collection domain', () => {
     const legacyCard = { ...cards[0], setId: 'set:legacy' };
     const legacyCatalog = { ...current.catalog, sets: [...current.catalog.sets, { id: 'set:legacy', seriesId: 'series:kayou-naruto', name: 'legacy' }], cards: [legacyCard], ownership: [{ cardId: legacyCard.id, owned: 2, incoming: 0, updatedAt: '2026-01-01' }] };
     const old = { ...current, schemaVersion: 1, catalog: legacyCatalog };
-    expect(migrateVault(old).schemaVersion).toBe(5);
+    expect(migrateVault(old).schemaVersion).toBe(6);
     expect(migrateVault(old).catalog.ownership[0]).toMatchObject({ personal: 2, duplicates: 0, incoming: 0 });
     expect(() => migrateVault({ schemaVersion: 99 })).toThrow('Unsupported');
   });
@@ -127,7 +127,7 @@ describe('collection domain', () => {
     old.catalog.series = old.catalog.series.filter((series) => series.id !== 'series:media:snl-dvds').map(({ category: _category, ...series }) => series);
     old.catalog.sets = old.catalog.sets.filter((set) => set.id !== 'set:media:snl-dvds:collection');
     const migrated = migrateVault(JSON.parse(JSON.stringify(old)));
-    expect(migrated.schemaVersion).toBe(5);
+    expect(migrated.schemaVersion).toBe(6);
     expect(migrated.catalog.series.filter((series) => series.category === 'cards')).toHaveLength(2);
     expect(migrated.catalog.series.find((series) => series.id === 'series:media:snl-dvds')).toMatchObject({ name: 'SNL DVDs', category: 'media' });
     expect(migrated.catalog.sets.find((set) => set.id === 'set:media:snl-dvds:collection')).toMatchObject({ seriesId: 'series:media:snl-dvds', name: 'DVD collection' });
@@ -139,7 +139,7 @@ describe('collection domain', () => {
     old.schemaVersion = 3;
     Object.assign(old.catalog, { sets: old.catalog.sets.map(({ tracked: _tracked, ...set }, index) => index === 0 ? set : { ...set, tracked: false }) });
     const migrated = migrateVault(JSON.parse(JSON.stringify(old)));
-    expect(migrated.schemaVersion).toBe(5);
+    expect(migrated.schemaVersion).toBe(6);
     expect(migrated.catalog.sets[0].tracked).toBe(true);
     expect(migrated.catalog.sets[1].tracked).toBe(false);
   });
@@ -162,7 +162,7 @@ describe('collection domain', () => {
     old.catalog.acquisitions.push({ id: 'acquisition:srg:one', cardId: ownedId, quantity: 3, status: 'incoming', acquiredAt: '2026-01-01' });
 
     const migrated = migrateVault(JSON.parse(JSON.stringify(old)));
-    expect(migrated.schemaVersion).toBe(5);
+    expect(migrated.schemaVersion).toBe(6);
     expect(migrated.catalog.sets.filter((set) => set.seriesId === 'series:srg-switch' && !set.archived)).toEqual([
       expect.objectContaining({ id: SRG_SET_ID, name: 'Nintendo Switch releases', tracked: true }),
     ]);
@@ -178,6 +178,39 @@ describe('collection domain', () => {
       { name: 'Game Two', indicator: 'incomplete', missingSlots: ['Title', '1', '2', '3', '4', '5'], mismatch: false },
     ]);
     expect(migrateVault(JSON.parse(JSON.stringify(migrated)))).toEqual(migrated);
+    expect(validateCatalog(migrated.catalog)).toEqual([]);
+  });
+  it('moves Final Fantasy Full Art quantities to optional card entries and keeps completion on Normal or Foil', () => {
+    const old = emptyVault();
+    old.schemaVersion = 5;
+    old.catalog.publishers.push({ id: 'publisher:square-enix', name: 'Square Enix' });
+    old.catalog.franchises.push({ id: 'franchise:final-fantasy', publisherId: 'publisher:square-enix', name: 'Final Fantasy' });
+    old.catalog.series.push({ id: 'series:final-fantasy-tcg', franchiseId: 'franchise:final-fantasy', name: 'Final Fantasy TCG', category: 'cards' });
+    const setId = 'set:final-fantasy-tcg:memories-of-life';
+    old.catalog.sets.push({ id: setId, seriesId: 'series:final-fantasy-tcg', name: 'Memories of Life', tracked: true, expectedCardCount: 1 });
+    const cardId = `${setId}:7-001C`;
+    const normalId = `${cardId}:fftcg:normal`;
+    const fullArtId = `${cardId}:fftcg:full-art`;
+    old.catalog.cards.push({ id: cardId, setId, number: '7-001C', name: 'Example Hero', rarity: 'C' });
+    old.catalog.variants.push(
+      { id: normalId, cardId, name: 'Normal', treatment: 'normal', imageUrls: [] },
+      { id: fullArtId, cardId, name: 'Full Art', treatment: 'full-art', imageUrls: [{ url: 'https://example.test/full-art.jpg', source: 'user-provided' }] },
+    );
+    old.catalog.ownership.push(
+      { cardId, variantId: normalId, personal: 1, duplicates: 0, incoming: 0, updatedAt: 'normal' },
+      { cardId, variantId: fullArtId, personal: 1, duplicates: 2, incoming: 3, updatedAt: 'full-art' },
+    );
+
+    const migrated = migrateVault(JSON.parse(JSON.stringify(old)));
+    const bonusId = fullArtBonusCardId(cardId);
+    const bonusCard = migrated.catalog.cards.find((card) => card.id === bonusId)!;
+    expect(migrated.schemaVersion).toBe(6);
+    expect(bonusCard).toMatchObject({ id: bonusId, setId, number: '7-001C', name: 'Example Hero', countsTowardSetCompletion: false, relatedCardId: cardId, bonusLabel: 'Full Art' });
+    expect(migrated.catalog.variants.find((variant) => variant.id === fullArtId)).toMatchObject({ cardId: bonusId, name: 'Full Art' });
+    expect(migrated.catalog.ownership.find((item) => item.variantId === fullArtId)).toMatchObject({ cardId: bonusId, personal: 1, duplicates: 2, incoming: 3 });
+    expect(migrated.catalog.ownership.find((item) => item.variantId === normalId)).toMatchObject({ cardId, personal: 1 });
+    expect(completion(migrated.catalog.cards.filter((card) => card.setId === setId), migrated.catalog.ownership)).toEqual({ owned: 1, total: 1, percent: 100 });
+    expect(completion([bonusCard], migrated.catalog.ownership)).toEqual({ owned: 0, total: 0, percent: 0 });
     expect(validateCatalog(migrated.catalog)).toEqual([]);
   });
   it('detects overlapping records changed in either copy', () => {
