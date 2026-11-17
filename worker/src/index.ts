@@ -45,7 +45,7 @@ export default {
       if (url.pathname === '/api/data' && request.method === 'GET') {
         const { session, cookie } = await getSession(request, env);
         const canonical = await getCanonical(env, session.accessToken);
-        if (!canonical.exists || !canonical.rawData || !canonical.revision || !canonical.updatedAt) {
+        if (!canonical.exists || !canonical.rawData || !canonical.revision) {
           return json({ exists: false, data: null, revision: null, commitSha: canonical.commitSha, updatedAt: null }, 200, cookie);
         }
         return jsonVault(canonical.rawData, canonical.revision, canonical.commitSha, canonical.updatedAt, cookie);
@@ -130,19 +130,11 @@ async function getCanonical(env: Env, token: string): Promise<Canonical> {
   const head = await getRepositoryHead(env, token);
   if (!head.exists || !head.revision) return { ...head, rawData: null, updatedAt: null };
   const { owner, repository } = repositoryConfig(env);
-  const blob = await githubApi<{ content: string; size: number }>(`/repos/${owner}/${repository}/git/blobs/${head.revision}`, token);
-  if (blob.size > MAX_SNAPSHOT_BYTES) throw new ServiceError('The private snapshot exceeds the supported size.', 502, 'snapshot_too_large');
-  let snapshot: unknown;
-  let rawData: string;
-  try {
-    rawData = decodeBase64(blob.content);
-    snapshot = JSON.parse(rawData);
-  } catch { throw new ServiceError('The canonical private snapshot is not valid JSON. Restore a previous repository revision before syncing.', 502, 'invalid_remote_json'); }
-  const data = migrateRemoteSnapshot(snapshot);
-  // Current snapshots can be streamed back exactly as stored. Older schemas are
-  // migrated in memory and serialized only when a migration actually changed them.
-  const responseData = data === snapshot ? rawData : JSON.stringify(data);
-  return { ...head, rawData: responseData, updatedAt: data.updatedAt };
+  // GitHub's default blob response is base64 JSON. Read the raw media type to
+  // avoid holding that encoded copy plus a parsed copy of this large catalog in
+  // the Worker. The browser validates and migrates the snapshot after download.
+  const rawData = await githubRaw(`/repos/${owner}/${repository}/git/blobs/${head.revision}`, token);
+  return { ...head, rawData, updatedAt: null };
 }
 
 async function getRepositoryHead(env: Env, token: string): Promise<RepositoryHead> {
@@ -197,14 +189,26 @@ async function commitSnapshot(env: Env, session: AuthSession, expectedRevision: 
 
 async function githubApi<T>(path: string, token: string, init: RequestInit = {}): Promise<T> {
   const response = await fetch(`https://api.github.com${path}`, { ...init, headers: { Accept: 'application/vnd.github+json', Authorization: `Bearer ${token}`, 'User-Agent': 'CollectEverything/0.1', 'X-GitHub-Api-Version': API_VERSION, 'Content-Type': 'application/json', ...init.headers } });
-  if (!response.ok) {
-    if (response.status === 401) throw new ServiceError('GitHub access expired. Sign in again.', 401, 'unauthorized');
-    if (response.status === 409 || response.status === 422) throw new ServiceError(`GitHub rejected a stale repository update (${response.status}).`, 409, 'revision_conflict');
-    const body = await response.json().catch(() => null) as { message?: unknown } | null;
-    const detail = typeof body?.message === 'string' ? body.message.replace(/[\r\n\t]+/g, ' ').slice(0, 140) : '';
-    throw new ServiceError(`GitHub repository request failed (${response.status})${detail ? `: ${detail}` : '.'}`, response.status === 404 ? 404 : 502, 'github_request_failed');
-  }
+  if (!response.ok) throw await githubResponseError(response);
   return response.json() as Promise<T>;
+}
+
+async function githubRaw(path: string, token: string): Promise<string> {
+  const response = await fetch(`https://api.github.com${path}`, { headers: { Accept: 'application/vnd.github.raw+json', Authorization: `Bearer ${token}`, 'User-Agent': 'CollectEverything/0.1', 'X-GitHub-Api-Version': API_VERSION } });
+  if (!response.ok) throw await githubResponseError(response);
+  const contentLength = Number(response.headers.get('content-length'));
+  if (Number.isFinite(contentLength) && contentLength > MAX_SNAPSHOT_BYTES) throw new ServiceError('The private snapshot exceeds the supported size.', 502, 'snapshot_too_large');
+  const rawData = await response.text();
+  if (rawData.length > MAX_SNAPSHOT_BYTES) throw new ServiceError('The private snapshot exceeds the supported size.', 502, 'snapshot_too_large');
+  return rawData;
+}
+
+async function githubResponseError(response: Response): Promise<ServiceError> {
+  if (response.status === 401) return new ServiceError('GitHub access expired. Sign in again.', 401, 'unauthorized');
+  if (response.status === 409 || response.status === 422) return new ServiceError(`GitHub rejected a stale repository update (${response.status}).`, 409, 'revision_conflict');
+  const body = await response.json().catch(() => null) as { message?: unknown } | null;
+  const detail = typeof body?.message === 'string' ? body.message.replace(/[\r\n\t]+/g, ' ').slice(0, 140) : '';
+  return new ServiceError(`GitHub repository request failed (${response.status})${detail ? `: ${detail}` : '.'}`, response.status === 404 ? 404 : 502, 'github_request_failed');
 }
 
 async function tokenRequest(body: URLSearchParams, grant: 'device_code' | 'refresh_token') {
@@ -254,7 +258,7 @@ function readCookie(request: Request, name: string) { return request.headers.get
 function json(value: unknown, status = 200, cookie?: string) {
   return new Response(JSON.stringify(value), { status, headers: jsonHeaders(cookie) });
 }
-function jsonVault(rawData: string, revision: string, commitSha: string, updatedAt: string, cookie?: string) {
+function jsonVault(rawData: string, revision: string, commitSha: string, updatedAt: string | null, cookie?: string) {
   const encoder = new TextEncoder();
   const prefix = encoder.encode('{"exists":true,"data":');
   const suffix = encoder.encode(`,"revision":${JSON.stringify(revision)},"commitSha":${JSON.stringify(commitSha)},"updatedAt":${JSON.stringify(updatedAt)}` + '}');
@@ -305,4 +309,3 @@ async function encryptionKey(secret: string) {
   const key = raw.length === 32 ? raw : new Uint8Array(await crypto.subtle.digest('SHA-256', raw));
   return crypto.subtle.importKey('raw', key, 'AES-GCM', false, ['encrypt', 'decrypt']);
 }
-function decodeBase64(content: string) { const binary = atob(content.replace(/\s/g, '')); return new TextDecoder().decode(Uint8Array.from(binary, (character) => character.charCodeAt(0))); }

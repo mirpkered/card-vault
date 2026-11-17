@@ -1,4 +1,4 @@
-import type { VaultData } from './domain';
+import { migrateVault, type VaultData } from './domain';
 
 export type CloudHealth = { configured: boolean };
 export type CloudSession = { authenticated: true; login: string; expiresAt: number };
@@ -51,8 +51,15 @@ export function signOutCloud() {
   return request<{ signedOut: true }>('/api/auth/sign-out', { method: 'POST', body: '{}' });
 }
 
-export function getRemoteVault() {
-  return request<RemoteVault>('/api/data');
+export async function getRemoteVault(): Promise<RemoteVault> {
+  const remote = await request<RemoteVault>('/api/data');
+  if (!remote.exists || !remote.data) return remote;
+  try {
+    const data = migrateVault(remote.data);
+    return { ...remote, data, updatedAt: remote.updatedAt ?? data.updatedAt };
+  } catch {
+    throw new CloudRequestError('The private snapshot has an unsupported schema or invalid catalog records. No change was applied.', 502, 'invalid_remote_snapshot');
+  }
 }
 
 export function putRemoteVault(expectedRevision: string | null, data: VaultData) {
