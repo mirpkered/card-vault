@@ -171,14 +171,13 @@ async function commitSnapshot(env: Env, session: AuthSession, expectedRevision: 
   const tree = await githubApi<{ sha: string }>(`${root}/git/trees`, session.accessToken, { method: 'POST', body: JSON.stringify({ base_tree: current.treeSha, tree: treeEntries }) });
   const commit = await githubApi<{ sha: string }>(`${root}/git/commits`, session.accessToken, { method: 'POST', body: JSON.stringify({ message: `Save Collect Everything vault ${data.updatedAt}`, tree: tree.sha, parents: [current.commitSha] }) });
   try {
-    await githubApi(`${root}/git/refs/heads/${encodeURIComponent(branch)}`, session.accessToken, { method: 'PATCH', body: JSON.stringify({ sha: commit.sha, force: false }) });
+    const updatedRef = await githubApi<{ object?: { sha?: string } }>(`${root}/git/refs/heads/${encodeURIComponent(branch)}`, session.accessToken, { method: 'PATCH', body: JSON.stringify({ sha: commit.sha, force: false }) });
+    if (updatedRef.object?.sha !== commit.sha) throw new ServiceError('Revision conflict: the private repository did not confirm this save. Your local changes remain here.', 409, 'revision_conflict');
   } catch (cause) {
     if (cause instanceof ServiceError && cause.status === 409) throw new ServiceError('Revision conflict: another device saved first. Your local changes remain here; review both copies.', 409, 'revision_conflict');
     throw cause;
   }
-  const confirmed = await getCanonical(env, session.accessToken);
-  if (!confirmed.exists || confirmed.revision !== blob.sha) throw new ServiceError('Revision conflict: the write was replaced before it could be confirmed. Your local changes remain here.', 409, 'revision_conflict');
-  return { exists: true, data: confirmed.data, revision: confirmed.revision, commitSha: confirmed.commitSha, updatedAt: confirmed.updatedAt };
+  return { exists: true, data, revision: blob.sha, commitSha: commit.sha, updatedAt: data.updatedAt };
 }
 
 async function githubApi<T>(path: string, token: string, init: RequestInit = {}): Promise<T> {
