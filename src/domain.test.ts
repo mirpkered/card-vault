@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { cardStatus, completion, emptyVault, filterCards, findConflicts, getTrackedCards, migrateVault, parseCsv, sortCardsByNumber, validateCatalog, validateInventoryRows, type CardDefinition, type CardVariant, type Ownership } from './domain';
+import { cardStatus, completion, emptyVault, filterCards, findConflicts, getTrackedCards, migrateVault, parseCsv, reviewReleaseMarkers, sortCardsByNumber, SRG_SET_ID, validateCatalog, validateInventoryRows, type CardDefinition, type CardVariant, type Ownership } from './domain';
 
 const cards: CardDefinition[] = [
   { id: 'set:one:01', setId: 'set:one', number: '01', name: 'Kakashi', rarity: 'Rare' },
@@ -117,7 +117,7 @@ describe('collection domain', () => {
     const legacyCard = { ...cards[0], setId: 'set:legacy' };
     const legacyCatalog = { ...current.catalog, sets: [...current.catalog.sets, { id: 'set:legacy', seriesId: 'series:kayou-naruto', name: 'legacy' }], cards: [legacyCard], ownership: [{ cardId: legacyCard.id, owned: 2, incoming: 0, updatedAt: '2026-01-01' }] };
     const old = { ...current, schemaVersion: 1, catalog: legacyCatalog };
-    expect(migrateVault(old).schemaVersion).toBe(4);
+    expect(migrateVault(old).schemaVersion).toBe(5);
     expect(migrateVault(old).catalog.ownership[0]).toMatchObject({ personal: 2, duplicates: 0, incoming: 0 });
     expect(() => migrateVault({ schemaVersion: 99 })).toThrow('Unsupported');
   });
@@ -127,7 +127,7 @@ describe('collection domain', () => {
     old.catalog.series = old.catalog.series.filter((series) => series.id !== 'series:media:snl-dvds').map(({ category: _category, ...series }) => series);
     old.catalog.sets = old.catalog.sets.filter((set) => set.id !== 'set:media:snl-dvds:collection');
     const migrated = migrateVault(JSON.parse(JSON.stringify(old)));
-    expect(migrated.schemaVersion).toBe(4);
+    expect(migrated.schemaVersion).toBe(5);
     expect(migrated.catalog.series.filter((series) => series.category === 'cards')).toHaveLength(2);
     expect(migrated.catalog.series.find((series) => series.id === 'series:media:snl-dvds')).toMatchObject({ name: 'SNL DVDs', category: 'media' });
     expect(migrated.catalog.sets.find((set) => set.id === 'set:media:snl-dvds:collection')).toMatchObject({ seriesId: 'series:media:snl-dvds', name: 'DVD collection' });
@@ -139,9 +139,46 @@ describe('collection domain', () => {
     old.schemaVersion = 3;
     Object.assign(old.catalog, { sets: old.catalog.sets.map(({ tracked: _tracked, ...set }, index) => index === 0 ? set : { ...set, tracked: false }) });
     const migrated = migrateVault(JSON.parse(JSON.stringify(old)));
-    expect(migrated.schemaVersion).toBe(4);
+    expect(migrated.schemaVersion).toBe(5);
     expect(migrated.catalog.sets[0].tracked).toBe(true);
     expect(migrated.catalog.sets[1].tracked).toBe(false);
+  });
+  it('migrates per-game Super Rare sets into one set without losing quantities or references', () => {
+    const old = emptyVault();
+    old.schemaVersion = 4;
+    old.catalog.sets = old.catalog.sets.filter((set) => set.id !== SRG_SET_ID);
+    const releases = [
+      { id: 'set:srg-switch:game-one', name: 'Game One', indicator: 'complete' as const, row: 3, tracked: true },
+      { id: 'set:srg-switch:game-two', name: 'Game Two', indicator: 'incomplete' as const, row: 12, tracked: false },
+    ];
+    old.catalog.sets.push(...releases.map((release) => ({ id: release.id, seriesId: 'series:srg-switch', name: release.name, tracked: release.tracked, expectedCardCount: 6, sourceCompletionIndicator: release.indicator, sourceRow: release.row })));
+    for (const release of releases) for (const slot of ['Title', '1', '2', '3', '4', '5']) {
+      const id = `${release.id}:${slot.toLowerCase()}`;
+      old.catalog.cards.push({ id, setId: release.id, number: slot, name: slot === 'Title' ? 'Title card' : `Card ${slot}`, category: slot === 'Title' ? 'Title' : 'Numbered' });
+    }
+    const ownedId = 'set:srg-switch:game-one:title';
+    old.catalog.variants.push({ id: `${ownedId}:photo`, cardId: ownedId, name: 'Photo', imageUrls: [{ url: 'https://example.test/card.png', source: 'user-provided' }] });
+    old.catalog.ownership.push({ cardId: ownedId, variantId: `${ownedId}:photo`, personal: 1, duplicates: 2, incoming: 3, updatedAt: '2026-01-01' });
+    old.catalog.acquisitions.push({ id: 'acquisition:srg:one', cardId: ownedId, quantity: 3, status: 'incoming', acquiredAt: '2026-01-01' });
+
+    const migrated = migrateVault(JSON.parse(JSON.stringify(old)));
+    expect(migrated.schemaVersion).toBe(5);
+    expect(migrated.catalog.sets.filter((set) => set.seriesId === 'series:srg-switch' && !set.archived)).toEqual([
+      expect.objectContaining({ id: SRG_SET_ID, name: 'Nintendo Switch releases', tracked: true }),
+    ]);
+    expect(migrated.catalog.sets.filter((set) => set.seriesId === 'series:srg-switch' && set.archived)).toHaveLength(2);
+    expect(migrated.catalog.cards.every((card) => card.setId === SRG_SET_ID)).toBe(true);
+    expect(migrated.catalog.cards.find((card) => card.id === ownedId)).toMatchObject({ releaseName: 'Game One', releaseSourceCompletionIndicator: 'complete', releaseSourceRow: 3 });
+    expect(migrated.catalog.ownership).toEqual(old.catalog.ownership);
+    expect(migrated.catalog.variants).toEqual(old.catalog.variants);
+    expect(migrated.catalog.acquisitions).toEqual(old.catalog.acquisitions);
+    expect(getTrackedCards(migrated.catalog)).toHaveLength(12);
+    expect(reviewReleaseMarkers(migrated.catalog.cards, migrated.catalog.ownership)).toMatchObject([
+      { name: 'Game One', indicator: 'complete', missingSlots: ['1', '2', '3', '4', '5'], mismatch: true },
+      { name: 'Game Two', indicator: 'incomplete', missingSlots: ['Title', '1', '2', '3', '4', '5'], mismatch: false },
+    ]);
+    expect(migrateVault(JSON.parse(JSON.stringify(migrated)))).toEqual(migrated);
+    expect(validateCatalog(migrated.catalog)).toEqual([]);
   });
   it('detects overlapping records changed in either copy', () => {
     const local = emptyVault(); const remote = emptyVault();

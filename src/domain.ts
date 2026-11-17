@@ -12,8 +12,9 @@ export type Publisher = { id: string; name: string };
 export type Franchise = { id: string; publisherId: string; name: string };
 export type CollectionCategory = 'cards' | 'media' | 'misc';
 export type Series = { id: string; franchiseId?: string; name: string; category?: CollectionCategory };
-export type CardSet = { id: string; seriesId: string; name: string; releaseNumber?: string; expectedCardCount?: number; rarityScheme?: string[]; tracked: boolean; sourceCompletionIndicator?: 'complete' | 'incomplete' | 'unmarked'; sourceRow?: number };
-export type CardDefinition = { id: string; setId: string; number: string; name: string; category?: string; rarity?: string; slot?: 'title' | 'numbered'; sourceNote?: string };
+export type SourceCompletionIndicator = 'complete' | 'incomplete' | 'unmarked';
+export type CardSet = { id: string; seriesId: string; name: string; releaseNumber?: string; expectedCardCount?: number; rarityScheme?: string[]; tracked: boolean; archived?: boolean; sourceCompletionIndicator?: SourceCompletionIndicator; sourceRow?: number };
+export type CardDefinition = { id: string; setId: string; number: string; name: string; category?: string; rarity?: string; slot?: 'title' | 'numbered'; sourceNote?: string; releaseName?: string; releaseNumber?: string; releaseSourceCompletionIndicator?: SourceCompletionIndicator; releaseSourceRow?: number };
 export type CardVariant = {
   id: string;
   cardId: string;
@@ -27,7 +28,9 @@ export type Ownership = { cardId: string; variantId?: string; personal: number; 
 export type Acquisition = { id: string; cardId: string; quantity: number; status: 'incoming' | 'received'; acquiredAt?: string; note?: string };
 export type VaultData = { schemaVersion: number; updatedAt: string; catalog: Catalog };
 
-export const CURRENT_SCHEMA_VERSION = 4;
+export const CURRENT_SCHEMA_VERSION = 5;
+export const SRG_SERIES_ID = 'series:srg-switch';
+export const SRG_SET_ID = 'set:srg-switch:nintendo-switch-releases';
 export const emptyCatalog = (): Catalog => ({ publishers: [], franchises: [], series: [], sets: [], cards: [], variants: [], ownership: [], acquisitions: [] });
 export function starterCatalog(): Catalog {
   return {
@@ -35,12 +38,13 @@ export function starterCatalog(): Catalog {
     franchises: [{ id: 'franchise:naruto', publisherId: 'publisher:kayou', name: 'Naruto' }, { id: 'franchise:nintendo-switch-release-cards', publisherId: 'publisher:super-rare-games', name: 'Nintendo Switch release cards' }],
     series: [
       { id: 'series:kayou-naruto', franchiseId: 'franchise:naruto', name: 'Kayou Naruto', category: 'cards' },
-      { id: 'series:srg-switch', franchiseId: 'franchise:nintendo-switch-release-cards', name: 'Super Rare Games', category: 'cards' },
+      { id: SRG_SERIES_ID, franchiseId: 'franchise:nintendo-switch-release-cards', name: 'Super Rare Games', category: 'cards' },
       { id: 'series:media:snl-dvds', name: 'SNL DVDs', category: 'media' },
     ],
     sets: [
       { id: 'set:kayou-naruto-nrea02', seriesId: 'series:kayou-naruto', name: 'NREA02', tracked: true },
       { id: 'set:kayou-naruto-nrea03', seriesId: 'series:kayou-naruto', name: 'NREA03', tracked: true },
+      { id: SRG_SET_ID, seriesId: SRG_SERIES_ID, name: 'Nintendo Switch releases', tracked: true },
       { id: 'set:media:snl-dvds:collection', seriesId: 'series:media:snl-dvds', name: 'DVD collection', tracked: true },
     ], cards: [], variants: [], ownership: [], acquisitions: [],
   };
@@ -57,6 +61,62 @@ function ensureSnlDvdCollection(catalog: Catalog): Catalog {
     ? catalog.sets
     : [...catalog.sets, { id: setId, seriesId, name: 'DVD collection', tracked: true }];
   return { ...catalog, series, sets };
+}
+
+function consolidateSrgReleases(catalog: Catalog): Catalog {
+  if (!catalog.series.some((series) => series.id === SRG_SERIES_ID)) return catalog;
+  const sourceSets = catalog.sets.filter((set) => set.seriesId === SRG_SERIES_ID);
+  const oldSetsById = new Map(sourceSets.map((set) => [set.id, set]));
+  const priorAggregate = sourceSets.find((set) => set.id === SRG_SET_ID);
+  const legacyReleaseSets = sourceSets.filter((set) => set.id !== SRG_SET_ID);
+  const tracked = priorAggregate?.tracked === true || legacyReleaseSets.some((set) => set.tracked) || (!priorAggregate && sourceSets.length === 0);
+
+  const sets = catalog.sets.map((set) => {
+    if (set.seriesId !== SRG_SERIES_ID || set.id === SRG_SET_ID) return set;
+    const archived = { ...set, tracked: false, archived: true } as CardSet;
+    delete archived.expectedCardCount;
+    return archived;
+  });
+  const aggregate: CardSet = { ...(priorAggregate ?? {} as CardSet), id: SRG_SET_ID, seriesId: SRG_SERIES_ID, name: 'Nintendo Switch releases', tracked };
+  delete aggregate.expectedCardCount;
+  delete aggregate.archived;
+  const aggregateExists = sets.some((set) => set.id === SRG_SET_ID);
+  const nextSets = aggregateExists ? sets.map((set) => set.id === SRG_SET_ID ? aggregate : set) : [...sets, aggregate];
+  const cards = catalog.cards.map((card) => {
+    const previousSet = oldSetsById.get(card.setId);
+    if (!previousSet || card.setId === SRG_SET_ID) return card;
+    return {
+      ...card,
+      setId: SRG_SET_ID,
+      releaseName: card.releaseName ?? previousSet.name,
+      ...(card.releaseNumber ?? previousSet.releaseNumber ? { releaseNumber: card.releaseNumber ?? previousSet.releaseNumber } : {}),
+      ...(card.releaseSourceCompletionIndicator ?? previousSet.sourceCompletionIndicator ? { releaseSourceCompletionIndicator: card.releaseSourceCompletionIndicator ?? previousSet.sourceCompletionIndicator } : {}),
+      ...(card.releaseSourceRow ?? previousSet.sourceRow ? { releaseSourceRow: card.releaseSourceRow ?? previousSet.sourceRow } : {}),
+    };
+  });
+  return { ...catalog, sets: nextSets, cards };
+}
+
+export type ReleaseMarkerReview = {
+  name: string;
+  indicator: SourceCompletionIndicator;
+  sourceRow?: number;
+  missingSlots: string[];
+  mismatch: boolean;
+};
+
+export function reviewReleaseMarkers(cards: CardDefinition[], inventory: Ownership[]): ReleaseMarkerReview[] {
+  const releases = new Map<string, CardDefinition[]>();
+  for (const card of cards) {
+    if (!card.releaseName) continue;
+    releases.set(card.releaseName, [...(releases.get(card.releaseName) ?? []), card]);
+  }
+  return [...releases.entries()].map(([name, releaseCards]) => {
+    const indicator = releaseCards.find((card) => card.releaseSourceCompletionIndicator)?.releaseSourceCompletionIndicator ?? 'unmarked';
+    const sourceRow = releaseCards.find((card) => card.releaseSourceRow !== undefined)?.releaseSourceRow;
+    const missingSlots = releaseCards.filter((card) => !inventory.some((item) => item.cardId === card.id && item.personal + item.duplicates > 0)).map((card) => card.number);
+    return { name, indicator, sourceRow, missingSlots, mismatch: indicator === 'complete' ? missingSlots.length > 0 : indicator === 'incomplete' ? missingSlots.length === 0 : false };
+  }).sort((left, right) => (left.sourceRow ?? Number.MAX_SAFE_INTEGER) - (right.sourceRow ?? Number.MAX_SAFE_INTEGER) || left.name.localeCompare(right.name));
 }
 
 function isCollectionCategory(value: unknown): value is CollectionCategory {
@@ -83,8 +143,14 @@ export function validateCatalog(catalog: Catalog): string[] {
   }
   for (const item of catalog.sets) if (!has('series', item.seriesId)) errors.push(`Set ${item.id} references missing series ${item.seriesId}.`);
   for (const item of catalog.sets) if (typeof item.tracked !== 'boolean') errors.push(`Set ${item.id} must record whether it is tracked.`);
+  for (const item of catalog.sets) if (item.archived !== undefined && typeof item.archived !== 'boolean') errors.push(`Set ${item.id} has an invalid archive state.`);
   for (const item of catalog.sets) if (item.expectedCardCount !== undefined && catalog.cards.filter((card) => card.setId === item.id).length !== item.expectedCardCount) errors.push(`Set ${item.id} must define exactly ${item.expectedCardCount} cards.`);
   for (const item of catalog.cards) if (!has('sets', item.setId)) errors.push(`Card ${item.id} references missing set ${item.setId}.`);
+  for (const item of catalog.cards) {
+    if (item.releaseName !== undefined && typeof item.releaseName !== 'string') errors.push(`Card ${item.id} has an invalid release name.`);
+    if (item.releaseSourceCompletionIndicator !== undefined && !['complete', 'incomplete', 'unmarked'].includes(item.releaseSourceCompletionIndicator)) errors.push(`Card ${item.id} has an invalid release completion marker.`);
+    if (item.releaseSourceRow !== undefined && (!Number.isInteger(item.releaseSourceRow) || item.releaseSourceRow < 1)) errors.push(`Card ${item.id} has an invalid release source row.`);
+  }
   const variantById = new Map(catalog.variants.map((variant) => [variant.id, variant]));
   for (const item of catalog.variants) {
     if (!has('cards', item.cardId)) errors.push(`Variant ${item.id} references missing card ${item.cardId}.`);
@@ -119,6 +185,13 @@ export function migrateVault(value: unknown): VaultData {
   if (!value || typeof value !== 'object') throw new Error('Backup must be a JSON object.');
   const source = value as Partial<VaultData>;
   if (source.schemaVersion === CURRENT_SCHEMA_VERSION && source.catalog && validateCatalog(source.catalog).length === 0) return source as VaultData;
+  if (source.schemaVersion === 4 && source.catalog) {
+    const catalog = ensureSnlDvdCollection(consolidateSrgReleases(source.catalog));
+    const migrated = { ...source, catalog, schemaVersion: CURRENT_SCHEMA_VERSION, updatedAt: source.updatedAt ?? new Date().toISOString() } as VaultData;
+    const errors = validateCatalog(migrated.catalog);
+    if (errors.length) throw new Error(`Migration failed: ${errors.join(' ')}`);
+    return migrated;
+  }
   if ((source.schemaVersion === 0 || source.schemaVersion === 1 || source.schemaVersion === 2 || source.schemaVersion === 3) && source.catalog) {
     const previous = source.catalog as Omit<Catalog, 'ownership'> & { ownership?: (Partial<Ownership> & { cardId: string; owned?: number })[]; series: Series[] };
     const migratedCatalog = { ...previous, sets: previous.sets.map((item) => ({ ...item, tracked: typeof item.tracked === 'boolean' ? item.tracked : true })), series: previous.series.map((item) => ({ ...item, category: isCollectionCategory(item.category) ? item.category : 'cards' as const })), ownership: (previous.ownership ?? []).map((item) => ({
@@ -126,7 +199,7 @@ export function migrateVault(value: unknown): VaultData {
       duplicates: item.duplicates ?? 0, ...(item.duplicatesKnown === undefined ? {} : { duplicatesKnown: item.duplicatesKnown }),
       incoming: item.incoming ?? 0, updatedAt: item.updatedAt ?? new Date().toISOString(),
     })) } as Catalog;
-    const catalog = ensureSnlDvdCollection(migratedCatalog);
+    const catalog = ensureSnlDvdCollection(consolidateSrgReleases(migratedCatalog));
     const migrated = { ...source, catalog, schemaVersion: CURRENT_SCHEMA_VERSION, updatedAt: source.updatedAt ?? new Date().toISOString() } as VaultData;
     const errors = validateCatalog(migrated.catalog);
     if (errors.length) throw new Error(`Migration failed: ${errors.join(' ')}`);
@@ -153,7 +226,7 @@ export function completion(cards: CardDefinition[], inventory: Ownership[]) {
   return { owned: cards.filter((card) => owned.has(card.id)).length, total: cards.length, percent: cards.length ? Math.round(cards.filter((card) => owned.has(card.id)).length / cards.length * 100) : 0 };
 }
 export function getTrackedCards(catalog: Pick<Catalog, 'sets' | 'cards'>): CardDefinition[] {
-  const trackedSetIds = new Set(catalog.sets.filter((set) => set.tracked).map((set) => set.id));
+  const trackedSetIds = new Set(catalog.sets.filter((set) => set.tracked && !set.archived).map((set) => set.id));
   return catalog.cards.filter((card) => trackedSetIds.has(card.setId));
 }
 const cardNumberCollator = new Intl.Collator('en', { numeric: true, sensitivity: 'base' });
@@ -175,7 +248,7 @@ export function findConflicts(local: VaultData, remote: VaultData): string[] {
 
 export function filterCards(cards: CardDefinition[], inventory: Ownership[], filter: CardStatus | 'all', query = ''): CardDefinition[] {
   const normalized = query.trim().toLowerCase();
-  return cards.filter((card) => (filter === 'all' || cardStatus(card.id, inventory) === filter) && (!normalized || `${card.name} ${card.number} ${card.rarity ?? ''} ${card.category ?? ''}`.toLowerCase().includes(normalized)));
+  return cards.filter((card) => (filter === 'all' || cardStatus(card.id, inventory) === filter) && (!normalized || `${card.name} ${card.number} ${card.rarity ?? ''} ${card.category ?? ''} ${card.releaseName ?? ''} ${card.releaseNumber ?? ''}`.toLowerCase().includes(normalized)));
 }
 
 export function validateInventoryRows(rows: Record<string, string>[], cards: CardDefinition[], variants: CardVariant[] = []): { updates: Ownership[]; errors: string[] } {

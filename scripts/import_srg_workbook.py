@@ -161,7 +161,13 @@ def import_workbook(source: Path) -> tuple[dict, dict]:
             raise ValueError(f"Source data found without a card number on row {row_number}.")
 
     title_ids = set()
-    release_records = []
+    aggregate_set_id = "set:srg-switch:nintendo-switch-releases"
+    release_records = [{
+        "id": aggregate_set_id,
+        "seriesId": "series:srg-switch",
+        "name": "Nintendo Switch releases",
+        "tracked": True,
+    }]
     card_records = []
     ownership_records = []
     marker_mismatches = []
@@ -177,15 +183,6 @@ def import_workbook(source: Path) -> tuple[dict, dict]:
         by_number = {slot["number"]: slot for slot in slots}
         if len(slots) != 6 or len(by_number) != 6 or set(by_number) != set(EXPECTED):
             raise ValueError(f"{release['title']} (row {release['row']}) must have exactly Title and cards 1–5.")
-        set_id = f"set:srg-switch:{release_id}"
-        release_records.append({
-            "id": set_id,
-            "seriesId": "series:srg-switch",
-            "name": release["title"],
-            "expectedCardCount": 6,
-            "sourceCompletionIndicator": release["indicator"],
-            "sourceRow": release["row"],
-        })
         physically_complete = all(slot["personal"] + slot["duplicates"] > 0 for slot in slots)
         if release["indicator"] == "complete" and not physically_complete:
             marker_mismatches.append({"title": release["title"], "row": release["row"], "missing": [slot["number"] for slot in slots if slot["personal"] + slot["duplicates"] == 0]})
@@ -194,15 +191,20 @@ def import_workbook(source: Path) -> tuple[dict, dict]:
         if release["indicator"] == "unmarked":
             unmarked.append({"title": release["title"], "row": release["row"], "missing": [slot["number"] for slot in slots if slot["personal"] + slot["duplicates"] == 0]})
         for slot in slots:
-            card_id = f"{set_id}:{slot['number'].lower()}"
+            # Preserve the existing per-release namespaced IDs so importing into
+            # older vaults can reconcile quantities without changing identity.
+            card_id = f"set:srg-switch:{release_id}:{slot['number'].lower()}"
             card = {
                 "id": card_id,
-                "setId": set_id,
+                "setId": aggregate_set_id,
                 "number": slot["number"],
                 "name": "Title card" if slot["number"] == "Title" else f"Card {slot['number']}",
                 "category": "Title" if slot["number"] == "Title" else "Numbered",
                 "slot": "title" if slot["number"] == "Title" else "numbered",
                 "sourceRow": slot["row"],
+                "releaseName": release["title"],
+                "releaseSourceCompletionIndicator": release["indicator"],
+                "releaseSourceRow": release["row"],
             }
             if slot["notes"]:
                 card["sourceNote"] = " | ".join(slot["notes"])
@@ -221,29 +223,20 @@ def import_workbook(source: Path) -> tuple[dict, dict]:
             totals["duplicateCards"] += int(slot["duplicates"] > 0)
 
     catalog = {
-        "publishers": [
-            {"id": "publisher:kayou", "name": "Kayou"},
-            {"id": "publisher:super-rare-games", "name": "Super Rare Games"},
-        ],
+        "publishers": [{"id": "publisher:super-rare-games", "name": "Super Rare Games"}],
         "franchises": [
-            {"id": "franchise:naruto", "publisherId": "publisher:kayou", "name": "Naruto"},
             {"id": "franchise:nintendo-switch-release-cards", "publisherId": "publisher:super-rare-games", "name": "Nintendo Switch release cards"},
         ],
         "series": [
-            {"id": "series:kayou-naruto", "franchiseId": "franchise:naruto", "name": "Kayou Naruto"},
-            {"id": "series:srg-switch", "franchiseId": "franchise:nintendo-switch-release-cards", "name": "Super Rare Games"},
+            {"id": "series:srg-switch", "franchiseId": "franchise:nintendo-switch-release-cards", "name": "Super Rare Games", "category": "cards"},
         ],
-        "sets": [
-            {"id": "set:kayou-naruto-nrea02", "seriesId": "series:kayou-naruto", "name": "NREA02"},
-            {"id": "set:kayou-naruto-nrea03", "seriesId": "series:kayou-naruto", "name": "NREA03"},
-            *release_records,
-        ],
+        "sets": release_records,
         "cards": card_records,
         "variants": [],
         "ownership": ownership_records,
         "acquisitions": [],
     }
-    backup = {"schemaVersion": 2, "updatedAt": datetime.now(timezone.utc).isoformat(), "catalog": catalog}
+    backup = {"schemaVersion": 5, "updatedAt": datetime.now(timezone.utc).isoformat(), "catalog": catalog}
     source_hash = hashlib.sha256(source.read_bytes()).hexdigest()
     report = {
         "source": source.name,
