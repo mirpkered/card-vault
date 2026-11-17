@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState, type ChangeEvent } from 'react';
 import { Archive, ArrowDownToLine, ArrowUpFromLine, BookOpen, Check, CircleHelp, Cloud, Download, Grid2X2, ImagePlus, List, Plus, Search, Settings2, ShieldCheck, SlidersHorizontal, Sparkles, Upload, X } from 'lucide-react';
-import { cardStatus, completion, emptyVault, filterCards, findConflicts, getTrackedCards, migrateVault, parseCsv, validateInventoryRows, type CardDefinition, type CardSet, type CardVariant, type CollectionCategory, type Ownership, type VaultData } from '../domain';
+import { cardStatus, completion, emptyVault, filterCards, findConflicts, getTrackedCards, migrateVault, parseCsv, sortCardsByNumber, validateInventoryRows, type CardDefinition, type CardSet, type CardVariant, type CollectionCategory, type Ownership, type VaultData } from '../domain';
 import { loadVault, saveVault } from '../storage';
 import { applyNarutoCatalogUpdate, parseNarutoCatalogUpdate, planNarutoCatalogUpdate, type NarutoCatalogUpdate } from '../narutoCatalog';
 import { applyFinalFantasyCatalogUpdate, parseFinalFantasyCatalogUpdate, planFinalFantasyCatalogUpdate, type FinalFantasyCatalogUpdate } from '../finalFantasyCatalog';
@@ -64,7 +64,10 @@ export default function App() {
   const categoryTrackedSets = trackedSets.filter((set) => categorySeries.some((series) => series.id === set.seriesId));
   const selectedSet = trackedSets.find((x) => x.id === setId && seriesCategory(x.seriesId) === activeCategory);
   const selectedSeries = selectedSet ? seriesMap.get(selectedSet.seriesId) : undefined;
-  const cards = vault.catalog.cards.filter((card) => !selectedSet || card.setId === selectedSet.id);
+  const cards = useMemo(() => {
+    const inSet = vault.catalog.cards.filter((card) => !selectedSet || card.setId === selectedSet.id);
+    return selectedSet?.seriesId === 'series:final-fantasy-tcg' ? sortCardsByNumber(inSet) : inSet;
+  }, [vault.catalog.cards, selectedSet?.id, selectedSet?.seriesId]);
   const byId = new Map<string, Ownership[]>();
   for (const item of vault.catalog.ownership) byId.set(item.cardId, [...(byId.get(item.cardId) ?? []), item]);
   const inventoryForCard = (cardId: string) => byId.get(cardId) ?? [];

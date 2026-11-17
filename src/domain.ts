@@ -156,6 +156,10 @@ export function getTrackedCards(catalog: Pick<Catalog, 'sets' | 'cards'>): CardD
   const trackedSetIds = new Set(catalog.sets.filter((set) => set.tracked).map((set) => set.id));
   return catalog.cards.filter((card) => trackedSetIds.has(card.setId));
 }
+const cardNumberCollator = new Intl.Collator('en', { numeric: true, sensitivity: 'base' });
+export function sortCardsByNumber(cards: CardDefinition[]): CardDefinition[] {
+  return [...cards].sort((left, right) => cardNumberCollator.compare(left.number, right.number) || left.id.localeCompare(right.id));
+}
 export function findConflicts(local: VaultData, remote: VaultData): string[] {
   const conflicts: string[] = [];
   for (const key of ['publishers', 'franchises', 'series', 'sets', 'cards', 'variants', 'acquisitions'] as const) {

@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { cardStatus, completion, emptyVault, filterCards, findConflicts, getTrackedCards, migrateVault, parseCsv, validateCatalog, validateInventoryRows, type CardDefinition, type CardVariant, type Ownership } from './domain';
+import { cardStatus, completion, emptyVault, filterCards, findConflicts, getTrackedCards, migrateVault, parseCsv, sortCardsByNumber, validateCatalog, validateInventoryRows, type CardDefinition, type CardVariant, type Ownership } from './domain';
 
 const cards: CardDefinition[] = [
   { id: 'set:one:01', setId: 'set:one', number: '01', name: 'Kakashi', rarity: 'Rare' },
@@ -15,6 +15,11 @@ describe('collection domain', () => {
   it('keeps same card numbers unique across namespaced sets', () => {
     expect(cards[0].number).toBe(cards[1].number);
     expect(cards[0].id).not.toBe(cards[1].id);
+  });
+  it('sorts card codes by their numeric portions without changing the source array', () => {
+    const unsorted: CardDefinition[] = ['30-117R', '30-118H', '20-077L', '21-004L', '25-105L', '30-2C', '30-10C'].map((number) => ({ id: `set:memories:${number}`, setId: 'set:memories', number, name: number }));
+    expect(sortCardsByNumber(unsorted).map((card) => card.number)).toEqual(['20-077L', '21-004L', '25-105L', '30-2C', '30-10C', '30-117R', '30-118H']);
+    expect(unsorted.map((card) => card.number)).toEqual(['30-117R', '30-118H', '20-077L', '21-004L', '25-105L', '30-2C', '30-10C']);
   });
   it('tracks owned quantities, duplicates, and incoming separately', () => {
     expect(cardStatus(cards[0].id, inventory)).toBe('duplicate');
