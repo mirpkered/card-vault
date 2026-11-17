@@ -15,7 +15,8 @@ afterEach(cleanup);
 describe('Final Fantasy card tile versions', () => {
   it('labels the selected version, changes its image, and edits that version quantity', () => {
     const onQuantity = vi.fn();
-    render(<CardTile card={card} inventory={[]} variants={variants} view="gallery" showStatus={false} itemLabel="card" onOpen={vi.fn()} onQuantity={onQuantity}/>);
+    const onOpen = vi.fn();
+    render(<CardTile card={card} inventory={[]} variants={variants} view="gallery" showStatus={false} itemLabel="card" onOpen={onOpen} onQuantity={onQuantity}/>);
     const tile = screen.getByRole('article');
     const versionGroup = within(tile).getByRole('group', { name: 'Sample Hero version' });
 
@@ -30,6 +31,8 @@ describe('Final Fantasy card tile versions', () => {
 
     fireEvent.click(within(tile).getByRole('button', { name: 'Increase full art · personal' }));
     expect(onQuantity).toHaveBeenCalledWith(card, 'personal', 1, `${card.id}:full-art`);
+    fireEvent.click(within(tile).getByRole('button', { name: 'Open card: Sample Hero, showing Full Art' }));
+    expect(onOpen).toHaveBeenCalledWith(`${card.id}:full-art`);
   });
 
   it('shows when the foil finish is not visible in its catalog image', () => {
