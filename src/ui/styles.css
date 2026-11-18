@@ -29,6 +29,27 @@
 @media(max-width:720px){.card-grid.gallery-view .card-image{height:205px}.gallery-view .tile-versions button{min-height:36px;padding-inline:9px}}
 @media(max-width:380px){.card-grid.gallery-view .card-image{height:186px}}
 
+.variant-transfer-list{display:flex;flex-direction:column;gap:4px;margin:4px 0 2px}
+.variant-transfer{display:flex;flex-direction:column;align-items:flex-start;gap:3px;width:100%;min-height:34px;padding:5px 7px;border:1px solid #46533c;border-radius:6px;background:#20271e;color:#d4e8b0;text-align:left;cursor:pointer}
+.variant-transfer:hover{border-color:#91b858;background:#263023}
+.variant-transfer:focus-visible{outline:2px solid #c4eb76;outline-offset:2px}
+.variant-transfer span{font-size:8px;line-height:1.25}
+.variant-transfer small{color:#9aa58d;font:7px var(--mono);line-height:1.25}
+@media(max-width:720px){.variant-transfer{min-height:38px;padding:6px 8px}.variant-transfer span{font-size:9px}.variant-transfer small{font-size:7px}}
+
+/* Compact home tiles keep top-level collections easy to scan and open. */
+.collection-cards{grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}
+.collection-card{height:136px;border-radius:9px}
+.cover-orb{width:122px;height:122px;right:-34px;top:-43px}
+.cover-content{height:99px;padding:11px 12px 0}
+.cover-content>strong{font-size:15px;line-height:1.12;margin-top:9px;display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;overflow:hidden}
+.cover-sub{max-width:100%;font-size:7px;line-height:1.2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.cover-footer{font-size:8px}
+.cover-meta{height:36px;padding-inline:12px;gap:5px;font-size:8px}
+@media(max-width:1100px){.collection-cards{grid-template-columns:repeat(3,minmax(0,1fr))}}
+@media(max-width:720px){.collection-cards{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}.collection-card{height:122px}.cover-orb{width:96px;height:96px;right:-28px;top:-31px}.cover-content{height:90px;padding:10px 10px 0}.cover-content>strong{font-size:13px;margin-top:7px}.cover-sub{font-size:6px}.cover-footer{font-size:7px}.cover-meta{height:32px;padding-inline:10px;gap:4px;font-size:7px}}
+@media(max-width:380px){.collection-card{height:112px}.cover-orb{width:85px;height:85px;right:-27px;top:-28px}.cover-content{height:81px;padding:9px 9px 0}.cover-content>strong{font-size:12px;margin-top:6px}.cover-footer{font-size:6px}.cover-meta{height:30px;padding-inline:9px}}
+
 @media(max-width:720px){
   .tile-list{grid-template-columns:68px minmax(0,1fr);grid-template-rows:auto auto;align-items:start;gap:6px 9px;padding:7px}
   .tile-list .card-image{grid-column:1;grid-row:1 / span 2;width:64px;height:88px;align-self:start}
