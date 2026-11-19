@@ -59,3 +59,75 @@
   .tile-list .tile-qty>div>span{gap:3px}
   .tile-list .tile-qty>div>span button{width:20px;height:20px}
 }
+
+/* Keep collection choices compact and make list thumbnails easier to inspect. */
+.collection-card{height:116px}
+.cover-orb{width:108px;height:108px;right:-30px;top:-36px}
+.cover-content{height:83px;padding:9px 10px 0}
+.cover-content>strong{font-size:14px;margin-top:6px}
+.cover-meta{height:33px;padding-inline:10px;gap:4px;font-size:7px}
+@media(max-width:720px){
+  .collection-card{height:98px}
+  .cover-orb{width:76px;height:76px;right:-22px;top:-23px}
+  .cover-content{height:69px;padding:7px 8px 0}
+  .cover-content>strong{font-size:12px;margin-top:4px}
+  .cover-sub{font-size:6px}
+  .cover-footer{font-size:6px}
+  .cover-meta{height:29px;padding-inline:8px;gap:3px;font-size:6px}
+  .tile-list{grid-template-columns:92px minmax(0,1fr);gap:7px 10px}
+  .tile-list .card-image{width:88px;height:122px}
+  .app-shell.has-pending-transfer .content-wrap{padding-bottom:190px}
+  .variant-save-bar{left:12px;right:12px;bottom:calc(70px + env(safe-area-inset-bottom, 0px));width:auto;transform:none;gap:6px;padding:9px}
+  .variant-save-copy{gap:2px}
+  .variant-save-copy strong{font-size:10px}
+  .variant-save-copy small{font-size:7px;line-height:1.2}
+  .variant-save-bar .button{min-height:39px;padding:0 9px;font-size:9px}
+  .variant-save-bar .button.primary{gap:4px}
+  .app-shell.has-pending-transfer .toast{bottom:calc(145px + env(safe-area-inset-bottom, 0px))}
+}
+@media(max-width:380px){
+  .collection-card{height:92px}
+  .cover-content{height:64px;padding:6px 7px 0}
+  .cover-content>strong{font-size:11px;margin-top:3px}
+  .cover-meta{height:28px;padding-inline:7px}
+  .tile-list{grid-template-columns:84px minmax(0,1fr);gap:6px 8px}
+  .tile-list .card-image{width:80px;height:112px}
+  .variant-save-copy small{display:none}
+  .variant-save-bar{left:8px;right:8px;padding:8px;gap:5px}
+  .variant-save-bar .button{padding-inline:7px;font-size:8px}
+}
+.variant-save-bar{position:fixed;z-index:15;left:50%;bottom:18px;transform:translateX(-50%);width:min(calc(100vw - 36px),740px);display:flex;align-items:center;gap:10px;padding:11px 13px;border:1px solid #596b42;border-radius:10px;background:#202820;box-shadow:0 12px 38px #000b}
+.variant-save-copy{display:flex;flex-direction:column;gap:3px;flex:1;min-width:0}
+.variant-save-copy strong{color:#e4eddb;font-size:12px}
+.variant-save-copy small{color:#9da995;font-size:9px}
+.variant-save-bar .button{min-height:40px;white-space:nowrap}
+.variant-save-bar .button.primary{gap:6px}
+.app-shell.has-pending-transfer .content-wrap{padding-bottom:120px}
+.variant-transfer.queued{border-color:#9ebf61;background:#252e20;color:#d9f4a2}
+.pending-transfer-note{display:flex;align-items:center;justify-content:space-between;gap:8px;margin:9px 0;padding:8px 10px;border:1px solid #586b41;border-radius:7px;background:#20281c;color:#d9edb3;font-size:10px}
+.pending-transfer-note button{border:0;background:transparent;color:#c3d89e;text-decoration:underline;font-size:9px}
+.app-shell.has-pending-transfer .toast{bottom:104px}
+@media(max-width:720px){
+  .variant-save-bar{left:12px;right:12px;bottom:calc(70px + env(safe-area-inset-bottom, 0px));width:auto;transform:none;gap:6px;padding:9px}
+  .app-shell.has-pending-transfer .content-wrap{padding-bottom:190px}
+  .app-shell.has-pending-transfer .toast{bottom:calc(145px + env(safe-area-inset-bottom, 0px))}
+}
+@media(max-width:380px){
+  .variant-save-bar{left:8px;right:8px;padding:8px;gap:5px}
+}
+.tile-list{grid-template-columns:86px minmax(90px,1fr) auto auto}
+.tile-list .card-image{width:78px;height:108px}
+@media(max-width:720px){
+  .variant-save-copy strong{font-size:10px}
+  .variant-save-copy small{font-size:7px;line-height:1.2}
+  .variant-save-bar .button.primary{gap:4px}
+}
+@media(max-width:380px){.variant-save-copy small{display:none}}
+@media(max-width:720px){
+  .tile-list{grid-template-columns:92px minmax(0,1fr)}
+  .tile-list .card-image{width:88px;height:122px}
+}
+@media(max-width:380px){
+  .tile-list{grid-template-columns:84px minmax(0,1fr)}
+  .tile-list .card-image{width:80px;height:112px}
+}
