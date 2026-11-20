@@ -123,4 +123,7 @@
   .tile-list{grid-template-columns:84px minmax(0,1fr)}
   .tile-list .card-image{width:80px;height:112px}
 }
+.summary-grid{grid-template-columns:repeat(3,minmax(0,1fr))}
+.detail-counts{grid-template-columns:repeat(2,minmax(0,1fr))}
+@media(max-width:720px){.summary-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
 .pending-variant-note{color:#c7e88f!important}

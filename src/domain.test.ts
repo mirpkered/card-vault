@@ -21,10 +21,10 @@ describe('collection domain', () => {
     expect(sortCardsByNumber(unsorted).map((card) => card.number)).toEqual(['20-077L', '21-004L', '25-105L', '30-2C', '30-10C', '30-117R', '30-118H']);
     expect(unsorted.map((card) => card.number)).toEqual(['30-117R', '30-118H', '20-077L', '21-004L', '25-105L', '30-2C', '30-10C']);
   });
-  it('tracks owned quantities, duplicates, and incoming separately', () => {
+  it('tracks physical ownership and ignores retired incoming quantities', () => {
     expect(cardStatus(cards[0].id, inventory)).toBe('duplicate');
     expect(inventory[0].personal + inventory[0].duplicates).toBe(3);
-    expect(cardStatus(cards[1].id, inventory)).toBe('incoming');
+    expect(cardStatus(cards[1].id, inventory)).toBe('missing');
     expect(cardStatus(cards[2].id, inventory)).toBe('missing');
   });
   it('counts a card held only in the duplicate pile as physically owned', () => {
@@ -68,7 +68,7 @@ describe('collection domain', () => {
   });
   it('combines status and text filters', () => {
     expect(filterCards(cards, inventory, 'duplicate', 'kak')).toEqual([cards[0]]);
-    expect(filterCards(cards, inventory, 'incoming', 'nar')).toEqual([cards[1]]);
+    expect(filterCards(cards, inventory, 'missing', 'nar')).toEqual([cards[1]]);
     expect(filterCards(cards, inventory, 'owned', 'sas')).toEqual([]);
   });
   it('validates references and ownership quantities', () => {
@@ -84,6 +84,11 @@ describe('collection domain', () => {
     expect(parsed.rows[0]).toMatchObject({ card_id: 'set:one:01', personal: '1', duplicates: '2' });
     expect(validateInventoryRows(parsed.rows, cards).errors).toEqual([]);
     expect(validateInventoryRows([{ card_id: 'unknown', personal: '-1', duplicates: '0', incoming: '0' }], cards).errors).toHaveLength(2);
+  });
+  it('accepts the current CSV format without the retired incoming column', () => {
+    const parsed = parseCsv('card_id,personal,duplicates\n"set:one:01",1,2');
+    expect(parsed.errors).toEqual([]);
+    expect(validateInventoryRows(parsed.rows, cards).updates[0]).toMatchObject({ personal: 1, duplicates: 2, incoming: 0 });
   });
   it('validates variant-specific CSV rows and defaults legacy rows to Normal', () => {
     const variants: CardVariant[] = [

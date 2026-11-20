@@ -262,17 +262,15 @@ export function migrateVault(value: unknown): VaultData {
   throw new Error(`Unsupported or invalid backup schema version: ${String(source.schemaVersion)}.`);
 }
 
-export type CardStatus = 'owned' | 'missing' | 'incoming' | 'duplicate';
+export type CardStatus = 'owned' | 'missing' | 'duplicate';
 export function cardStatus(cardId: string, inventory: Ownership[]): CardStatus {
   const records = inventory.filter((item) => item.cardId === cardId);
   const hasDuplicateVersion = records.some((item) => item.duplicates > 0 || item.personal + item.duplicates > 1);
   const personal = records.reduce((sum, item) => sum + item.personal, 0);
   const duplicates = records.reduce((sum, item) => sum + item.duplicates, 0);
-  const incoming = records.reduce((sum, item) => sum + item.incoming, 0);
   const total = personal + duplicates;
   if (hasDuplicateVersion) return 'duplicate';
   if (total > 0) return 'owned';
-  if (incoming > 0) return 'incoming';
   return 'missing';
 }
 export function completion(cards: CardDefinition[], inventory: Ownership[]) {
@@ -316,8 +314,8 @@ export function validateInventoryRows(rows: Record<string, string>[], cards: Car
     if (!known.has(row.card_id)) errors.push(`Row ${line} references unknown card ID ${row.card_id}.`);
     const variantId = row.variant_id?.trim() || normalVariantByCard.get(row.card_id);
     if (variantId && knownVariants.get(variantId) !== row.card_id) errors.push(`Row ${line} references an unknown card variant ${variantId}.`);
-    const personal = Number(row.personal ?? row.owned); const duplicates = Number(row.duplicates ?? row.dupes ?? 0); const incoming = Number(row.incoming);
-    if (![personal, duplicates, incoming].every((x) => Number.isInteger(x) && x >= 0)) errors.push(`Row ${line} has invalid Personal, Dupes, or incoming quantities.`);
+    const personal = Number(row.personal ?? row.owned); const duplicates = Number(row.duplicates ?? row.dupes ?? 0); const incoming = Number(row.incoming ?? 0);
+    if (![personal, duplicates, incoming].every((x) => Number.isInteger(x) && x >= 0)) errors.push(`Row ${line} has invalid Personal or Dupes quantities.`);
     else {
       const duplicateFlag = row.duplicates_known?.trim().toLowerCase();
       if (duplicateFlag && duplicateFlag !== 'true' && duplicateFlag !== 'false') errors.push(`Row ${line} has invalid duplicates_known; use true or false.`);
@@ -350,7 +348,7 @@ export function parseCsv(text: string): { rows: Record<string, string>[]; errors
     if (values.length !== headers.length) errors.push(`Row ${index + 2} has ${values.length} values; expected ${headers.length}.`);
     return Object.fromEntries(headers.map((header, i) => [header, values[i] ?? '']));
   });
-  for (const required of ['card_id', 'incoming']) if (!headers.includes(required)) errors.push(`CSV is missing required “${required}” column.`);
+  if (!headers.includes('card_id')) errors.push('CSV is missing required “card_id” column.');
   if (!headers.includes('personal') && !headers.includes('owned')) errors.push('CSV is missing required “personal” column.');
   return { rows, errors };
 }

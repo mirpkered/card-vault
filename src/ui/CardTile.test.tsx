@@ -23,6 +23,7 @@ describe('Final Fantasy card tile versions', () => {
     expect(within(versionGroup).getByRole('button', { name: 'Show Normal version' })).toHaveAttribute('aria-pressed', 'true');
     expect(within(tile).getByRole('img')).toHaveAttribute('alt', 'Sample Hero · Normal');
     expect(tile.querySelector('.card-image')).not.toHaveTextContent('Normal');
+    expect(within(tile).queryByText(/incoming/i)).not.toBeInTheDocument();
 
     fireEvent.click(within(versionGroup).getByRole('button', { name: 'Show Full Art version' }));
     expect(within(versionGroup).getByRole('button', { name: 'Show Full Art version' })).toHaveAttribute('aria-pressed', 'true');
