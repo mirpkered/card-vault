@@ -1,6 +1,6 @@
 import { cleanup, fireEvent, render, screen, within } from '@testing-library/react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import type { CardDefinition, CardVariant } from '../domain';
+import type { CardDefinition, CardVariant, Ownership } from '../domain';
 import { CardTile } from './App';
 
 const card: CardDefinition = { id: 'set:final-fantasy:01-001', setId: 'set:final-fantasy', number: '01-001', name: 'Sample Hero', rarity: 'L' };
@@ -40,6 +40,34 @@ describe('Final Fantasy card tile versions', () => {
     const tile = screen.getByRole('article');
     fireEvent.click(within(tile).getByRole('button', { name: 'Show Foil version' }));
     expect(within(tile).getByText('Foil finish not pictured')).toHaveAttribute('title', variants[1].imageNote);
+    expect(within(tile).getByRole('button', { name: 'Increase foil · personal' })).toBeInTheDocument();
+  });
+
+  it('queues the owned version move when switching to an empty foil version', () => {
+    const onQueueTransfer = vi.fn();
+    const inventory: Ownership[] = [{ cardId: card.id, variantId: variants[0].id, personal: 1, duplicates: 0, incoming: 0, updatedAt: '2026-01-01T00:00:00.000Z' }];
+    render(<CardTile card={card} inventory={inventory} variants={variants} view="gallery" showStatus={false} itemLabel="card" onOpen={vi.fn()} onQuantity={vi.fn()} onQueueTransfer={onQueueTransfer}/>);
+    const tile = screen.getByRole('article');
+
+    fireEvent.click(within(tile).getByRole('button', { name: 'Switch to Foil and queue the Normal inventory move' }));
+
+    expect(onQueueTransfer).toHaveBeenCalledTimes(1);
+    expect(onQueueTransfer).toHaveBeenCalledWith(card, variants[0].id, variants[1].id);
+    expect(within(tile).queryByText(/Move Normal inventory to Foil/)).not.toBeInTheDocument();
+  });
+
+  it('keeps Normal and Foil quantities separate when both versions are owned', () => {
+    const onQueueTransfer = vi.fn();
+    const inventory: Ownership[] = [
+      { cardId: card.id, variantId: variants[0].id, personal: 1, duplicates: 0, incoming: 0, updatedAt: '2026-01-01T00:00:00.000Z' },
+      { cardId: card.id, variantId: variants[1].id, personal: 1, duplicates: 0, incoming: 0, updatedAt: '2026-01-01T00:00:00.000Z' },
+    ];
+    render(<CardTile card={card} inventory={inventory} variants={variants} view="gallery" showStatus={false} itemLabel="card" onOpen={vi.fn()} onQuantity={vi.fn()} onQueueTransfer={onQueueTransfer}/>);
+    const tile = screen.getByRole('article');
+
+    fireEvent.click(within(tile).getByRole('button', { name: 'Show Foil version' }));
+
+    expect(onQueueTransfer).not.toHaveBeenCalled();
     expect(within(tile).getByRole('button', { name: 'Increase foil · personal' })).toBeInTheDocument();
   });
 });

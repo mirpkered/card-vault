@@ -29,13 +29,6 @@
 @media(max-width:720px){.card-grid.gallery-view .card-image{height:205px}.gallery-view .tile-versions button{min-height:36px;padding-inline:9px}}
 @media(max-width:380px){.card-grid.gallery-view .card-image{height:186px}}
 
-.variant-transfer-list{display:flex;flex-direction:column;gap:4px;margin:4px 0 2px}
-.variant-transfer{display:flex;flex-direction:column;align-items:flex-start;gap:3px;width:100%;min-height:34px;padding:5px 7px;border:1px solid #46533c;border-radius:6px;background:#20271e;color:#d4e8b0;text-align:left;cursor:pointer}
-.variant-transfer:hover{border-color:#91b858;background:#263023}
-.variant-transfer:focus-visible{outline:2px solid #c4eb76;outline-offset:2px}
-.variant-transfer span{font-size:8px;line-height:1.25}
-.variant-transfer small{color:#9aa58d;font:7px var(--mono);line-height:1.25}
-@media(max-width:720px){.variant-transfer{min-height:38px;padding:6px 8px}.variant-transfer span{font-size:9px}.variant-transfer small{font-size:7px}}
 
 /* Compact home tiles keep top-level collections easy to scan and open. */
 .collection-cards{grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}
@@ -103,7 +96,6 @@
 .variant-save-bar .button{min-height:40px;white-space:nowrap}
 .variant-save-bar .button.primary{gap:6px}
 .app-shell.has-pending-transfer .content-wrap{padding-bottom:120px}
-.variant-transfer.queued{border-color:#9ebf61;background:#252e20;color:#d9f4a2}
 .pending-transfer-note{display:flex;align-items:center;justify-content:space-between;gap:8px;margin:9px 0;padding:8px 10px;border:1px solid #586b41;border-radius:7px;background:#20281c;color:#d9edb3;font-size:10px}
 .pending-transfer-note button{border:0;background:transparent;color:#c3d89e;text-decoration:underline;font-size:9px}
 .app-shell.has-pending-transfer .toast{bottom:104px}
@@ -131,3 +123,4 @@
   .tile-list{grid-template-columns:84px minmax(0,1fr)}
   .tile-list .card-image{width:80px;height:112px}
 }
+.pending-variant-note{color:#c7e88f!important}
